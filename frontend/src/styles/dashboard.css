@@ -1,0 +1,386 @@
+/* LifeXP dashboard layout, panels, HUD, and core dashboard widgets */
+
+.premium-dashboard-layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.premium-dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.premium-top-hud {
+  padding: 1.25rem;
+  border-radius: 30px;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.94)),
+    radial-gradient(circle at 12% 20%, rgba(168, 85, 247, 0.18), transparent 38%);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  box-shadow:
+    0 0 40px rgba(34, 211, 238, 0.08),
+    inset 0 0 35px rgba(168, 85, 247, 0.08);
+}
+
+.premium-brand-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.premium-brand-row h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 4rem);
+  letter-spacing: -0.05em;
+  background: linear-gradient(90deg, #ffffff, var(--lifexp-cyan), var(--lifexp-purple));
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.hud-stat-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hud-stat {
+  min-width: 112px;
+  padding: 0.85rem;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  text-align: center;
+}
+
+.hud-stat span {
+  display: block;
+  font-size: 1.3rem;
+}
+
+.hud-stat strong {
+  display: block;
+  font-size: 1.45rem;
+  margin-top: 0.15rem;
+}
+
+.hud-stat small,
+.panel p {
+  color: var(--lifexp-muted);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.panel {
+  position: relative;
+  padding: 1rem;
+  border-radius: 26px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(3, 7, 18, 0.86));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.35),
+    inset 0 0 28px rgba(34, 211, 238, 0.035);
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.45), rgba(168, 85, 247, 0.3), rgba(249, 115, 22, 0.18));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.68;
+}
+
+.panel h2,
+.panel h3,
+.panel h4 {
+  letter-spacing: -0.03em;
+}
+
+.eyebrow {
+  color: var(--lifexp-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-shadow: 0 0 18px rgba(34, 211, 238, 0.4);
+}
+
+.hero-panel {
+  grid-column: span 3;
+  background:
+    radial-gradient(circle at 18% 28%, color-mix(in srgb, var(--class-color), transparent 70%), transparent 38%),
+    linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(3, 7, 18, 0.88));
+}
+
+.avatar-panel {
+  grid-column: span 4;
+  min-height: 780px;
+  text-align: center;
+  background:
+    radial-gradient(circle at center 34%, rgba(168, 85, 247, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(8, 13, 30, 0.94), rgba(3, 7, 18, 0.96));
+}
+
+.avatar-customizer {
+  grid-column: span 5;
+}
+
+.sanctuary-status,
+.timer-panel,
+.class-panel,
+.activity-panel,
+.equipment-panel,
+.shop-panel,
+.inventory-panel,
+.boss-panel,
+.loot-panel,
+.currency-panel,
+.quests-panel,
+.skill-panel,
+.achievements-panel,
+.activity-log {
+  grid-column: span 6;
+}
+
+.world-map-panel {
+  grid-column: span 12;
+}
+
+.level-orb {
+  width: 126px;
+  height: 126px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  margin: 1rem 0;
+  background: radial-gradient(circle, var(--class-color), #111827 70%);
+  box-shadow:
+    0 0 32px color-mix(in srgb, var(--class-color), transparent 30%),
+    inset 0 0 28px rgba(255, 255, 255, 0.08);
+}
+
+.level-orb span {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.level-orb strong {
+  font-size: 2.5rem;
+}
+
+.xp-bar,
+.boss-health,
+.mini-progress {
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(2, 6, 23, 0.85);
+}
+
+.xp-bar div,
+.boss-health div,
+.mini-progress div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--class-color), white);
+  box-shadow: 0 0 18px var(--class-color);
+}
+
+.timer-display {
+  margin: 1rem 0;
+  padding: 1rem;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  border-radius: 20px;
+  color: var(--class-color);
+  background: rgba(2, 6, 23, 0.8);
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- Dashboard Text Spacing Cleanup ---------- */
+.panel p,
+.panel small,
+.panel span,
+.panel strong,
+.panel button,
+.panel label {
+  line-height: 1.35;
+}
+
+.panel h2,
+.panel h3,
+.panel h4 {
+  margin-top: 0;
+  margin-bottom: 0.55rem;
+}
+
+.panel p {
+  margin: 0.35rem 0;
+}
+
+.hero-panel h2,
+.sanctuary-status h3,
+.class-panel h3,
+.equipment-panel h3,
+.shop-panel h3,
+.inventory-panel h3,
+.quests-panel h3,
+.skill-panel h3,
+.activity-log h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.hero-panel p,
+.equipment-panel p,
+.sanctuary-status p,
+.quests-panel p,
+.inventory-panel p,
+.shop-panel p {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.hero-panel .eyebrow,
+.panel .eyebrow {
+  display: block;
+  margin-bottom: 0.45rem;
+}
+
+.sanctuary-status button,
+.class-panel button,
+.shop-panel button,
+.inventory-panel button,
+.activity-panel button,
+.timer-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.class-panel button strong,
+.shop-panel button strong,
+.inventory-panel button strong,
+.quests-panel strong,
+.equipment-panel strong {
+  margin-left: 0.25rem;
+}
+
+.quests-panel li,
+.activity-log li,
+.inventory-panel li,
+.shop-panel li {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  border-radius: 16px;
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.quests-panel ul,
+.activity-log ul,
+.inventory-panel ul,
+.shop-panel ul {
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.reward-text,
+.quest-reward,
+.item-reward,
+.activity-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--class-color);
+  font-weight: 900;
+}
+
+@media (max-width: 1100px) {
+  .hero-panel,
+  .avatar-panel,
+  .avatar-customizer,
+  .sanctuary-status,
+  .timer-panel,
+  .class-panel,
+  .activity-panel,
+  .equipment-panel,
+  .shop-panel,
+  .inventory-panel,
+  .boss-panel,
+  .loot-panel,
+  .currency-panel,
+  .quests-panel,
+  .skill-panel,
+  .achievements-panel,
+  .activity-log {
+    grid-column: span 12;
+  }
+}
+
+
+/* ---------- Desktop Overlap Fix - Image 2 Layout Target ---------- */
+.dashboard-grid > .panel {
+  min-width: 0;
+}
+
+.avatar-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.avatar-customizer {
+  min-width: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 1500px) and (min-width: 1251px) {
+  .hero-panel {
+    grid-column: span 4;
+  }
+
+  .avatar-panel {
+    grid-column: span 4;
+    min-height: 760px;
+  }
+
+  .avatar-customizer {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 1250px) {
+  .hero-panel,
+  .avatar-panel,
+  .avatar-customizer {
+    grid-column: span 12;
+  }
+}

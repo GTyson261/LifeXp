@@ -1,0 +1,47 @@
+
+
+/* LifeXP shared animations and animation-driven UI */
+
+.floating-xp {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  background: var(--class-color);
+  color: black;
+  font-size: 2rem;
+  font-weight: 900;
+  animation: floatUp 1.2s ease forwards;
+}
+
+@keyframes avatarWork {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes floatUp {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -80px);
+  }
+}
+
+@keyframes lootPop {
+  from {
+    transform: translateY(12px) scale(0.96);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}

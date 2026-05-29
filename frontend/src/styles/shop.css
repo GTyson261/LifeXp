@@ -1,0 +1,113 @@
+/* LifeXP shop, inventory, world, quest, loot, and economy card styles */
+
+.currency,
+.shop-card,
+.world-card,
+.quest-card,
+.achievement,
+.log-item,
+.loot-chip {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.72);
+  border-radius: 20px;
+}
+
+.currency {
+  padding: 1rem;
+  background:
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 36%),
+    rgba(2, 6, 23, 0.72);
+}
+
+.currency span {
+  display: block;
+  color: var(--lifexp-muted);
+}
+
+.currency strong {
+  font-size: 1.8rem;
+}
+
+.currency-grid,
+.shop-grid,
+.skill-grid,
+.world-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.currency-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.world-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.shop-card,
+.quest-card,
+.achievement {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.shop-card.equipped,
+.quest-card.completed,
+.achievement.unlocked {
+  border-color: rgba(34, 197, 94, 0.45);
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.12);
+}
+
+.shop-card strong,
+.world-card strong {
+  display: block;
+}
+
+.shop-card span,
+.world-card span,
+.quest-card span {
+  color: var(--class-color);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.world-card {
+  padding: 1rem;
+}
+
+.world-card p,
+.quest-card p,
+.achievement p {
+  color: #cbd5e1;
+}
+
+.active-world {
+  border-color: var(--class-color);
+  box-shadow: 0 0 25px color-mix(in srgb, var(--class-color), transparent 65%);
+}
+
+.log-item {
+  padding: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.loot-burst {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.loot-chip {
+  padding: 0.95rem 1.1rem;
+  background:
+    linear-gradient(90deg, rgba(250, 204, 21, 0.18), rgba(168, 85, 247, 0.22)),
+    rgba(2, 6, 23, 0.78);
+  color: #fef9c3;
+  font-weight: 900;
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.15);
+  animation: lootPop 0.7s ease both;
+}
+

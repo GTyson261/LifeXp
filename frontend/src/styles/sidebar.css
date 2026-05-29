@@ -1,0 +1,126 @@
+/* LifeXP sidebar styles */
+
+.lifexp-sidebar {
+  position: sticky;
+  top: 1rem;
+  min-height: calc(100vh - 2.5rem);
+  padding: 1.25rem;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.96)),
+    radial-gradient(circle at top, rgba(168, 85, 247, 0.18), transparent 42%);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.45),
+    inset 0 0 35px rgba(34, 211, 238, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.sidebar-brand h1 {
+  margin: 0;
+  font-size: 2.15rem;
+  letter-spacing: -0.06em;
+  background: linear-gradient(90deg, #ffffff, var(--lifexp-cyan), var(--lifexp-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sidebar-brand p,
+.sidebar-card p,
+.sidebar-quote {
+  color: var(--lifexp-muted);
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+  border: 1px solid transparent;
+  background: rgba(15, 23, 42, 0.65);
+  color: white;
+  text-align: left;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.sidebar-link:hover {
+  transform: translateX(4px);
+  border-color: rgba(34, 211, 238, 0.35);
+}
+
+.sidebar-link span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-link.active {
+  border-color: var(--class-color);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--class-color), transparent 82%), rgba(15, 23, 42, 0.85));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--class-color), transparent 78%);
+}
+
+.sidebar-card {
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.mini-avatar {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 19px;
+  font-size: 1.7rem;
+  background: rgba(168, 85, 247, 0.16);
+  border: 1px solid rgba(168, 85, 247, 0.24);
+}
+
+.rank-card h3 {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.mini-progress {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mini-progress div {
+  height: 100%;
+  background: linear-gradient(90deg, var(--class-color), white);
+  box-shadow: 0 0 18px var(--class-color);
+}
+
+.sidebar-quote {
+  margin-top: auto;
+  padding: 1rem;
+  border-left: 3px solid var(--class-color);
+  font-style: italic;
+  background: rgba(2, 6, 23, 0.55);
+  border-radius: 18px;
+}
+

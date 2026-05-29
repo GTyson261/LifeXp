@@ -1,0 +1,251 @@
+{
+  "introCompleted" : true,
+  "primaryClass" : "NOVICE",
+  "activeClass" : "NOVICE",
+  "level" : 1,
+  "xp" : 0,
+  "skillPoints" : 0,
+  "lastXpGain" : 0,
+  "bossesDefeated" : 0,
+  "classMastery" : 0,
+  "xpPenaltyActionsLeft" : 0,
+  "gold" : 100,
+  "crystals" : 10,
+  "essence" : 0,
+  "energy" : 100,
+  "lastDailyReset" : 1780009246982,
+  "loginStreak" : 1,
+  "lastActivityTimestamp" : 1780009246982,
+  "lastRestTimestamp" : 0,
+  "title" : "Gatebound Novice",
+  "pronouns" : "they/them",
+  "equippedTheme" : "Default Cyber Grid",
+  "equippedFrame" : "Starter Frame",
+  "equippedAura" : "Starter Glow",
+  "currentWorldId" : "world_gate",
+  "avatar" : {
+    "gender" : "Custom",
+    "pronouns" : "they/them",
+    "bodyType" : "Average",
+    "skinTone" : "#8d5524",
+    "hairStyle" : "Fade",
+    "outfit" : "Novice Jacket",
+    "aura" : "Starter Glow"
+  },
+  "currentBoss" : {
+    "name" : "Procrastination King",
+    "description" : "A shadow ruler that grows stronger whenever you delay your goals.",
+    "hp" : 500,
+    "maxHp" : 500
+  },
+  "activityLog" : [ "The LifeXP Gate opened.", "LifeXP initialized. The gate is waiting." ],
+  "lastLootDrops" : [ ],
+  "lootHistory" : [ ],
+  "dailyQuests" : [ {
+    "id" : "q1",
+    "name" : "Start Your Grind",
+    "description" : "Complete any real-life action today.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 40,
+    "rewardGold" : 15
+  }, {
+    "id" : "q2",
+    "name" : "Focus Spark",
+    "description" : "Complete a focus, coding, or reading session.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 55,
+    "rewardGold" : 20
+  }, {
+    "id" : "q3",
+    "name" : "Boss Damage",
+    "description" : "Damage the current boss with any activity.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 65,
+    "rewardGold" : 25
+  } ],
+  "skills" : [ {
+    "id" : "s1",
+    "name" : "XP Flow",
+    "description" : "Gain +5 bonus XP from every activity.",
+    "unlocked" : false
+  }, {
+    "id" : "s2",
+    "name" : "Iron Focus",
+    "description" : "Focus and coding actions deal extra boss damage.",
+    "unlocked" : false
+  }, {
+    "id" : "s3",
+    "name" : "Loot Sense",
+    "description" : "Gain more gold from completed actions.",
+    "unlocked" : false
+  }, {
+    "id" : "s4",
+    "name" : "Aura Control",
+    "description" : "Unlock stronger visual aura effects.",
+    "unlocked" : false
+  } ],
+  "achievements" : [ {
+    "id" : "a1",
+    "name" : "Night Architect",
+    "description" : "Complete a coding action.",
+    "unlocked" : false
+  }, {
+    "id" : "a2",
+    "name" : "Lore Keeper",
+    "description" : "Complete a reading action.",
+    "unlocked" : false
+  }, {
+    "id" : "a3",
+    "name" : "Boss Breaker",
+    "description" : "Defeat your first boss.",
+    "unlocked" : false
+  }, {
+    "id" : "a4",
+    "name" : "Life Sage",
+    "description" : "Reach level 5.",
+    "unlocked" : false
+  }, {
+    "id" : "a5",
+    "name" : "First Victory",
+    "description" : "Claim your first boss loot drop.",
+    "unlocked" : false
+  }, {
+    "id" : "a6",
+    "name" : "Loot Hunter",
+    "description" : "Defeat 3 bosses.",
+    "unlocked" : false
+  } ],
+  "shopItems" : [ {
+    "id" : "shop_aura_blue",
+    "name" : "Blue Terminal Aura",
+    "type" : "aura",
+    "currency" : "gold",
+    "cost" : 75,
+    "description" : "A glowing coder-style aura."
+  }, {
+    "id" : "shop_aura_purple",
+    "name" : "Purple Rune Aura",
+    "type" : "aura",
+    "currency" : "crystals",
+    "cost" : 5,
+    "description" : "A magical bookworm aura."
+  }, {
+    "id" : "shop_theme_arcade",
+    "name" : "Arcade Nexus Theme",
+    "type" : "theme",
+    "currency" : "gold",
+    "cost" : 120,
+    "description" : "RGB arcade dashboard theme."
+  }, {
+    "id" : "shop_theme_temple",
+    "name" : "Spirit Temple Theme",
+    "type" : "theme",
+    "currency" : "essence",
+    "cost" : 4,
+    "description" : "Calm spiritual dashboard theme."
+  }, {
+    "id" : "shop_frame_legend",
+    "name" : "Legendary Neon Frame",
+    "type" : "frame",
+    "currency" : "crystals",
+    "cost" : 8,
+    "description" : "A glowing profile frame."
+  }, {
+    "id" : "shop_outfit_cyber",
+    "name" : "Cyber Runner Outfit",
+    "type" : "outfit",
+    "currency" : "gold",
+    "cost" : 90,
+    "description" : "A futuristic neon jacket."
+  }, {
+    "id" : "shop_outfit_scholar",
+    "name" : "Arcane Scholar Outfit",
+    "type" : "outfit",
+    "currency" : "gold",
+    "cost" : 90,
+    "description" : "A magical library coat."
+  } ],
+  "inventory" : [ {
+    "id" : "starter_frame",
+    "name" : "Starter Frame",
+    "type" : "frame",
+    "equipped" : true
+  }, {
+    "id" : "starter_aura",
+    "name" : "Starter Glow",
+    "type" : "aura",
+    "equipped" : true
+  }, {
+    "id" : "starter_theme",
+    "name" : "Default Cyber Grid",
+    "type" : "theme",
+    "equipped" : true
+  } ],
+  "worlds" : [ {
+    "id" : "world_gate",
+    "name" : "Awakening Gate",
+    "classTheme" : "NOVICE",
+    "bossName" : "Procrastination King",
+    "description" : "Your starting zone.",
+    "unlocked" : true
+  }, {
+    "id" : "world_cyber",
+    "name" : "Cyber District",
+    "classTheme" : "CODER",
+    "bossName" : "Bug Lord",
+    "description" : "A neon city powered by code.",
+    "unlocked" : true
+  }, {
+    "id" : "world_knowledge",
+    "name" : "Knowledge Forest",
+    "classTheme" : "BOOKWORM",
+    "bossName" : "Forgetfulness Wraith",
+    "description" : "A glowing forest of books and memory.",
+    "unlocked" : true
+  }, {
+    "id" : "world_arena",
+    "name" : "Titan Arena",
+    "classTheme" : "SPORT_MASTER",
+    "bossName" : "Burnout Titan",
+    "description" : "A battle zone for physical discipline.",
+    "unlocked" : true
+  }, {
+    "id" : "world_arcade",
+    "name" : "Arcade Nexus",
+    "classTheme" : "GAMER",
+    "bossName" : "Doomscroll Phantom",
+    "description" : "A chaotic RGB world of focus and reflex.",
+    "unlocked" : true
+  }, {
+    "id" : "world_frontier",
+    "name" : "Lost Frontier",
+    "classTheme" : "EXPLORER",
+    "bossName" : "Fear of Unknown",
+    "description" : "A map-based world for discovery.",
+    "unlocked" : true
+  }, {
+    "id" : "world_temple",
+    "name" : "Spirit Temple",
+    "classTheme" : "ZEN",
+    "bossName" : "Stress Serpent",
+    "description" : "A calm temple for meditation and balance.",
+    "unlocked" : true
+  }, {
+    "id" : "world_rhythm",
+    "name" : "Rhythm Realm",
+    "classTheme" : "MUSICIAN",
+    "bossName" : "Silence Reaper",
+    "description" : "A soundwave world for practice and flow.",
+    "unlocked" : true
+  }, {
+    "id" : "world_culinary",
+    "name" : "Culinary Kingdom",
+    "classTheme" : "CHEF",
+    "bossName" : "Chaos Chef",
+    "description" : "A fire-and-steam world for cooking mastery.",
+    "unlocked" : true
+  } ]
+}

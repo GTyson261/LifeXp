@@ -1,0 +1,105 @@
+/* LifeXP responsive-only overrides */
+
+@media (max-width: 1200px) {
+  .premium-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lifexp-sidebar {
+    position: relative;
+    min-height: auto;
+  }
+
+  .premium-brand-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hud-stat-row {
+    width: 100%;
+  }
+
+  .hero-panel,
+  .avatar-panel,
+  .avatar-customizer,
+  .sanctuary-status,
+  .timer-panel,
+  .class-panel,
+  .activity-panel,
+  .equipment-panel,
+  .shop-panel,
+  .inventory-panel,
+  .boss-panel,
+  .loot-panel,
+  .currency-panel,
+  .quests-panel,
+  .skill-panel,
+  .achievements-panel,
+  .activity-log {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 700px) {
+  .app-shell {
+    padding: 0.75rem;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel,
+  .hero-panel,
+  .avatar-panel,
+  .avatar-customizer,
+  .sanctuary-status,
+  .timer-panel,
+  .class-panel,
+  .activity-panel,
+  .equipment-panel,
+  .shop-panel,
+  .inventory-panel,
+  .boss-panel,
+  .loot-panel,
+  .currency-panel,
+  .quests-panel,
+  .skill-panel,
+  .achievements-panel,
+  .activity-log,
+  .world-map-panel {
+    grid-column: span 1;
+  }
+
+  .premium-brand-row h1 {
+    font-size: 2.2rem;
+  }
+
+  .shop-card,
+  .quest-card,
+  .achievement {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fake-avatar {
+    transform: scale(0.86);
+    transform-origin: top center;
+  }
+
+  .avatar-panel {
+    min-height: 700px;
+  }
+
+  .hero-card-avatar {
+    height: 500px;
+  }
+
+  .hero-card-stats div {
+    padding: 0.55rem;
+  }
+
+  .hero-card-stats strong {
+    font-size: 0.9rem;
+  }
+}

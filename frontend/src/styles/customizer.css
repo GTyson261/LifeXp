@@ -1,0 +1,192 @@
+/* LifeXP avatar customizer styles */
+
+.avatar-customizer {
+  background:
+    linear-gradient(145deg, rgba(17, 24, 39, 0.92), rgba(2, 6, 23, 0.92)),
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.18), transparent 34%);
+}
+
+.avatar-customizer h3::before {
+  content: "✦ ";
+  color: var(--lifexp-purple);
+}
+
+.avatar-customizer p {
+  color: #cbd5e1;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.customizer-section {
+  padding: 0.9rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.72);
+  border-radius: 20px;
+}
+
+.customizer-section h4 {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0 0 0.65rem;
+}
+
+.choice-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.55rem;
+}
+
+.choice-card {
+  min-height: 74px;
+  display: grid;
+  place-items: center;
+  gap: 0.2rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.72);
+  border-radius: 20px;
+}
+
+.choice-card.active {
+  border-color: var(--class-color);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--class-color), transparent 65%);
+}
+
+.hair-preview-dot,
+.outfit-preview-tile,
+.body-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--lifexp-purple), var(--lifexp-cyan));
+}
+
+.outfit-preview-tile {
+  border-radius: 9px;
+}
+
+.customizer-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.avatar-customizer label {
+  display: grid;
+  gap: 0.4rem;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.save-avatar-button {
+  width: 100%;
+  margin-top: 0.85rem;
+}
+
+/* ---------- Body Slider UI ---------- */
+
+.body-slider-card {
+  padding: 1rem;
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15, 23, 42, 0.95),
+      rgba(2, 6, 23, 0.95)
+    );
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.body-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.body-slider-header strong {
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: white;
+}
+
+.body-type-slider {
+  width: 100%;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--lifexp-cyan),
+      var(--lifexp-purple)
+    );
+  outline: none;
+  margin-bottom: 1rem;
+}
+
+.body-type-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 2px solid white;
+  background: var(--class-color);
+  cursor: pointer;
+  box-shadow:
+    0 0 18px color-mix(
+      in srgb,
+      var(--class-color),
+      transparent 40%
+    );
+}
+
+.body-slider-labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.45rem;
+}
+
+.body-slider-labels button {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.82);
+  color: #cbd5e1;
+  border-radius: 12px;
+  padding: 0.45rem 0.2rem;
+  font-size: 0.78rem;
+  transition: all 0.2s ease;
+}
+
+.body-slider-labels button:hover {
+  transform: translateY(-2px);
+}
+
+.body-slider-labels button.active {
+  border-color: var(--class-color);
+  color: white;
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(
+        in srgb,
+        var(--class-color),
+        black 55%
+      ),
+      rgba(15, 23, 42, 0.95)
+    );
+
+  box-shadow:
+    0 0 18px color-mix(
+      in srgb,
+      var(--class-color),
+      transparent 72%
+    );
+}
