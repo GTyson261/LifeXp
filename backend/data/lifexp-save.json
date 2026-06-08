@@ -1,7 +1,7 @@
 {
   "introCompleted" : true,
-  "primaryClass" : "SPORT_MASTER",
-  "activeClass" : "SPORT_MASTER",
+  "primaryClass" : "CODER",
+  "activeClass" : "CODER",
   "level" : 1,
   "xp" : 0,
   "skillPoints" : 0,
@@ -9,15 +9,15 @@
   "bossesDefeated" : 0,
   "classMastery" : 0,
   "xpPenaltyActionsLeft" : 3,
-  "gold" : 75,
+  "gold" : 50,
   "crystals" : 10,
   "essence" : 0,
   "energy" : 100,
-  "lastDailyReset" : 1780511945923,
+  "lastDailyReset" : 1780933023020,
   "loginStreak" : 1,
-  "lastActivityTimestamp" : 1780511945923,
+  "lastActivityTimestamp" : 1780933023020,
   "lastRestTimestamp" : 0,
-  "title" : "Arena Strider",
+  "title" : "Cyber Architect",
   "pronouns" : "they/them",
   "equippedTheme" : "Default Cyber Grid",
   "equippedFrame" : "Starter Frame",
@@ -29,8 +29,8 @@
     "bodyType" : "Average",
     "skinTone" : "#8d5524",
     "hairStyle" : "Fade",
-    "outfit" : "Titan Arena Gear",
-    "aura" : "Orange Battle Aura"
+    "outfit" : "Neon Tech Jacket",
+    "aura" : "Blue Terminal Aura"
   },
   "currentBoss" : {
     "name" : "Procrastination King",
@@ -38,7 +38,7 @@
     "hp" : 500,
     "maxHp" : 500
   },
-  "activityLog" : [ "Class mastery reset. Temporary XP penalty active for 3 actions.", "Class Sanctuary complete. Primary class changed to SPORT_MASTER.", "The LifeXP Gate opened.", "LifeXP initialized. The gate is waiting." ],
+  "activityLog" : [ "Class mastery reset. Temporary XP penalty active for 3 actions.", "Class Sanctuary complete. Primary class changed to CODER.", "Class mastery reset. Temporary XP penalty active for 3 actions.", "Class Sanctuary complete. Primary class changed to BOOKWORM.", "The LifeXP Gate opened.", "LifeXP initialized. The gate is waiting." ],
   "lastLootDrops" : [ ],
   "lootHistory" : [ ],
   "dailyQuests" : [ {
