@@ -6,6 +6,7 @@ import {
   getOutfitClass,
   getOutfitTheme
 } from "../data/avatarOptions";
+import { getEvolution, getNextEvolution } from "../data/evolutionData";
 
 export default function AvatarPreview({
   state,
@@ -23,6 +24,9 @@ export default function AvatarPreview({
     color: "#9ca3af"
   };
   const [avatarMode, setAvatarMode] = useState("live");
+
+  const currentEvolution = getEvolution(activeClass, state?.level || 1);
+  const nextEvolution = getNextEvolution(activeClass, state?.level || 1);
 
   return (
     <div className={`panel avatar-panel ${frameClass(equippedFrame)}`}>
@@ -62,6 +66,7 @@ export default function AvatarPreview({
           auraName={equippedAura}
           avatar={avatar}
           classMeta={classMeta}
+          level={state?.level || 1}
         />
       ) : (
         <HeroCard
@@ -82,6 +87,23 @@ export default function AvatarPreview({
         <LoadoutStat label="Frame" value={equippedFrame} />
         <LoadoutStat label="Pronouns" value={avatar?.pronouns || "they/them"} />
       </div>
+      <div className="avatar-evolution-panel">
+        <h4>Evolution Path</h4>
+
+        <div className="avatar-evolution-current">
+          <span>Current Evolution</span>
+          <strong>{currentEvolution?.title}</strong>
+          <small>{currentEvolution?.outfit}</small>
+        </div>
+
+        {nextEvolution && (
+          <div className="avatar-evolution-next">
+            <span>Next Evolution</span>
+            <strong>{nextEvolution.title}</strong>
+            <small>Unlocks at Level {nextEvolution.level}</small>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -95,17 +117,24 @@ export function LoadoutStat({ label, value }) {
   );
 }
 
-export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classMeta }) {
+export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classMeta, level = 1 }) {
   const skinTone = avatar?.skinTone || "#8d5524";
   const hairStyle = avatar?.hairStyle || "Fade";
   const bodyType = avatar?.bodyType || "Average";
   const outfit = avatar?.outfit || "Novice Jacket";
   const icon = classMeta?.[activeClass]?.icon || "✨";
   const outfitTheme = getOutfitTheme(outfit);
+  const playerLevel = Number(level || 1);
+const evolutionTier =
+  playerLevel >= 100 ? "evo-100" :
+  playerLevel >= 75 ? "evo-75" :
+  playerLevel >= 50 ? "evo-50" :
+  playerLevel >= 25 ? "evo-25" :
+  "evo-1";
 
   return (
     <div
-      className={`fake-avatar premium-avatar ${activeClass.toLowerCase()} ${
+      className={`fake-avatar premium-avatar ${activeClass.toLowerCase()} ${evolutionTier} ${
         timerRunning ? "avatar-active" : ""
       } ${getBodyClass(bodyType)} ${getHairClass(hairStyle)} ${getOutfitClass(outfit)}`}
       style={{

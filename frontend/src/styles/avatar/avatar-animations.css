@@ -1,0 +1,115 @@
+/* =========================================================
+   LifeXP Avatar Animations
+   - Idle movement, aura pulse, and animation keyframes
+   - Imported by ../avatar.css
+   ========================================================= */
+
+/* ---------- Idle Animation Polish ---------- */
+.premium-avatar {
+  animation: avatarFloatSoft 4.5s ease-in-out infinite alternate;
+}
+
+.premium-avatar .avatar-head {
+  animation: avatarHeadSway 5.2s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+
+.premium-avatar .avatar-arms {
+  animation: avatarArmSway 4.2s ease-in-out infinite alternate;
+  transform-origin: center top;
+}
+
+.premium-avatar .avatar-aura,
+.premium-avatar .avatar-back-glow {
+  animation: avatarAuraSoftPulse 3.2s ease-in-out infinite alternate;
+}
+
+.premium-avatar .avatar-ground-ring {
+  animation: avatarGroundPulse 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes avatarFloatSoft {
+  from {
+    transform: translateY(0px);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes avatarHeadSway {
+  from {
+    transform: rotate(-0.8deg);
+  }
+
+  to {
+    transform: rotate(0.8deg);
+  }
+}
+
+@keyframes avatarArmSway {
+  from {
+    transform: translateY(0px);
+  }
+
+  to {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes avatarAuraSoftPulse {
+  from {
+    opacity: 0.52;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes avatarGroundPulse {
+  from {
+    opacity: 0.44;
+    transform: scaleX(0.94);
+  }
+
+  to {
+    opacity: 0.78;
+    transform: scaleX(1.06);
+  }
+}
+
+
+/* ---------- Live Avatar Animation ---------- */
+.avatar-active.premium-avatar {
+  animation: avatarIdleBreath 1.4s ease-in-out infinite alternate;
+}
+
+.avatar-active .avatar-aura {
+  animation: avatarAuraPulse 1.5s infinite alternate;
+}
+
+@keyframes avatarIdleBreath {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-8px) scale(1.02);
+  }
+}
+
+@keyframes avatarAuraPulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}

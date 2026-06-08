@@ -5,8 +5,8 @@
 .hero-card-avatar {
   position: relative;
   display: block;
-  width: min(340px, calc(100% - 1.5rem));
-  height: 620px;
+  width: min(430px, calc(100% - 1rem));
+  height: 720px;
   margin: 1.25rem auto 1.5rem;
   overflow: hidden;
   border-radius: 34px;
@@ -154,8 +154,8 @@
   z-index: 8;
   left: 0;
   right: 0;
-  top: 108px;
-  height: 390px;
+  top: 112px;
+  height: 398px;
 
   transform:
     perspective(900px)
@@ -187,13 +187,9 @@
   z-index: 12;
   top: 2px;
   left: 50%;
-  width: 120px;
-  height: 132px;
-  transform:
-
-    translateX(-50%)
-
-    rotate(-2deg);
+  width: 132px;
+  height: 142px;
+  transform: translateX(-50%) rotate(-2deg);
   border-radius: 46% 46% 42% 42%;
   background:
     radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.28), transparent 14%),
@@ -240,7 +236,7 @@
 
 .hero-portrait-neck {
   z-index: 9;
-  top: 128px;
+  top: 132px;
   left: 50%;
   width: 48px;
   height: 52px;
@@ -251,13 +247,11 @@
 
 .hero-portrait-body {
   z-index: 10;
-  top: 168px;
+  top: 182px;
   left: 50%;
-  width: 246px;
-  height: 250px;
-  transform:
-  translateX(-50%)
-  rotate(-1.5deg);
+  width: 260px;
+  height: 258px;
+  transform: translateX(-50%) rotate(-1.5deg);
   border-radius: 74px 74px 34px 34px;
   background:
     linear-gradient(145deg, rgba(255, 255, 255, 0.16), transparent 28%),
@@ -271,7 +265,7 @@
 
 .hero-portrait-coat {
   top: 20px;
-  width: 88px;
+  width: 92px;
   height: 220px;
   border-radius: 42px 28px 34px 34px;
   background:
@@ -294,13 +288,13 @@
   z-index: 12;
   left: 50%;
   top: 76px;
-  width: 88px;
-  height: 82px;
+  width: 82px;
+  height: 78px;
   transform: translateX(-50%);
   display: grid;
   place-items: center;
   border-radius: 30px;
-  font-size: 2.75rem;
+  font-size: 2.1rem;
   background: rgba(2, 6, 23, 0.5);
   color: color-mix(in srgb, var(--outfit-glow), white 30%);
   text-shadow: 0 0 16px var(--outfit-glow), 0 0 34px var(--outfit-glow);
@@ -313,7 +307,7 @@
   z-index: 20;
   left: 18px;
   right: 18px;
-  bottom: 132px;
+  bottom: 138px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -351,13 +345,13 @@
   z-index: 20;
   left: 18px;
   right: 18px;
-  bottom: 18px;
-  min-height: 60px;
+  bottom: 70px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 14px 16px;
+  padding: 10px 14px;
   border-radius: 22px;
   background: rgba(2, 6, 23, 0.86);
   border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 58%);
@@ -366,7 +360,8 @@
 .hero-card-bottom span,
 .hero-card-bottom strong {
   color: white;
-  font-size: 0.9rem;
+  max-width: 150px;
+  font-size: 0.82rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -408,37 +403,6 @@
   border-radius: 42px 42px 30px 30px;
 }
 
-/* ---------- Loadout Grid ---------- */
-.avatar-loadout-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem;
-  margin-top: 1rem;
-}
-
-.avatar-loadout-stat {
-  padding: 0.75rem;
-  border-radius: 16px;
-  background: rgba(2, 6, 23, 0.85);
-  border: 1px solid color-mix(in srgb, var(--class-color), transparent 60%);
-  text-align: left;
-}
-
-.avatar-loadout-stat span {
-  display: block;
-  color: var(--lifexp-muted);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.avatar-loadout-stat strong {
-  display: block;
-  margin-top: 0.2rem;
-  color: white;
-  font-size: 0.9rem;
-}
-
 /* ---------- Animations ---------- */
 @keyframes heroCardShimmer {
   0%, 100% {
@@ -464,16 +428,6 @@
   }
 }
 
-@media (max-width: 700px) {
-  .hero-card-avatar {
-    width: min(320px, calc(100% - 1rem));
-    height: 590px;
-  }
-
-  .hero-portrait-body {
-    width: 225px;
-  }
-}
 /* Hero Card body type differences */
 .hero-card-avatar.body-lean .hero-portrait-body {
   width: 220px;
@@ -514,163 +468,7 @@
   width: 108px;
 }
 
-/* ---------- Hero Card Layout Correction ---------- */
-.avatar-panel {
-  grid-column: span 4;
-  min-width: 430px;
-}
-
-.hero-card-avatar {
-  width: min(430px, calc(100% - 1rem));
-  height: 690px;
-}
-
-.hero-portrait {
-  top: 120px;
-  height: 405px;
-}
-
-.hero-portrait-head {
-  width: 132px;
-  height: 142px;
-}
-
-.hero-portrait-body {
-  top: 190px;
-  width: 270px;
-  height: 268px;
-}
-
-.hero-portrait-coat {
-  width: 94px;
-  height: 232px;
-}
-
-.hero-portrait-symbol {
-  top: 82px;
-  width: 84px;
-  height: 80px;
-  font-size: 2.25rem;
-}
-
-.hero-card-stats {
-  bottom: 126px;
-}
-
-.hero-card-bottom {
-  bottom: 62px;
-  min-height: 52px;
-  padding: 10px 14px;
-}
-
-.hero-card-nav {
-  bottom: 16px;
-  min-height: 40px;
-}
-
-.hero-card-bottom small {
-  margin-right: 0.35rem;
-}
-
-.hero-card-bottom span,
-.hero-card-bottom strong {
-  font-size: 0.82rem;
-}
-
-@media (max-width: 1100px) {
-  .avatar-panel {
-    grid-column: span 12;
-    min-width: 0;
-  }
-}
-
-@media (max-width: 700px) {
-  .avatar-panel {
-    min-width: 0;
-  }
-
-  .hero-card-avatar {
-    width: min(350px, calc(100% - 1rem));
-    height: 650px;
-  }
-
-  .hero-portrait-body {
-    width: 245px;
-  }
-}
-
 /* ---------- Hero Card Stable Layout Lock ---------- */
-.hero-card-avatar {
-  width: min(430px, calc(100% - 1rem));
-  height: 720px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.hero-portrait {
-  top: 112px;
-  height: 398px;
-}
-
-.hero-portrait-head {
-  top: 2px;
-  width: 132px;
-  height: 142px;
-}
-
-.hero-portrait-neck {
-  top: 132px;
-}
-
-.hero-portrait-body {
-  top: 182px;
-  width: 260px;
-  height: 258px;
-}
-
-.hero-portrait-coat {
-  width: 92px;
-  height: 220px;
-}
-
-.hero-portrait-symbol {
-  top: 76px;
-  width: 82px;
-  height: 78px;
-  font-size: 2.1rem;
-}
-
-.hero-card-stats {
-  bottom: 138px;
-}
-
-.hero-card-bottom {
-  bottom: 70px;
-  min-height: 48px;
-  padding: 10px 14px;
-}
-
-.hero-card-nav {
-  bottom: 18px;
-  min-height: 40px;
-}
-
-.hero-card-bottom span,
-.hero-card-bottom strong {
-  max-width: 150px;
-  font-size: 0.82rem;
-}
-
-@media (max-width: 700px) {
-  .hero-card-avatar {
-    width: min(350px, calc(100% - 1rem));
-    height: 650px;
-  }
-
-  .hero-portrait-body {
-    width: 238px;
-  }
-}
 /* =========================================================
    HERO CARD CLASS-BASED OVERRIDE SYSTEM
    Makes Hero Card identity follow active class,
@@ -1327,7 +1125,7 @@
   z-index: 20;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  min-height: 42px;
+  min-height: 40px;
   overflow: hidden;
   border-radius: 22px;
   background: rgba(2, 6, 23, 0.78);
@@ -1438,4 +1236,263 @@
 
 .outfit-chef .hero-portrait-coat.right {
   background: linear-gradient(180deg, #ef4444, #7f1d1d 72%, #020617 92%);
+}
+@media (max-width: 700px) {
+  .hero-card-avatar {
+    width: min(350px, calc(100% - 1rem));
+    height: 650px;
+  }
+
+  .hero-portrait-body {
+    width: 238px;
+  }
+}
+/* =========================================================
+   HERO CARD REFINEMENT PASS 2
+   - stronger portrait connection
+   - smoother torso depth
+   - cleaner card polish
+   ========================================================= */
+
+.hero-card-avatar {
+  isolation: isolate;
+}
+
+.hero-portrait-head {
+  top: 0;
+  z-index: 15;
+}
+
+.hero-portrait-neck {
+  top: 126px;
+  width: 58px;
+  height: 72px;
+  z-index: 10;
+  border-radius: 22px 22px 26px 26px;
+  background:
+    linear-gradient(180deg, var(--avatar-skin), color-mix(in srgb, var(--avatar-skin), black 18%));
+  box-shadow: inset -10px -10px 14px rgba(0, 0, 0, 0.18);
+}
+
+.hero-portrait-body {
+  top: 176px;
+  overflow: visible;
+}
+
+.hero-portrait-body::after {
+  content: "";
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  top: -24px;
+  height: 58px;
+  border-radius: 999px 999px 30px 30px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.14), transparent 68%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-trim), white 10%), color-mix(in srgb, var(--outfit-trim), #020617 42%));
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-portrait-coat,
+.hero-portrait-symbol {
+  z-index: 2;
+}
+
+.hero-portrait-aura {
+  transform-origin: center;
+  animation: heroPortraitAuraBreath 3.8s ease-in-out infinite alternate;
+}
+
+.hero-card-avatar:hover .hero-portrait {
+  transform:
+    perspective(900px)
+    rotateX(4deg)
+    rotateY(-5deg)
+    translateY(-4px);
+}
+
+@keyframes heroPortraitAuraBreath {
+  from {
+    opacity: 0.64;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@media (max-width: 700px) {
+  .hero-portrait-neck {
+    top: 122px;
+  }
+
+  .hero-portrait-body {
+    top: 170px;
+  }
+}
+
+/* =========================================================
+   HERO CARD DETAIL PASS 3
+   - richer portrait face
+   - connected neck and torso
+   - collectible card depth
+   ========================================================= */
+
+.hero-card-avatar {
+  background:
+    radial-gradient(circle at 50% 24%, color-mix(in srgb, var(--outfit-glow), transparent 74%), transparent 28%),
+    linear-gradient(180deg, #020617, #030712 72%, #020617);
+}
+
+.hero-card-avatar::before {
+  background:
+    linear-gradient(115deg, transparent 0 24%, rgba(255, 255, 255, 0.16) 34%, transparent 45%),
+    radial-gradient(circle at 50% 5%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+}
+
+.hero-portrait-head::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 22% 50%, rgba(255, 255, 255, 0.15), transparent 28%),
+    radial-gradient(circle at 78% 50%, rgba(255, 255, 255, 0.1), transparent 28%),
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.08));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-portrait-face span::after {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  left: 4px;
+  top: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.hero-portrait-neck::after {
+  content: "";
+  position: absolute;
+  left: -22px;
+  right: -22px;
+  bottom: -13px;
+  height: 34px;
+  border-radius: 999px 999px 28px 28px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.12), transparent 64%),
+    linear-gradient(180deg, color-mix(in srgb, var(--avatar-skin), white 7%), color-mix(in srgb, var(--avatar-skin), black 20%));
+  opacity: 0.78;
+  z-index: -1;
+}
+
+.hero-portrait-body::before {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.2), transparent 34%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, transparent 16%, transparent 82%, rgba(0, 0, 0, 0.26) 100%);
+  border-radius: inherit;
+}
+
+.hero-portrait-coat {
+  box-shadow:
+    inset -12px -16px 24px rgba(0, 0, 0, 0.28),
+    inset 8px 8px 18px rgba(255, 255, 255, 0.08),
+    0 0 18px color-mix(in srgb, var(--outfit-glow), transparent 76%);
+}
+
+.hero-portrait-symbol {
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, 0.08),
+    0 0 22px color-mix(in srgb, var(--outfit-glow), transparent 62%);
+}
+
+.hero-card-stats div,
+.hero-card-bottom,
+.hero-card-nav {
+  backdrop-filter: blur(10px);
+}
+
+.hero-card-stats div::before {
+  content: "";
+  display: block;
+  height: 3px;
+  width: 42%;
+  margin: -3px auto 7px;
+  border-radius: 999px;
+  background: var(--outfit-glow);
+  box-shadow: 0 0 10px var(--outfit-glow);
+  opacity: 0.72;
+}
+
+.hero-card-avatar.coder .hero-portrait-symbol::after,
+.hero-card-avatar.gamer .hero-portrait-symbol::after,
+.hero-card-avatar.bookworm .hero-portrait-symbol::after,
+.hero-card-avatar.musician .hero-portrait-symbol::after,
+.hero-card-avatar.explorer .hero-portrait-symbol::after,
+.hero-card-avatar.zen .hero-portrait-symbol::after,
+.hero-card-avatar.chef .hero-portrait-symbol::after,
+.hero-card-avatar.sport_master .hero-portrait-symbol::after {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #020617;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 35%);
+  color: var(--outfit-glow);
+  font-size: 0.68rem;
+  box-shadow: 0 0 12px var(--outfit-glow);
+}
+
+.hero-card-avatar.coder .hero-portrait-symbol::after {
+  content: "</>";
+  width: 28px;
+}
+
+.hero-card-avatar.gamer .hero-portrait-symbol::after {
+  content: "◆";
+}
+
+.hero-card-avatar.bookworm .hero-portrait-symbol::after {
+  content: "✦";
+}
+
+.hero-card-avatar.musician .hero-portrait-symbol::after {
+  content: "♫";
+}
+
+.hero-card-avatar.explorer .hero-portrait-symbol::after {
+  content: "⌖";
+}
+
+.hero-card-avatar.zen .hero-portrait-symbol::after {
+  content: "○";
+}
+
+.hero-card-avatar.chef .hero-portrait-symbol::after {
+  content: "🔥";
+}
+
+.hero-card-avatar.sport_master .hero-portrait-symbol::after {
+  content: "⚡";
+}
+
+@media (max-width: 700px) {
+  .hero-card-stats div::before {
+    width: 34%;
+  }
 }

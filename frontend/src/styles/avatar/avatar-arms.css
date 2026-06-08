@@ -1,0 +1,126 @@
+/* ---------- Segmented Arms + Gloves Polish Pass ---------- */
+.premium-avatar .avatar-arms {
+  z-index: 9;
+  pointer-events: none;
+}
+
+.premium-avatar .avatar-arms span {
+  position: relative;
+  width: var(--arm-width) !important;
+  height: var(--arm-height) !important;
+  border-radius: 999px 999px 22px 22px !important;
+  overflow: visible;
+  background:
+    radial-gradient(ellipse at 35% 14%, rgba(255, 255, 255, 0.22), transparent 30%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-glow), white 18%) 0 42%, color-mix(in srgb, var(--outfit-trim), #020617 44%) 43% 100%);
+  box-shadow:
+    inset -8px -12px 16px rgba(0, 0, 0, 0.24),
+    inset 7px 8px 14px rgba(255, 255, 255, 0.08),
+    0 10px 18px rgba(0, 0, 0, 0.18);
+}
+
+.premium-avatar .avatar-arms span::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 47%;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--outfit-glow), white 16%);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--outfit-glow), transparent 45%);
+  opacity: 0.9;
+}
+
+.premium-avatar .avatar-arms span::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  bottom: 11px;
+  height: 20px;
+  border-radius: 999px 999px 12px 12px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-glow), white 12%), color-mix(in srgb, var(--outfit-trim), #020617 30%));
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 45%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--outfit-glow), transparent 58%);
+  opacity: 0.95;
+}
+
+.premium-avatar .avatar-arms span i {
+  left: 5px;
+  right: 5px;
+  bottom: -11px;
+  height: 20px;
+  border-radius: 999px 999px 10px 10px;
+  box-shadow:
+    inset -5px -5px rgba(0, 0, 0, 0.14),
+    0 5px 10px rgba(0, 0, 0, 0.22);
+}
+
+.premium-avatar .left-arm i {
+  transform: translateX(-1px) rotate(-3deg);
+}
+
+.premium-avatar .right-arm i {
+  transform: translateX(1px) rotate(3deg);
+}
+
+/* ---------- Arm Pose Refinement ---------- */
+.premium-avatar .left-arm {
+  transform: rotate(4deg) translateX(2px) !important;
+}
+
+.premium-avatar .right-arm {
+  transform: rotate(-4deg) translateX(-2px) !important;
+}
+
+.body-lean.premium-avatar .left-arm {
+  transform: rotate(3deg) translateX(3px) !important;
+}
+
+.body-lean.premium-avatar .right-arm {
+  transform: rotate(-3deg) translateX(-3px) !important;
+}
+
+.body-strong.premium-avatar .left-arm,
+.body-broad.premium-avatar .left-arm {
+  transform: rotate(5deg) translateX(1px) !important;
+}
+
+.body-strong.premium-avatar .right-arm,
+.body-broad.premium-avatar .right-arm {
+  transform: rotate(-5deg) translateX(-1px) !important;
+}
+
+.premium-avatar.outfit-cyber .avatar-arms span::after {
+  background: linear-gradient(180deg, #67e8f9, #164e63);
+}
+
+.premium-avatar.outfit-arcade .avatar-arms span::after {
+  background: linear-gradient(180deg, #22c55e, #831843);
+}
+
+.premium-avatar.outfit-scholar .avatar-arms span::after {
+  background: linear-gradient(180deg, #c084fc, #581c87);
+}
+
+.premium-avatar.outfit-musician .avatar-arms span::after {
+  background: linear-gradient(180deg, #f9a8d4, #831843);
+}
+
+.premium-avatar.outfit-chef .avatar-arms span::after {
+  background: linear-gradient(180deg, #fed7aa, #7f1d1d);
+}
+
+.premium-avatar.outfit-zen .avatar-arms span::after {
+  background: linear-gradient(180deg, #bae6fd, #075985);
+}
+
+.premium-avatar.outfit-explorer .avatar-arms span::after {
+  background: linear-gradient(180deg, #facc15, #713f12);
+}
+
+.premium-avatar.outfit-titan .avatar-arms span::after {
+  background: linear-gradient(180deg, #facc15, #9a3412);
+}

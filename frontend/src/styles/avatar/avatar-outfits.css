@@ -1,0 +1,1412 @@
+
+
+/* =========================================================
+   LifeXP Avatar Outfit System
+   - Outfit color themes
+   - Class silhouettes
+   - Class-specific eye styles
+   ========================================================= */
+
+.premium-avatar.outfit-chef .avatar-body,
+.premium-avatar.outfit-chef .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #ef4444, #7f1d1d 65%, #020617 90%);
+}
+
+.premium-avatar.outfit-chef .avatar-chest-plate {
+  background: rgba(254, 226, 226, 0.22);
+}
+
+.premium-avatar.outfit-zen .avatar-body,
+.premium-avatar.outfit-zen .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #0ea5e9, #075985 68%, #020617 90%);
+}
+
+.premium-avatar.outfit-scholar .avatar-body,
+.premium-avatar.outfit-scholar .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #7c3aed, #581c87 68%, #020617 90%);
+}
+
+.premium-avatar.outfit-arcade .avatar-body,
+.premium-avatar.outfit-arcade .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #22c55e, #14532d 68%, #020617 90%);
+}
+
+.premium-avatar.outfit-cyber .avatar-body,
+.premium-avatar.outfit-cyber .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #22d3ee, #164e63 68%, #020617 90%);
+}
+
+.premium-avatar.outfit-titan .avatar-body,
+.premium-avatar.outfit-titan .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #fb923c, #9a3412 68%, #020617 90%);
+}
+
+.premium-avatar.outfit-explorer .avatar-body,
+.premium-avatar.outfit-explorer .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #eab308, #713f12 68%, #020617 90%);
+}
+
+.premium-avatar.outfit-musician .avatar-body,
+.premium-avatar.outfit-musician .avatar-jacket-panel {
+  background:
+    linear-gradient(180deg, #ec4899, #831843 68%, #020617 90%);
+}
+
+/* ---------- Live Avatar Class Outfit Silhouette Layer ---------- */
+.avatar-outfit-layer,
+.avatar-outfit-layer span,
+.avatar-gauntlet {
+  position: absolute;
+  pointer-events: none;
+}
+
+.avatar-outfit-layer {
+  inset: 0;
+  z-index: 6;
+}
+
+.outfit-strap,
+.outfit-sash,
+.outfit-pouch,
+.outfit-apron,
+.outfit-robe-left,
+.outfit-robe-right,
+.avatar-gauntlet {
+  display: none;
+}
+
+/* EXPLORER - clean adventurer hoodie */
+.premium-avatar.outfit-explorer .outfit-strap,
+.premium-avatar.outfit-explorer .outfit-pouch {
+  display: block;
+}
+
+.premium-avatar.outfit-explorer .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.13), transparent 26%),
+    linear-gradient(180deg, #facc15 0%, #ca8a04 42%, #713f12 72%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-explorer .avatar-jacket-panel.left,
+.premium-avatar.outfit-explorer .avatar-jacket-panel.right {
+  opacity: 0.7;
+  background:
+    linear-gradient(180deg, rgba(250, 204, 21, 0.22), rgba(113, 63, 18, 0.72) 58%, rgba(2, 6, 23, 0.94));
+  border: 1px solid rgba(250, 204, 21, 0.16);
+}
+
+.premium-avatar.outfit-explorer .outfit-strap {
+  top: 30px;
+  width: 5px;
+  height: 94px;
+  border-radius: 999px;
+  opacity: 0.48;
+  background: linear-gradient(180deg, #fef3c7, #facc15 44%, #854d0e 100%);
+  box-shadow:
+    0 0 8px rgba(250, 204, 21, 0.38),
+    0 0 14px rgba(234, 179, 8, 0.18);
+}
+
+.premium-avatar.outfit-explorer .strap-left {
+  left: 58px;
+  transform: rotate(-6deg);
+}
+
+.premium-avatar.outfit-explorer .strap-right {
+  right: 58px;
+  transform: rotate(6deg);
+}
+
+.premium-avatar.outfit-explorer .outfit-pouch {
+  bottom: 36px;
+  width: 22px;
+  height: 18px;
+  border-radius: 6px 6px 10px 10px;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(133, 77, 14, 0.72), rgba(2, 6, 23, 0.86));
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.34),
+    0 0 8px rgba(250, 204, 21, 0.2);
+  opacity: 0.68;
+}
+
+.premium-avatar.outfit-explorer .pouch-left {
+  left: 34px;
+}
+
+.premium-avatar.outfit-explorer .pouch-right {
+  right: 34px;
+}
+
+.premium-avatar.outfit-explorer .outfit-pouch::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.7);
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.45);
+}
+
+.premium-avatar.outfit-explorer .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.1;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(250, 204, 21, 0.18), transparent 60%),
+    rgba(2, 6, 23, 0.28);
+}
+
+.premium-avatar.outfit-explorer .avatar-glow-line.line-one {
+  left: 80px;
+  opacity: 0.58;
+  background: linear-gradient(180deg, #fef3c7, #facc15, #854d0e) !important;
+}
+
+.premium-avatar.outfit-explorer .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-explorer .avatar-belt {
+  left: 42px;
+  right: 42px;
+  bottom: 34px;
+  height: 8px;
+  opacity: 0.3;
+}
+
+.premium-avatar.outfit-explorer .avatar-core {
+  font-size: 1.1rem;
+  transform: translateY(-2px) scale(0.72);
+  opacity: 0.28;
+}
+
+.premium-avatar.outfit-explorer .avatar-shoulder.left,
+.premium-avatar.outfit-explorer .avatar-shoulder.right {
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(250, 204, 21, 0.92), rgba(133, 77, 14, 0.92) 66%, rgba(2, 6, 23, 0.9)) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.22),
+    0 0 14px rgba(250, 204, 21, 0.3) !important;
+}
+
+.premium-avatar.outfit-explorer .avatar-shoulder.left::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background:
+    conic-gradient(from 40deg, rgba(254, 243, 199, 0.8), rgba(250, 204, 21, 0.25), rgba(2, 6, 23, 0.55), rgba(254, 243, 199, 0.8));
+  border: 1px solid rgba(254, 243, 199, 0.32);
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.25);
+  opacity: 0.32;
+}
+
+/* ZEN - calm monk hoodie */
+.premium-avatar.outfit-zen .outfit-sash,
+.premium-avatar.outfit-zen .outfit-robe-left,
+.premium-avatar.outfit-zen .outfit-robe-right {
+  display: block;
+}
+
+.premium-avatar.outfit-zen .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.13), transparent 26%),
+    linear-gradient(180deg, #38bdf8 0%, #0ea5e9 42%, #075985 72%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-zen .avatar-jacket-panel.left,
+.premium-avatar.outfit-zen .avatar-jacket-panel.right {
+  opacity: 0.68;
+  background:
+    linear-gradient(180deg, rgba(186, 230, 253, 0.2), rgba(7, 89, 133, 0.68) 58%, rgba(2, 6, 23, 0.92));
+  border: 1px solid rgba(186, 230, 253, 0.14);
+}
+
+.premium-avatar.outfit-zen .outfit-sash {
+  left: 44px;
+  right: 44px;
+  top: 96px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(186, 230, 253, 0.42), rgba(56, 189, 248, 0.72), rgba(186, 230, 253, 0.42));
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.34);
+  opacity: 0.55;
+}
+
+.premium-avatar.outfit-zen .outfit-robe-left,
+.premium-avatar.outfit-zen .outfit-robe-right {
+  top: 34px;
+  width: 40px;
+  height: 112px;
+  border-radius: 28px 28px 18px 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(186, 230, 253, 0.28), rgba(7, 89, 133, 0.42) 58%, rgba(2, 6, 23, 0.82) 95%);
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  opacity: 0.34;
+}
+
+.premium-avatar.outfit-zen .outfit-robe-left {
+  left: 18px;
+  transform: skewY(3deg) rotate(1deg);
+}
+
+.premium-avatar.outfit-zen .outfit-robe-right {
+  right: 18px;
+  transform: skewY(-3deg) rotate(-1deg);
+}
+
+.premium-avatar.outfit-zen .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.08;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(186, 230, 253, 0.18), transparent 60%),
+    rgba(2, 6, 23, 0.2);
+}
+
+.premium-avatar.outfit-zen .avatar-glow-line.line-one {
+  left: 80px;
+  opacity: 0.42;
+  background: linear-gradient(180deg, #bae6fd, #38bdf8, #075985) !important;
+}
+
+.premium-avatar.outfit-zen .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-zen .avatar-belt {
+  left: 48px;
+  right: 48px;
+  bottom: 38px;
+  height: 7px;
+  border-radius: 999px;
+  opacity: 0.24;
+  background: rgba(186, 230, 253, 0.48) !important;
+}
+
+.premium-avatar.outfit-zen .avatar-core {
+  font-size: 1.05rem;
+  transform: translateY(-2px) scale(0.68);
+  opacity: 0.22;
+}
+
+.premium-avatar.outfit-zen .avatar-shoulder.left,
+.premium-avatar.outfit-zen .avatar-shoulder.right {
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(125, 211, 252, 0.82), rgba(7, 89, 133, 0.84) 66%, rgba(2, 6, 23, 0.9)) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.2),
+    0 0 12px rgba(56, 189, 248, 0.24) !important;
+}
+
+.premium-avatar.outfit-zen .avatar-shoulder.left::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 9px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, rgba(186, 230, 253, 0.58) 0 3px, transparent 4px),
+    conic-gradient(from 90deg, rgba(186, 230, 253, 0.36), rgba(56, 189, 248, 0.12), rgba(2, 6, 23, 0.3), rgba(186, 230, 253, 0.36));
+  border: 1px solid rgba(186, 230, 253, 0.2);
+  opacity: 0.22;
+}
+
+/* CHEF - apron and heat gauntlets */
+.premium-avatar.outfit-chef .outfit-apron,
+.premium-avatar.outfit-chef .avatar-gauntlet {
+  display: block;
+}
+
+.premium-avatar.outfit-chef .outfit-apron {
+  left: 48px;
+  top: 38px;
+  width: 54px;
+  height: 122px;
+  border-radius: 16px 16px 20px 20px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.22), transparent 24%),
+    linear-gradient(180deg, rgba(255,245,245,0.95), rgba(254,226,226,0.92) 42%, rgba(248,113,113,0.75) 78%, rgba(127,29,29,0.65) 100%);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow:
+    inset 0 0 12px rgba(255,255,255,0.12),
+    0 0 10px rgba(249,115,22,0.18);
+  opacity: 0.82;
+}
+
+.premium-avatar.outfit-chef .outfit-apron::before,
+.premium-avatar.outfit-chef .outfit-apron::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 62px;
+  border-radius: 999px;
+  background: rgba(255,245,245,0.9);
+  opacity: 0.75;
+}
+
+.premium-avatar.outfit-chef .outfit-apron::before {
+  left: -6px;
+  transform: rotate(-10deg);
+}
+
+.premium-avatar.outfit-chef .outfit-apron::after {
+  right: -6px;
+  transform: rotate(10deg);
+}
+
+.premium-avatar.outfit-chef .avatar-gauntlet {
+  top: 92px;
+  width: 22px;
+  height: 26px;
+  border-radius: 999px 999px 10px 10px;
+  background: linear-gradient(180deg, #f97316, #7f1d1d);
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 6px rgba(249, 115, 22, 0.22);
+  opacity: 0.55;
+  z-index: 8;
+}
+
+.premium-avatar.outfit-chef .avatar-gauntlet.left {
+  left: -8px;
+}
+
+.premium-avatar.outfit-chef .avatar-gauntlet.right {
+  right: -8px;
+}
+
+.premium-avatar.outfit-chef .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.12), transparent 26%),
+    linear-gradient(180deg, #ef4444 0%, #dc2626 42%, #7f1d1d 72%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-chef .avatar-jacket-panel.left,
+.premium-avatar.outfit-chef .avatar-jacket-panel.right {
+  opacity: 0.72;
+  background:
+    linear-gradient(180deg, rgba(248, 113, 113, 0.22), rgba(127, 29, 29, 0.72) 58%, rgba(2, 6, 23, 0.94));
+  border: 1px solid rgba(254, 226, 226, 0.16);
+}
+
+.premium-avatar.outfit-chef .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.1;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(251, 146, 60, 0.2), transparent 60%),
+    rgba(2, 6, 23, 0.28);
+}
+
+.premium-avatar.outfit-chef .avatar-glow-line.line-one {
+  left: 80px;
+  opacity: 0.58;
+  background: linear-gradient(180deg, #fee2e2, #fb923c, #ef4444) !important;
+}
+
+.premium-avatar.outfit-chef .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-chef .avatar-belt {
+  left: 42px;
+  right: 42px;
+  bottom: 34px;
+  height: 8px;
+  opacity: 0.28;
+}
+
+.premium-avatar.outfit-chef .avatar-core {
+  font-size: 1.1rem;
+  transform: translateY(-2px) scale(0.72);
+  opacity: 0.26;
+}
+
+.premium-avatar.outfit-chef .avatar-shoulder.left,
+.premium-avatar.outfit-chef .avatar-shoulder.right {
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(248, 113, 113, 0.92), rgba(127, 29, 29, 0.92) 66%, rgba(2, 6, 23, 0.9)) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.22),
+    0 0 14px rgba(249, 115, 22, 0.3) !important;
+}
+
+.premium-avatar.outfit-chef .avatar-shoulder.left::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 44% 50%, rgba(2, 6, 23, 0.64) 0 5px, transparent 6px),
+    radial-gradient(circle at 58% 42%, rgba(254, 226, 226, 0.62) 0 7px, transparent 8px),
+    linear-gradient(180deg, rgba(254, 226, 226, 0.52), rgba(127, 29, 29, 0.38));
+  border: 1px solid rgba(254, 226, 226, 0.28);
+  box-shadow: 0 0 6px rgba(251, 146, 60, 0.22);
+  opacity: 0.28;
+}
+
+/* ---------- Live Avatar Outfit Polish Pass ---------- */
+
+
+
+/* ---------- Live Avatar Remaining Outfit Silhouettes ---------- */
+
+/* CODER - clean cyber hoodie */
+.premium-avatar.outfit-cyber .outfit-sash,
+.premium-avatar.outfit-cyber .outfit-pouch,
+.premium-avatar.outfit-cyber .outfit-strap {
+  display: block;
+}
+
+.premium-avatar.outfit-cyber .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.14), transparent 26%),
+    linear-gradient(180deg, #22d3ee 0%, #0e7490 42%, #083344 72%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-cyber .avatar-jacket-panel.left,
+.premium-avatar.outfit-cyber .avatar-jacket-panel.right {
+  opacity: 0.72;
+  background:
+    linear-gradient(180deg, rgba(103, 232, 249, 0.26), rgba(8, 47, 73, 0.68) 58%, rgba(2, 6, 23, 0.92));
+  border: 1px solid rgba(103, 232, 249, 0.2);
+}
+
+.premium-avatar.outfit-cyber .outfit-sash {
+  left: 82px;
+  top: 28px;
+  width: 5px;
+  height: 120px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #a5f3fc, #22d3ee 54%, #0891b2);
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.85),
+    0 0 24px rgba(34, 211, 238, 0.35);
+  opacity: 0.9;
+}
+
+.premium-avatar.outfit-cyber .outfit-sash::before,
+.premium-avatar.outfit-cyber .outfit-sash::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  width: 3px;
+  height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #cffafe, #22d3ee 72%, transparent);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.75);
+  opacity: 0.72;
+}
+
+.premium-avatar.outfit-cyber .outfit-sash::before {
+  left: -18px;
+  transform: rotate(3deg);
+}
+
+.premium-avatar.outfit-cyber .outfit-sash::after {
+  right: -18px;
+  transform: rotate(-3deg);
+}
+
+.premium-avatar.outfit-cyber .outfit-pouch {
+  left: 57px;
+  bottom: 34px;
+  width: 54px;
+  height: 24px;
+  border-radius: 999px 999px 14px 14px;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.64), rgba(2, 6, 23, 0.9));
+  border: 1px solid rgba(103, 232, 249, 0.78);
+  box-shadow:
+    inset 0 -8px 14px rgba(0, 0, 0, 0.42),
+    0 0 16px rgba(34, 211, 238, 0.38);
+}
+
+.premium-avatar.outfit-cyber .outfit-pouch::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(103, 232, 249, 0.82);
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.82);
+}
+
+.premium-avatar.outfit-cyber .outfit-strap {
+  left: 26px;
+  top: 32px;
+  width: 22px;
+  height: 13px;
+  border-radius: 4px 4px 6px 6px;
+  background:
+    repeating-linear-gradient(0deg, rgba(207, 250, 254, 0.58) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(103, 232, 249, 0.42) 0 3px, transparent 3px 6px),
+    linear-gradient(180deg, rgba(8, 47, 73, 0.62), rgba(2, 6, 23, 0.56));
+  border: 1px solid rgba(103, 232, 249, 0.32);
+  box-shadow:
+    inset 0 0 4px rgba(255, 255, 255, 0.05),
+    0 0 6px rgba(34, 211, 238, 0.18);
+  opacity: 0.34;
+  transform: rotate(-2deg);
+}
+/* ---------- Coder Hoodie Detail Polish ---------- */
+.premium-avatar.outfit-cyber .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.10;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(103, 232, 249, 0.2), transparent 60%),
+    rgba(2, 6, 23, 0.28);
+}
+
+.premium-avatar.outfit-cyber .avatar-glow-line.line-one {
+  left: 81px;
+  opacity: 0.82;
+}
+
+.premium-avatar.outfit-cyber .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-cyber .avatar-belt {
+  left: 42px;
+  right: 42px;
+  bottom: 34px;
+  height: 8px;
+  opacity: 0.30;
+}
+
+.premium-avatar.outfit-cyber .avatar-core {
+  font-size: 1.2rem;
+  transform: translateY(-2px) scale(0.74);
+  opacity: 0.28;
+}
+
+.premium-avatar.outfit-cyber .avatar-shoulder.left,
+.premium-avatar.outfit-cyber .avatar-shoulder.right {
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(103, 232, 249, 0.92), rgba(8, 47, 73, 0.92) 66%, rgba(2, 6, 23, 0.9)) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.22),
+    0 0 14px rgba(34, 211, 238, 0.34) !important;
+}
+
+.premium-avatar.outfit-cyber .avatar-shoulder.left::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  top: 11px;
+  height: 7px;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(0deg, rgba(207, 250, 254, 0.58) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(207, 250, 254, 0.44) 0 3px, transparent 3px 6px);
+  opacity: 0.24;
+}
+
+
+/* GAMER - arcade hoodie polish */
+.premium-avatar.outfit-arcade .outfit-strap,
+.premium-avatar.outfit-arcade .outfit-pouch {
+  display: block;
+}
+
+.premium-avatar.outfit-arcade .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.12), transparent 26%),
+    linear-gradient(180deg, #22c55e 0%, #15803d 42%, #064e3b 72%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-arcade .avatar-jacket-panel.left,
+.premium-avatar.outfit-arcade .avatar-jacket-panel.right {
+  opacity: 0.7;
+  background:
+    linear-gradient(180deg, rgba(74, 222, 128, 0.22), rgba(6, 78, 59, 0.7) 58%, rgba(2, 6, 23, 0.94));
+  border: 1px solid rgba(236, 72, 153, 0.16);
+}
+
+.premium-avatar.outfit-arcade .outfit-strap {
+  top: 28px;
+  width: 3px;
+  height: 88px;
+  border-radius: 999px;
+  opacity: 0.42;
+  background: linear-gradient(180deg, #22c55e 0%, #a855f7 48%, #ec4899 100%);
+  box-shadow:
+    0 0 10px rgba(236, 72, 153, 0.58),
+    0 0 18px rgba(168, 85, 247, 0.28);
+}
+
+.premium-avatar.outfit-arcade .strap-left {
+  left: 58px;
+  transform: rotate(-4deg);
+}
+
+.premium-avatar.outfit-arcade .strap-right {
+  right: 58px;
+  transform: rotate(4deg);
+}
+
+.premium-avatar.outfit-arcade .outfit-pouch {
+  left: 62px;
+  bottom: 36px;
+  width: 44px;
+  height: 22px;
+  border-radius: 999px 999px 14px 14px;
+  background:
+    radial-gradient(circle at 28% 25%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.68), rgba(2, 6, 23, 0.92));
+  border: 1px solid rgba(236, 72, 153, 0.72);
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(236, 72, 153, 0.42);
+}
+
+.premium-avatar.outfit-arcade .outfit-pouch::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  top: 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #a855f7, #ec4899);
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.78);
+}
+
+.premium-avatar.outfit-arcade .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.12;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(236, 72, 153, 0.18), transparent 60%),
+    rgba(2, 6, 23, 0.28);
+}
+
+.premium-avatar.outfit-arcade .avatar-glow-line.line-one {
+  left: 80px;
+  opacity: 0.72;
+  background: linear-gradient(180deg, #22c55e, #a855f7, #ec4899) !important;
+}
+
+.premium-avatar.outfit-arcade .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-arcade .avatar-belt {
+  left: 42px;
+  right: 42px;
+  bottom: 34px;
+  height: 8px;
+  opacity: 0.34;
+}
+
+.premium-avatar.outfit-arcade .avatar-core {
+  font-size: 1.15rem;
+  transform: translateY(-2px) scale(0.72);
+  opacity: 0.32;
+}
+
+.premium-avatar.outfit-arcade .avatar-shoulder.left,
+.premium-avatar.outfit-arcade .avatar-shoulder.right {
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, rgba(74, 222, 128, 0.92), rgba(22, 101, 52, 0.92) 62%, rgba(2, 6, 23, 0.9)) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.22),
+    0 0 14px rgba(34, 197, 94, 0.34) !important;
+}
+
+.premium-avatar.outfit-arcade .avatar-shoulder.left::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 18px;
+  height: 10px;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 70% 42%, #f97316 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 84% 30%, #22c55e 0 1.5px, transparent 2.5px),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.45), rgba(2, 6, 23, 0.2));
+  border: 1px solid rgba(236, 72, 153, 0.12);
+  opacity: 0.22;
+}
+
+.premium-avatar.outfit-arcade .outfit-strap::before,
+.premium-avatar.outfit-arcade .outfit-strap::after {
+  display: none !important;
+}
+
+/* SPORT MASTER - champion fighter */
+.premium-avatar.outfit-titan .outfit-titan .outfit-sash,
+.premium-avatar.outfit-titan .avatar-gauntlet {
+  display: block;
+}
+
+.premium-avatar.outfit-titan .outfit-strap {
+  display: none !important;
+}
+
+.premium-avatar.outfit-titan .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.14), transparent 26%),
+    linear-gradient(180deg, #fb923c 0%, #f97316 42%, #9a3412 72%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-titan .avatar-jacket-panel.left,
+.premium-avatar.outfit-titan .avatar-jacket-panel.right {
+  opacity: 0.76;
+  background:
+    linear-gradient(180deg, rgba(251, 146, 60, 0.24), rgba(154, 52, 18, 0.72) 58%, rgba(2, 6, 23, 0.94));
+  border: 1px solid rgba(250, 204, 21, 0.18);
+}
+
+.premium-avatar.outfit-titan .outfit-sash {
+  left: 30px;
+  right: 30px;
+  bottom: 40px;
+  height: 18px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, rgba(254, 243, 199, 0.72) 0 8px, transparent 9px),
+    linear-gradient(90deg, #7c2d12 0%, #f97316 32%, #facc15 50%, #f97316 68%, #7c2d12 100%);
+  border: 1px solid rgba(250, 204, 21, 0.55);
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.26),
+    0 0 14px rgba(249, 115, 22, 0.48),
+    0 0 22px rgba(250, 204, 21, 0.24);
+  opacity: 0.88;
+}
+
+.premium-avatar.outfit-titan .outfit-sash::before {
+  content: "★";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -54%);
+  font-size: 0.85rem;
+  color: #7c2d12;
+  text-shadow: 0 0 6px rgba(254, 243, 199, 0.75);
+}
+
+.premium-avatar.outfit-titan .avatar-gauntlet {
+  top: 86px;
+  width: 32px;
+  height: 38px;
+  border-radius: 20px 20px 12px 12px;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.24), transparent 24%),
+    linear-gradient(180deg, #facc15 0%, #f97316 48%, #7c2d12 100%);
+  border: 1px solid rgba(250, 204, 21, 0.55);
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.24),
+    0 0 14px rgba(249, 115, 22, 0.46);
+  opacity: 0.86;
+  z-index: 8;
+}
+
+.premium-avatar.outfit-titan .avatar-gauntlet.left {
+  left: -12px;
+}
+
+.premium-avatar.outfit-titan .avatar-gauntlet.right {
+  right: -12px;
+}
+
+.premium-avatar.outfit-titan .avatar-chest-plate {
+  top: 56px;
+  left: 54px;
+  width: 60px;
+  height: 50px;
+  opacity: 0.18;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(250, 204, 21, 0.24), transparent 60%),
+    rgba(2, 6, 23, 0.28);
+}
+
+.premium-avatar.outfit-titan .avatar-chest-plate::before {
+  content: "★";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: rgba(250, 204, 21, 0.9);
+  text-shadow:
+    0 0 8px rgba(250, 204, 21, 0.75),
+    0 0 16px rgba(249, 115, 22, 0.42);
+}
+
+.premium-avatar.outfit-titan .avatar-glow-line.line-one {
+  left: 80px;
+  opacity: 0.56;
+  background: linear-gradient(180deg, #facc15, #f97316, #7c2d12) !important;
+}
+
+.premium-avatar.outfit-titan .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-titan .avatar-belt {
+  left: 38px;
+  right: 38px;
+  bottom: 34px;
+  height: 8px;
+  opacity: 0.28;
+}
+
+.premium-avatar.outfit-titan .avatar-core {
+  font-size: 1.1rem;
+  transform: translateY(-2px) scale(0.72);
+  opacity: 0.3;
+}
+
+.premium-avatar.outfit-titan .avatar-shoulder.left,
+.premium-avatar.outfit-titan .avatar-shoulder.right {
+  width: 46px;
+  height: 30px;
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.2), transparent 28%),
+    linear-gradient(145deg, #facc15 0%, #f97316 58%, #7c2d12 100%) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.24),
+    0 0 18px rgba(249, 115, 22, 0.45) !important;
+}
+
+.premium-avatar.outfit-titan .avatar-shoulder.left {
+  left: -12px;
+}
+
+.premium-avatar.outfit-titan .avatar-shoulder.right {
+  right: -12px;
+}
+
+.premium-avatar.outfit-titan .avatar-shoulder.left::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 18px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(254, 243, 199, 0.34);
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.34);
+  opacity: 0.52;
+}
+
+/* ---------- Scholar + Musician Strong Silhouette Pass ---------- */
+
+.premium-avatar.outfit-scholar .outfit-robe-left,
+.premium-avatar.outfit-scholar .outfit-robe-right,
+.premium-avatar.outfit-scholar .outfit-sash,
+.premium-avatar.outfit-scholar .outfit-pouch,
+.premium-avatar.outfit-scholar .outfit-strap {
+  display: block;
+}
+
+.premium-avatar.outfit-scholar .avatar-body {
+  background:
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.12), transparent 26%),
+    linear-gradient(180deg, #a855f7 0%, #7c3aed 42%, #3b0764 74%, #020617 100%) !important;
+}
+
+.premium-avatar.outfit-scholar .avatar-shoulder.left,
+.premium-avatar.outfit-scholar .avatar-shoulder.right {
+  width: 42px;
+  height: 28px;
+  background:
+    radial-gradient(circle at 35% 26%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, #c084fc, #6d28d9 66%, #020617) !important;
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.22),
+    0 0 14px rgba(192, 132, 252, 0.34) !important;
+}
+
+.premium-avatar.outfit-scholar .avatar-shoulder.left {
+  left: -8px;
+}
+
+.premium-avatar.outfit-scholar .avatar-shoulder.right {
+  right: -8px;
+}
+
+.premium-avatar.outfit-scholar .outfit-robe-left,
+.premium-avatar.outfit-scholar .outfit-robe-right {
+  top: 32px;
+  width: 42px;
+  height: 118px;
+  border-radius: 28px 28px 18px 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), transparent 28%),
+    linear-gradient(180deg, rgba(168, 85, 247, 0.55), rgba(88, 28, 135, 0.58) 58%, rgba(2, 6, 23, 0.88) 95%);
+  border: 1px solid rgba(192, 132, 252, 0.32);
+  opacity: 0.15;
+}
+
+.premium-avatar.outfit-scholar .outfit-robe-left {
+  left: 16px;
+  transform: skewY(4deg) rotate(1deg);
+}
+
+.premium-avatar.outfit-scholar .outfit-robe-right {
+  right: 16px;
+  transform: skewY(-4deg) rotate(-1deg);
+}
+
+.premium-avatar.outfit-scholar .outfit-sash {
+  left: 58px;
+  top: 30px;
+  width: 5px;
+  height: 112px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #facc15, #c084fc, #7c3aed);
+  box-shadow: 0 0 12px rgba(192, 132, 252, 0.42);
+  opacity: 0.52;
+}
+
+.premium-avatar.outfit-scholar .outfit-strap {
+  top: 30px;
+  left: 82px;
+  width: 4px;
+  height: 104px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fef3c7, #c084fc, #581c87);
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.28);
+  opacity: 0.42;
+}
+
+.premium-avatar.outfit-scholar .outfit-pouch {
+  left: 62px;
+  bottom: 36px;
+  width: 44px;
+  height: 22px;
+  border-radius: 999px 999px 14px 14px;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.62), rgba(2, 6, 23, 0.92));
+  border: 1px solid rgba(250, 204, 21, 0.62);
+  box-shadow:
+    inset 0 -8px 12px rgba(0, 0, 0, 0.38),
+    0 0 12px rgba(250, 204, 21, 0.28);
+  opacity: 0.72;
+}
+
+.premium-avatar.outfit-scholar .outfit-pouch::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  top: 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #facc15, #c084fc);
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.55);
+}
+
+.premium-avatar.outfit-scholar .avatar-glow-line.line-one {
+  left: 80px;
+  opacity: 0.62;
+  background: linear-gradient(180deg, #facc15, #c084fc, #7c3aed) !important;
+}
+
+.premium-avatar.outfit-scholar .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-scholar .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.12;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, rgba(192, 132, 252, 0.18), transparent 60%),
+    rgba(2, 6, 23, 0.28);
+}
+
+.premium-avatar.outfit-scholar .avatar-belt {
+  left: 42px;
+  right: 42px;
+  bottom: 34px;
+  height: 8px;
+  opacity: 0.32;
+}
+
+.premium-avatar.outfit-scholar .avatar-core {
+  font-size: 1.15rem;
+  transform: translateY(-2px) scale(0.72);
+  opacity: 0.32;
+}
+
+.premium-avatar.outfit-musician .outfit-strap,
+.premium-avatar.outfit-musician .outfit-sash,
+.premium-avatar.outfit-musician .outfit-pouch,
+.premium-avatar.outfit-musician .outfit-robe-left,
+.premium-avatar.outfit-musician .avatar-gauntlet {
+  display: block;
+}
+
+.premium-avatar.outfit-musician .avatar-shoulder.left {
+  width: 48px;
+  height: 28px;
+  left: -24px;
+  background: linear-gradient(145deg, #f9a8d4, #ec4899 62%, #020617);
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.75);
+}
+
+.premium-avatar.outfit-musician .avatar-shoulder.right {
+  width: 34px;
+  height: 24px;
+  right: -12px;
+  background: linear-gradient(145deg, #22d3ee, #831843 72%, #020617);
+}
+
+.premium-avatar.outfit-musician .outfit-robe-left {
+  top: 20px;
+  left: 4px;
+  width: 54px;
+  height: 132px;
+  border-radius: 36px 28px 20px 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.16), transparent 28%),
+    linear-gradient(180deg, #ec4899, #831843 62%, #020617 96%);
+  border: 1px solid rgba(249, 168, 212, 0.58);
+  transform: skewY(9deg) rotate(3deg);
+}
+
+.premium-avatar.outfit-musician .outfit-strap {
+  top: 22px;
+  left: 54px;
+  width: 10px;
+  height: 132px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #22d3ee, #f9a8d4, #ec4899);
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.85);
+  transform: rotate(-22deg);
+}
+
+.premium-avatar.outfit-musician .outfit-sash {
+  left: 34px;
+  top: 78px;
+  width: 102px;
+  height: 11px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(90deg, #22d3ee 0 8px, #facc15 8px 14px, #ec4899 14px 22px);
+  box-shadow: 0 0 14px rgba(236, 72, 153, 0.78);
+  transform: rotate(-16deg);
+}
+
+.premium-avatar.outfit-musician .outfit-pouch {
+  right: 26px;
+  bottom: 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 50%, #facc15 0 6px, transparent 7px),
+    radial-gradient(circle at 50% 50%, #020617 0 14px, transparent 15px),
+    linear-gradient(180deg, #ec4899, #831843);
+  border: 1px solid rgba(249, 168, 212, 0.68);
+}
+
+/* ---------- Musician Clean Stage Jacket Final Lock ---------- */
+.premium-avatar.outfit-musician .outfit-strap {
+  top: 40px;
+  left: 62px;
+  width: 3px;
+  height: 74px;
+  opacity: 0.35;
+  transform: rotate(-7deg);
+}
+
+.premium-avatar.outfit-musician .outfit-sash {
+  left: 54px;
+  top: 86px;
+  width: 50px;
+  height: 3px;
+  opacity: 0.22;
+  transform: rotate(0deg);
+}
+
+.premium-avatar.outfit-musician .outfit-robe-left {
+  top: 26px;
+  left: 12px;
+  width: 40px;
+  height: 110px;
+  opacity: 0.62;
+}
+
+.premium-avatar.outfit-musician .outfit-pouch {
+  display: none !important;
+}
+
+.premium-avatar.outfit-musician .avatar-core {
+  font-size: 1rem;
+  transform: translateY(-12px) scale(0.62);
+  opacity: 0.26;
+}
+
+.premium-avatar.outfit-musician .avatar-chest-plate {
+  top: 58px;
+  left: 56px;
+  width: 56px;
+  height: 48px;
+  opacity: 0.1;
+  border-radius: 20px;
+}
+
+.premium-avatar.outfit-musician .avatar-glow-line {
+  opacity: 0.16;
+}
+
+.premium-avatar.outfit-musician .avatar-glow-line.line-two {
+  display: none;
+}
+
+.premium-avatar.outfit-musician .avatar-belt {
+  bottom: 34px;
+  left: 42px;
+  right: 42px;
+  height: 8px;
+  opacity: 0.24;
+}
+
+.premium-avatar.outfit-musician .avatar-jacket-panel.left,
+.premium-avatar.outfit-musician .avatar-jacket-panel.right {
+  opacity: 0.88;
+}
+
+/* ---------- Musician Neon Notes Outfit Detail ---------- */
+.premium-avatar.outfit-musician .outfit-robe-left::before {
+  content: "♪";
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  font-size: 0.9rem;
+  color: #ff4dd8;
+  text-shadow:
+    0 0 5px rgba(255, 77, 216, 0.55),
+    0 0 10px rgba(236, 72, 153, 0.3);
+  opacity: 0.42;
+}
+
+.premium-avatar.outfit-musician .outfit-robe-left::after {
+  display: none;
+}
+
+.premium-avatar.outfit-musician .avatar-jacket-panel.right::before {
+  content: "𝄞";
+  position: absolute;
+  right: 20px;
+  top: 44px;
+  font-size: 0.95rem;
+  color: #ff4dd8;
+  text-shadow:
+    0 0 5px rgba(255, 77, 216, 0.55),
+    0 0 10px rgba(236, 72, 153, 0.3);
+  opacity: 0.42;
+}
+
+.premium-avatar.outfit-musician .avatar-jacket-panel.right::after {
+  display: none;
+}
+
+.premium-avatar.outfit-musician .avatar-shoulder.left::after,
+.premium-avatar.outfit-musician .avatar-shoulder.right::after,
+.premium-avatar.outfit-musician .outfit-strap::before,
+.premium-avatar.outfit-musician .outfit-strap::after,
+.premium-avatar.outfit-musician .avatar-outfit-layer::before,
+.premium-avatar.outfit-musician .avatar-outfit-layer::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* ---------- Class-Specific Eye Styles ---------- */
+.premium-avatar .avatar-face .eye {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.premium-avatar .avatar-face .iris {
+  animation: avatarEyePulseGeneric 2.8s ease-in-out infinite alternate;
+}
+
+.premium-avatar.outfit-cyber .avatar-face .eye {
+  border-color: #67e8f9;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.65);
+}
+
+.premium-avatar.outfit-cyber .avatar-face .iris {
+  background: #67e8f9;
+  box-shadow:
+    0 0 8px rgba(103, 232, 249, 1),
+    0 0 18px rgba(34, 211, 238, 0.85);
+}
+
+.premium-avatar.outfit-arcade .avatar-face .eye:first-child .iris {
+  background: #22c55e;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.95);
+}
+
+.premium-avatar.outfit-arcade .avatar-face .eye:last-child .iris {
+  background: #ec4899;
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.95);
+}
+
+.premium-avatar.outfit-scholar .avatar-face .iris {
+  background: #c084fc;
+  box-shadow:
+    0 0 10px rgba(192, 132, 252, 1),
+    0 0 22px rgba(250, 204, 21, 0.45);
+}
+
+.premium-avatar.outfit-zen .avatar-face .iris {
+  background: #bae6fd;
+  box-shadow:
+    0 0 10px rgba(186, 230, 253, 1),
+    0 0 24px rgba(56, 189, 248, 0.75);
+  animation: zenEyeCalmPulse 3.8s ease-in-out infinite alternate;
+}
+
+.premium-avatar.outfit-explorer .avatar-face .iris {
+  background: #facc15;
+  box-shadow:
+    0 0 10px rgba(250, 204, 21, 1),
+    0 0 22px rgba(234, 179, 8, 0.8);
+}
+
+.premium-avatar.outfit-chef .avatar-face .iris {
+  background: #fb923c;
+  box-shadow:
+    0 0 10px rgba(251, 146, 60, 1),
+    0 0 22px rgba(239, 68, 68, 0.78);
+}
+/* ---------- Musician Final Cleanup ---------- */
+
+.premium-avatar.outfit-musician .outfit-strap {
+
+  display: none !important;
+
+}
+
+.premium-avatar.outfit-musician .outfit-pouch {
+
+  display: none !important;
+
+}
+
+.premium-avatar.outfit-musician .avatar-outfit-layer::before,
+
+.premium-avatar.outfit-musician .avatar-outfit-layer::after {
+
+  display: none !important;
+
+  content: none !important;
+
+}
+
+.premium-avatar.outfit-musician .avatar-face .iris {
+  background: #f472b6;
+  box-shadow:
+    0 0 10px rgba(244, 114, 182, 1),
+    0 0 22px rgba(236, 72, 153, 0.85),
+    0 0 30px rgba(34, 211, 238, 0.45);
+  animation: musicianEyePulse 1.8s ease-in-out infinite alternate;
+}
+
+ 
+.premium-avatar.outfit-titan .avatar-face .eye {
+  border-color: #facc15;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.72);
+}
+
+.premium-avatar.outfit-titan .avatar-face .iris {
+  background: #facc15;
+  box-shadow:
+    0 0 10px rgba(250, 204, 21, 1),
+    0 0 24px rgba(249, 115, 22, 0.78);
+}
+
+@keyframes avatarEyePulseGeneric {
+  from {
+    transform: scale(0.92);
+    filter: brightness(0.95);
+  }
+
+  to {
+    transform: scale(1.08);
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes zenEyeCalmPulse {
+  from {
+    transform: scale(0.95);
+    opacity: 0.76;
+  }
+
+  to {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+@keyframes musicianEyePulse {
+  from {
+    transform: scale(0.9);
+    filter: hue-rotate(0deg) brightness(1);
+  }
+
+  to {
+    transform: scale(1.12);
+    filter: hue-rotate(18deg) brightness(1.35);
+  }
+}

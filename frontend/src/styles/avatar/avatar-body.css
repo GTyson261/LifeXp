@@ -1,0 +1,493 @@
+/* =========================================================
+   LifeXP Avatar Body System
+   - Body, neck, torso, arms, legs, shoes, and body types
+   - Imported by ../avatar.css
+   ========================================================= */
+
+/* ---------- Core Avatar Anatomy Variables ---------- */
+.premium-avatar {
+  width: 310px !important;
+  height: 472px !important;
+
+  --avatar-center: 155px;
+  --head-left: 109px;
+  --head-top: 34px;
+  --head-width: 92px;
+  --head-height: 96px;
+
+  --neck-left: 140px;
+  --neck-top: 122px;
+  --neck-width: 30px;
+  --neck-height: 38px;
+
+  --torso-left: 70px;
+  --torso-top: 164px;
+  --torso-width: 168px;
+  --torso-height: 174px;
+
+  --arms-left: 38px;
+  --arms-top: 190px;
+  --arms-width: 234px;
+  --arm-width: 32px;
+  --arm-height: 116px;
+
+  --legs-left: 105px;
+  --legs-top: 332px;
+  --legs-width: 100px;
+  --leg-width: 34px;
+  --leg-height: 66px;
+}
+
+/* ---------- Head / Neck Alignment ---------- */
+
+.premium-avatar .avatar-neck {
+  top: var(--neck-top) !important;
+  left: var(--neck-left) !important;
+  width: var(--neck-width) !important;
+  height: var(--neck-height) !important;
+  z-index: 8 !important;
+  border-radius: 14px 14px 22px 22px !important;
+  background:
+    radial-gradient(circle at 35% 18%, rgba(255, 255, 255, 0.14), transparent 26%),
+    linear-gradient(180deg, var(--avatar-skin), color-mix(in srgb, var(--avatar-skin), black 20%)) !important;
+  box-shadow: inset -8px -10px 14px rgba(0, 0, 0, 0.18) !important;
+  transform: translateY(0) !important;
+}
+
+.premium-avatar .avatar-neck::after {
+  content: "";
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  bottom: -14px;
+  height: 24px;
+  border-radius: 999px 999px 18px 18px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1), transparent 62%),
+    linear-gradient(180deg, color-mix(in srgb, var(--avatar-skin), white 3%), color-mix(in srgb, var(--avatar-skin), black 28%));
+  z-index: -1;
+}
+
+/* ---------- Torso ---------- */
+.premium-avatar .avatar-collar {
+  top: calc(var(--torso-top) - 14px) !important;
+  left: calc(var(--torso-left) + 22px) !important;
+  width: calc(var(--torso-width) - 44px) !important;
+  height: 42px !important;
+  z-index: 24 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  gap: 0 !important;
+  pointer-events: none !important;
+}
+
+.premium-avatar .avatar-collar::before {
+  content: "";
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  top: 8px;
+  height: 28px;
+  border-radius: 0 0 999px 999px;
+  background:
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0.58), transparent 62%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.5));
+  box-shadow: inset 0 8px 14px rgba(0, 0, 0, 0.48);
+  z-index: 7;
+}
+
+.premium-avatar .avatar-collar span {
+  position: relative;
+  width: 50px !important;
+  height: 28px !important;
+  border-radius: 999px 999px 18px 18px !important;
+  background:
+    radial-gradient(circle at 35% 22%, rgba(255, 255, 255, 0.22), transparent 30%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-glow), white 8%), color-mix(in srgb, var(--outfit-trim), #020617 34%)) !important;
+  box-shadow:
+    inset 0 -10px 16px rgba(0, 0, 0, 0.26),
+    0 0 14px color-mix(in srgb, var(--outfit-glow), transparent 55%) !important;
+  opacity: 0.96 !important;
+  z-index: 9 !important;
+}
+
+.premium-avatar .avatar-collar span:first-child {
+  transform: rotate(8deg) translateX(3px) translateY(2px) !important;
+}
+
+.premium-avatar .avatar-collar span:last-child {
+  transform: rotate(-8deg) translateX(-3px) translateY(2px) !important;
+}
+
+.premium-avatar .avatar-body {
+  top: var(--torso-top) !important;
+  left: var(--torso-left) !important;
+  width: var(--torso-width) !important;
+  height: var(--torso-height) !important;
+  z-index: 12 !important;
+  overflow: visible !important;
+  border-radius: 56px 56px 38px 38px !important;
+  background:
+    radial-gradient(circle at 30% 16%, rgba(255, 255, 255, 0.18), transparent 22%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-trim), white 10%), color-mix(in srgb, var(--outfit-trim), #020617 42%) 58%, #020617 100%) !important;
+  box-shadow:
+    inset -14px -18px 24px rgba(0, 0, 0, 0.3),
+    inset 10px 10px 18px rgba(255, 255, 255, 0.08),
+    0 18px 28px rgba(0, 0, 0, 0.22) !important;
+}
+.premium-avatar .avatar-torso .avatar-core { position: absolute; }
+
+/* ---------- Torso Detail Layout ---------- */
+.avatar-jacket-panel {
+  top: 20px;
+  width: 48px;
+  height: 126px;
+  border-radius: 28px 28px 24px 24px;
+  opacity: 0.78;
+}
+
+.avatar-jacket-panel.left {
+  left: 15px;
+}
+
+.avatar-jacket-panel.right {
+  right: 15px;
+}
+
+.premium-avatar .avatar-chest-plate {
+  top: 48px;
+  left: 54px;
+  width: 70px;
+  height: 58px;
+  border-radius: 22px;
+  opacity: 0.72;
+}
+
+.avatar-glow-line {
+  top: 38px;
+  height: 70px;
+  opacity: 0.78;
+}
+
+.avatar-glow-line.line-one {
+  left: 56px;
+}
+
+.avatar-glow-line.line-two {
+  right: 56px;
+}
+
+.premium-avatar .avatar-belt {
+  left: 24px;
+  right: 24px;
+  bottom: 22px;
+  height: 13px;
+  opacity: 0.9;
+}
+
+.premium-avatar .avatar-core {
+  font-size: 2.1rem;
+  transform: translateY(8px);
+}
+
+.premium-avatar .avatar-body::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.18), transparent 34%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0%, transparent 18%, transparent 82%, rgba(0, 0, 0, 0.26) 100%) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+.premium-avatar .avatar-body::after {
+  content: "" !important;
+  position: absolute !important;
+  top: -8px !important;
+  left: 30px !important;
+  right: 30px !important;
+  height: 24px !important;
+  border-radius: 999px 999px 24px 24px !important;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 255, 255, 0.12), transparent 58%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-glow), white 4%), color-mix(in srgb, var(--outfit-trim), #020617 40%) 68%, rgba(2, 6, 23, 0.86)) !important;
+  box-shadow:
+    inset 0 -12px 18px rgba(0, 0, 0, 0.3),
+    0 0 12px color-mix(in srgb, var(--outfit-glow), transparent 72%) !important;
+  pointer-events: none !important;
+  z-index: 18 !important;
+}
+
+.premium-avatar .avatar-torso {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.premium-avatar .avatar-torso .avatar-shoulder,
+.premium-avatar .avatar-torso .avatar-jacket-panel,
+.premium-avatar .avatar-torso .avatar-chest-plate,
+.premium-avatar .avatar-torso .avatar-outfit-layer,
+.premium-avatar .avatar-torso .avatar-glow-line,
+.premium-avatar .avatar-torso .avatar-belt,
+.premium-avatar .avatar-torso .avatar-gauntlet,
+.premium-avatar .avatar-torso .avatar-core {
+  position: absolute;
+}
+
+/* ---------- Shoulders ---------- */
+.premium-avatar .avatar-shoulder {
+  top: 24px !important;
+  width: 42px !important;
+  height: 30px !important;
+  z-index: 3 !important;
+  opacity: 0.82 !important;
+  border-radius: 999px 999px 28px 28px !important;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.18), transparent 28%),
+    linear-gradient(145deg, color-mix(in srgb, var(--outfit-trim), white 12%), color-mix(in srgb, var(--outfit-trim), #020617 46%)) !important;
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.22),
+    0 6px 12px rgba(0, 0, 0, 0.18) !important;
+}
+
+.premium-avatar .avatar-shoulder.left {
+  left: -6px !important;
+  transform: rotate(-10deg) !important;
+}
+
+.premium-avatar .avatar-shoulder.right {
+  right: -6px !important;
+  transform: rotate(10deg) !important;
+}
+
+/* ---------- Arms ---------- */
+.premium-avatar .avatar-arms {
+  top: var(--arms-top) !important;
+  left: var(--arms-left) !important;
+  width: var(--arms-width) !important;
+  z-index: 9 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.premium-avatar .avatar-arms::before,
+.premium-avatar .avatar-arms::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  width: 54px;
+  height: 38px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.16), transparent 32%),
+    linear-gradient(145deg, color-mix(in srgb, var(--outfit-trim), white 12%), color-mix(in srgb, var(--outfit-trim), #020617 44%));
+  box-shadow: inset 0 -10px 14px rgba(0, 0, 0, 0.24);
+  z-index: -1;
+}
+
+.premium-avatar .avatar-arms::before {
+  left: 24px;
+  transform: rotate(-12deg);
+}
+
+.premium-avatar .avatar-arms::after {
+  right: 24px;
+  transform: rotate(12deg);
+}
+
+.premium-avatar .avatar-arms span {
+  width: var(--arm-width) !important;
+  height: var(--arm-height) !important;
+  border-radius: 999px 999px 24px 24px !important;
+  transform-origin: center 12px !important;
+  background:
+    radial-gradient(ellipse at 40% 18%, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(180deg, var(--outfit-trim) 0 42%, color-mix(in srgb, var(--outfit-trim), #020617 36%) 43% 100%) !important;
+}
+
+.premium-avatar .left-arm {
+  transform: rotate(6deg) !important;
+}
+
+.premium-avatar .right-arm {
+  transform: rotate(-6deg) !important;
+}
+
+.premium-avatar .avatar-arms span i {
+  left: 5px;
+  right: 5px;
+  bottom: -10px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--avatar-skin);
+}
+
+/* ---------- Legs / Shoes ---------- */
+.premium-avatar .avatar-legs {
+  top: calc(var(--legs-top) - 2px) !important;
+  left: var(--legs-left) !important;
+  width: var(--legs-width) !important;
+  z-index: 6 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.premium-avatar .avatar-legs::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: -11px;
+  height: 22px;
+  border-radius: 999px 999px 14px 14px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--outfit-trim), white 8%), #020617 82%);
+  box-shadow: inset 0 -8px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0.88;
+  z-index: -1;
+}
+
+.premium-avatar .avatar-legs span {
+  position: relative;
+  width: var(--leg-width) !important;
+  height: var(--leg-height) !important;
+  border-radius: 0 0 24px 24px !important;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 34%, rgba(0, 0, 0, 0.2)),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-trim), #111827 34%), #020617 78%) !important;
+  box-shadow:
+    inset -8px -12px 16px rgba(0, 0, 0, 0.32),
+    inset 7px 7px 12px rgba(255, 255, 255, 0.06) !important;
+}
+
+.premium-avatar .avatar-legs span::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 30px;
+  height: 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--outfit-glow), transparent 40%);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--outfit-glow), transparent 58%);
+}
+
+.premium-avatar .avatar-legs span i {
+  left: -6px;
+  right: -14px;
+  bottom: -11px;
+  height: 20px;
+  border-radius: 999px 999px 12px 12px;
+  background:
+    radial-gradient(circle at 24% 28%, rgba(255, 255, 255, 0.12), transparent 22%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-trim), #020617 34%), #020617 78%);
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 62%);
+  box-shadow:
+    inset -6px -6px 10px rgba(0, 0, 0, 0.32),
+    0 6px 12px rgba(0, 0, 0, 0.28),
+    0 0 10px color-mix(in srgb, var(--outfit-glow), transparent 72%);
+}
+
+.premium-avatar .left-leg i {
+  transform: translateX(-4px) rotate(-2deg);
+}
+
+.premium-avatar .right-leg i {
+  transform: translateX(4px) rotate(2deg);
+}
+
+.premium-avatar .avatar-ground-ring {
+  left: 56px !important;
+  right: 56px !important;
+  bottom: 6px !important;
+  height: 30px;
+  opacity: 0.62;
+}
+
+.premium-avatar .avatar-shadow {
+  left: 70px !important;
+  width: 170px !important;
+  bottom: 0 !important;
+  opacity: 0.78;
+}
+
+/* ---------- Body Types ---------- */
+.body-lean.premium-avatar {
+  --torso-left: 76px;
+  --torso-width: 158px;
+  --arms-left: 38px;
+  --arms-width: 234px;
+  --arm-width: 30px;
+  --arm-height: 116px;
+  --legs-left: 110px;
+  --legs-width: 90px;
+  --leg-width: 32px;
+  --leg-height: 64px;
+}
+
+.body-athletic.premium-avatar {
+  --torso-left: 66px;
+  --torso-width: 178px;
+  --arms-left: 30px;
+  --arms-width: 250px;
+  --arm-width: 34px;
+  --arm-height: 120px;
+  --legs-left: 100px;
+  --legs-width: 110px;
+  --leg-width: 36px;
+  --leg-height: 68px;
+}
+
+.body-strong.premium-avatar {
+  --torso-left: 58px;
+  --torso-width: 194px;
+  --arms-left: 24px;
+  --arms-width: 262px;
+  --arm-width: 36px;
+  --arm-height: 124px;
+  --legs-left: 94px;
+  --legs-width: 122px;
+  --leg-width: 38px;
+  --leg-height: 70px;
+}
+
+.body-broad.premium-avatar {
+  --torso-left: 54px;
+  --torso-width: 202px;
+  --arms-left: 20px;
+  --arms-width: 270px;
+  --arm-width: 38px;
+  --arm-height: 124px;
+  --legs-left: 92px;
+  --legs-width: 126px;
+  --leg-width: 40px;
+  --leg-height: 68px;
+}
+
+.body-lean.premium-avatar .avatar-body {
+  border-radius: 66px 66px 32px 32px !important;
+}
+
+.body-athletic.premium-avatar .avatar-body {
+  border-radius: 72px 72px 34px 34px !important;
+}
+
+.body-strong.premium-avatar .avatar-body,
+.body-broad.premium-avatar .avatar-body {
+  border-radius: 78px 78px 36px 36px !important;
+}
+
+/* ---------- Mobile Safety ---------- */
+@media (max-width: 700px) {
+  .premium-avatar {
+    transform: scale(0.94) !important;
+    transform-origin: top center !important;
+    margin-bottom: -0.75rem !important;
+  }
+}
