@@ -125,12 +125,12 @@ export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classM
   const icon = classMeta?.[activeClass]?.icon || "✨";
   const outfitTheme = getOutfitTheme(outfit);
   const playerLevel = Number(level || 1);
-const evolutionTier =
-  playerLevel >= 100 ? "evo-100" :
-  playerLevel >= 75 ? "evo-75" :
-  playerLevel >= 50 ? "evo-50" :
-  playerLevel >= 25 ? "evo-25" :
-  "evo-1";
+  const evolutionTier =
+    playerLevel >= 100 ? "evo-100" :
+      playerLevel >= 75 ? "evo-75" :
+        playerLevel >= 50 ? "evo-50" :
+          playerLevel >= 25 ? "evo-25" :
+            "evo-1";
 
   return (
     <div

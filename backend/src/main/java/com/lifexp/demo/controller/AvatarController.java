@@ -17,7 +17,7 @@ import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/avatar")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
 public class AvatarController {
 
     private final ObjectMapper mapper = new ObjectMapper();

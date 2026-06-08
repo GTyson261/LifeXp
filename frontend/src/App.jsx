@@ -47,6 +47,7 @@ export default function App() {
   const [state, setState] = useState(null);
   const [showIntro, setShowIntro] = useState(false);
   const [avatarDraft, setAvatarDraft] = useState(null);
+  const [loadError, setLoadError] = useState("");
 
   const [activityType, setActivityType] = useState("coding");
   const [amount, setAmount] = useState("");
@@ -59,10 +60,15 @@ export default function App() {
   const [floatingXp, setFloatingXp] = useState(null);
 
   async function loadGame() {
-    const data = await getGameState();
-    setState(data);
-    setAvatarDraft(data.avatar);
-    setShowIntro(!data.introCompleted);
+    try {
+      setLoadError("");
+      const data = await getGameState();
+      setState(data);
+      setAvatarDraft(data.avatar);
+      setShowIntro(!data.introCompleted);
+    } catch (error) {
+      setLoadError(error.message || "Could not connect to the LifeXP backend.");
+    }
   }
 
   useEffect(() => {
@@ -78,6 +84,24 @@ export default function App() {
 
     return () => clearInterval(interval);
   }, [timerRunning]);
+
+  if (!state && loadError) {
+    return (
+      <div className="loading-screen loading-error-screen">
+        <div className="loading-error-card">
+          <p className="eyebrow">Connection Needed</p>
+          <h1>LifeXP backend is offline</h1>
+          <p>
+            Start the Spring Boot backend on port 8080, then retry the dashboard.
+          </p>
+          <button type="button" onClick={loadGame}>
+            Retry Connection
+          </button>
+          <small>{loadError}</small>
+        </div>
+      </div>
+    );
+  }
 
   if (!state) {
     return <div className="loading-screen">Booting LifeXP...</div>;

@@ -111,3 +111,82 @@
   animation: lootPop 0.7s ease both;
 }
 
+/* ---------- Card Layout Polish ---------- */
+.shop-grid,
+.premium-inventory-grid,
+.premium-shop-grid {
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+}
+
+.skill-grid {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.quest-list,
+.achievement-list,
+.activity-timeline,
+.loot-history-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.shop-card,
+.quest-card,
+.achievement,
+.log-item {
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.shop-item-content,
+.inventory-item-content,
+.quest-card-main,
+.achievement div,
+.log-item div {
+  min-width: 0;
+}
+
+.shop-item-title-row,
+.quest-card-title-row,
+.quest-reward-row,
+.shop-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.shop-card strong,
+.quest-card strong,
+.achievement strong,
+.log-item strong,
+.world-card strong {
+  overflow-wrap: anywhere;
+}
+
+.shop-card p,
+.quest-card p,
+.achievement p,
+.log-item p,
+.world-card p {
+  margin: 0.3rem 0;
+}
+
+.shop-card button,
+.world-card button,
+.premium-inventory-card button {
+  flex: 0 0 auto;
+}
+
+.quest-status,
+.inventory-status,
+.shop-item-type {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.84);
+  white-space: nowrap;
+}

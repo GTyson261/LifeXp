@@ -75,6 +75,32 @@ textarea {
   background: radial-gradient(circle, #13213f, #050510);
 }
 
+.loading-error-screen {
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.loading-error-card {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  border-radius: 24px;
+  background: rgba(2, 6, 23, 0.88);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+}
+
+.loading-error-card h1,
+.loading-error-card p {
+  margin: 0;
+}
+
+.loading-error-card small {
+  color: var(--lifexp-muted);
+  overflow-wrap: anywhere;
+}
+
 .app-shell {
   min-height: 100vh;
   padding: 1.5rem;
