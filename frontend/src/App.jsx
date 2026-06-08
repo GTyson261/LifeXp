@@ -43,11 +43,21 @@ import "./styles/classes.css";
 import "./styles/responsive.css";
 import { CLASSES, CLASS_META, ACTIVITIES } from "./data/gameData";
 
+const DASHBOARD_TABS = [
+  { key: "overview", label: "Overview", icon: "⌂" },
+  { key: "avatar", label: "Avatar", icon: "♙" },
+  { key: "quests", label: "Quests", icon: "◇" },
+  { key: "shop", label: "Shop", icon: "◈" },
+  { key: "world", label: "World", icon: "⌖" },
+  { key: "log", label: "Log", icon: "☰" }
+];
+
 export default function App() {
   const [state, setState] = useState(null);
   const [showIntro, setShowIntro] = useState(false);
   const [avatarDraft, setAvatarDraft] = useState(null);
   const [loadError, setLoadError] = useState("");
+  const [activeView, setActiveView] = useState("overview");
 
   const [activityType, setActivityType] = useState("coding");
   const [amount, setAmount] = useState("");
@@ -273,133 +283,229 @@ export default function App() {
             classMeta={CLASS_META}
           />
 
-          <section className="dashboard-grid">
-            <div className="panel hero-panel">
-              <p className="eyebrow">Primary Class</p>
-              <h2>
-                {CLASS_META[state.primaryClass]?.icon || "✨"} {CLASS_META[state.primaryClass]?.label || state.primaryClass}
-              </h2>
+          <nav className="dashboard-tabs" aria-label="Dashboard views">
+            {DASHBOARD_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                aria-label={`Show ${tab.label} view`}
+                aria-pressed={activeView === tab.key}
+                className={activeView === tab.key ? "dashboard-tab active" : "dashboard-tab"}
+                onClick={() => setActiveView(tab.key)}
+              >
+                <span>{tab.icon}</span>
+                <strong>{tab.label}</strong>
+              </button>
+            ))}
+          </nav>
 
-              <p>Active Class: {CLASS_META[state.activeClass]?.label || state.activeClass}</p>
-              <p>World: {CLASS_META[state.activeClass]?.world || "Unknown"}</p>
+          <section className={`dashboard-grid view-${activeView}`}>
+            {activeView === "overview" && (
+              <>
+                <HeroProgressPanel
+                  state={state}
+                  xpNeeded={xpNeeded}
+                  xpPercent={xpPercent}
+                />
 
-              <div className="level-orb">
-                <span>LVL</span>
-                <strong>{state.level}</strong>
-              </div>
+                <AvatarPreview
+                  state={state}
+                  classMeta={CLASS_META}
+                  avatarDraft={avatarDraft}
+                  timerRunning={timerRunning}
+                />
 
-              <div className="xp-bar">
-                <div style={{ width: `${xpPercent}%` }} />
-              </div>
+                <TimerPanel
+                  activities={ACTIVITIES}
+                  timerActivity={timerActivity}
+                  setTimerActivity={setTimerActivity}
+                  timerRunning={timerRunning}
+                  timerSeconds={timerSeconds}
+                  onStart={() => setTimerRunning(true)}
+                  onStopAndClaim={stopTimerAndClaim}
+                  formatTime={formatTime}
+                />
 
-              <p>
-                {state.xp} / {xpNeeded} XP
-              </p>
-            </div>
+                <ActivityPanel
+                  activities={ACTIVITIES}
+                  activityType={activityType}
+                  setActivityType={setActivityType}
+                  amount={amount}
+                  setAmount={setAmount}
+                  summary={summary}
+                  setSummary={setSummary}
+                  verified={verified}
+                  setVerified={setVerified}
+                  energy={state.energy}
+                  energyCost={calculateEnergyCost(amount)}
+                  onSubmit={submitActivity}
+                />
 
-            <AvatarPreview
-              state={state}
-              classMeta={CLASS_META}
-              avatarDraft={avatarDraft}
-              timerRunning={timerRunning}
-            />
+                <BossPanel
+                  boss={state.currentBoss}
+                  bossesDefeated={state.bossesDefeated}
+                />
 
-            <AvatarCustomizer
-              avatarDraft={avatarDraft}
-              setAvatarDraft={setAvatarDraft}
-              onSave={saveAvatar}
-            />
+                <QuestPanel quests={state.dailyQuests || []} />
+              </>
+            )}
 
-            <SanctuaryPanel state={state} classMeta={CLASS_META} />
+            {activeView === "avatar" && (
+              <>
+                <AvatarPreview
+                  state={state}
+                  classMeta={CLASS_META}
+                  avatarDraft={avatarDraft}
+                  timerRunning={timerRunning}
+                />
 
-            <TimerPanel
-              activities={ACTIVITIES}
-              timerActivity={timerActivity}
-              setTimerActivity={setTimerActivity}
-              timerRunning={timerRunning}
-              timerSeconds={timerSeconds}
-              onStart={() => setTimerRunning(true)}
-              onStopAndClaim={stopTimerAndClaim}
-              formatTime={formatTime}
-            />
+                <AvatarCustomizer
+                  avatarDraft={avatarDraft}
+                  setAvatarDraft={setAvatarDraft}
+                  onSave={saveAvatar}
+                />
 
-            <ClassPanel
-              classes={CLASSES}
-              classMeta={CLASS_META}
-              primaryClass={state.primaryClass}
-              onClassSelect={handleClassChoice}
-            />
+                <EquipmentPanel
+                  equippedTheme={state.equippedTheme}
+                  equippedFrame={state.equippedFrame}
+                  equippedAura={state.equippedAura}
+                  outfit={state.avatar?.outfit}
+                />
 
-            <ActivityPanel
-              activities={ACTIVITIES}
-              activityType={activityType}
-              setActivityType={setActivityType}
-              amount={amount}
-              setAmount={setAmount}
-              summary={summary}
-              setSummary={setSummary}
-              verified={verified}
-              setVerified={setVerified}
-              energy={state.energy}
-              energyCost={calculateEnergyCost(amount)}
-              onSubmit={submitActivity}
-            />
+                <ClassPanel
+                  classes={CLASSES}
+                  classMeta={CLASS_META}
+                  primaryClass={state.primaryClass}
+                  onClassSelect={handleClassChoice}
+                />
 
-            <WorldMapPanel
-              worlds={state.worlds || []}
-              currentWorldId={state.currentWorldId}
-              onTravel={handleTravel}
-            />
+                <SanctuaryPanel state={state} classMeta={CLASS_META} />
+              </>
+            )}
 
-            <LootPanel
-              bossesDefeated={state.bossesDefeated}
-              lastLootDrops={state.lastLootDrops || []}
-              lootHistory={state.lootHistory || []}
-            />
+            {activeView === "quests" && (
+              <>
+                <QuestPanel quests={state.dailyQuests || []} />
 
-            <EquipmentPanel
-              equippedTheme={state.equippedTheme}
-              equippedFrame={state.equippedFrame}
-              equippedAura={state.equippedAura}
-              outfit={state.avatar?.outfit}
-            />
+                <SkillTreePanel
+                  skills={state.skills || []}
+                  skillPoints={state.skillPoints}
+                  onUnlockSkill={handleUnlockSkill}
+                />
 
-            <ShopPanel items={state.shopItems || []} onBuyItem={handleBuyItem} />
+                <AchievementPanel achievements={state.achievements || []} />
 
-            <InventoryPanel
-              items={state.inventory || []}
-              onEquipItem={handleEquipItem}
-            />
+                <ActivityPanel
+                  activities={ACTIVITIES}
+                  activityType={activityType}
+                  setActivityType={setActivityType}
+                  amount={amount}
+                  setAmount={setAmount}
+                  summary={summary}
+                  setSummary={setSummary}
+                  verified={verified}
+                  setVerified={setVerified}
+                  energy={state.energy}
+                  energyCost={calculateEnergyCost(amount)}
+                  onSubmit={submitActivity}
+                />
+              </>
+            )}
 
-            <BossPanel
-              boss={state.currentBoss}
-              bossesDefeated={state.bossesDefeated}
-            />
+            {activeView === "shop" && (
+              <>
+                <EconomyPanel
+                  gold={state.gold}
+                  crystals={state.crystals}
+                  essence={state.essence}
+                  energy={state.energy}
+                  lastRestTimestamp={state.lastRestTimestamp}
+                  onRest={handleRest}
+                />
 
-            <EconomyPanel
-              gold={state.gold}
-              crystals={state.crystals}
-              essence={state.essence}
-              energy={state.energy}
-              lastRestTimestamp={state.lastRestTimestamp}
-              onRest={handleRest}
-            />
+                <ShopPanel items={state.shopItems || []} onBuyItem={handleBuyItem} />
 
-            <QuestPanel quests={state.dailyQuests || []} />
+                <InventoryPanel
+                  items={state.inventory || []}
+                  onEquipItem={handleEquipItem}
+                />
 
-            <SkillTreePanel
-              skills={state.skills || []}
-              skillPoints={state.skillPoints}
-              onUnlockSkill={handleUnlockSkill}
-            />
+                <LootPanel
+                  bossesDefeated={state.bossesDefeated}
+                  lastLootDrops={state.lastLootDrops || []}
+                  lootHistory={state.lootHistory || []}
+                />
+              </>
+            )}
 
-            <AchievementPanel achievements={state.achievements || []} />
+            {activeView === "world" && (
+              <>
+                <WorldMapPanel
+                  worlds={state.worlds || []}
+                  currentWorldId={state.currentWorldId}
+                  onTravel={handleTravel}
+                />
 
-            <ActivityLogPanel activityLog={state.activityLog || []} />
+                <BossPanel
+                  boss={state.currentBoss}
+                  bossesDefeated={state.bossesDefeated}
+                />
+
+                <LootPanel
+                  bossesDefeated={state.bossesDefeated}
+                  lastLootDrops={state.lastLootDrops || []}
+                  lootHistory={state.lootHistory || []}
+                />
+              </>
+            )}
+
+            {activeView === "log" && (
+              <>
+                <ActivityLogPanel activityLog={state.activityLog || []} />
+
+                <SanctuaryPanel state={state} classMeta={CLASS_META} />
+
+                <EconomyPanel
+                  gold={state.gold}
+                  crystals={state.crystals}
+                  essence={state.essence}
+                  energy={state.energy}
+                  lastRestTimestamp={state.lastRestTimestamp}
+                  onRest={handleRest}
+                />
+              </>
+            )}
           </section>
         </div>
       </div>
     </main>
+  );
+}
+
+function HeroProgressPanel({ state, xpNeeded, xpPercent }) {
+  return (
+    <div className="panel hero-panel">
+      <p className="eyebrow">Primary Class</p>
+      <h2>
+        {CLASS_META[state.primaryClass]?.icon || "✨"} {CLASS_META[state.primaryClass]?.label || state.primaryClass}
+      </h2>
+
+      <p>Active Class: {CLASS_META[state.activeClass]?.label || state.activeClass}</p>
+      <p>World: {CLASS_META[state.activeClass]?.world || "Unknown"}</p>
+
+      <div className="level-orb">
+        <span>LVL</span>
+        <strong>{state.level}</strong>
+      </div>
+
+      <div className="xp-bar">
+        <div style={{ width: `${xpPercent}%` }} />
+      </div>
+
+      <p>
+        {state.xp} / {xpNeeded} XP
+      </p>
+    </div>
   );
 }
 
