@@ -491,3 +491,110 @@
     margin-bottom: -0.75rem !important;
   }
 }
+
+/* ---------- Live Avatar Body Polish ---------- */
+.premium-avatar {
+  --torso-top: 158px;
+  --torso-height: 180px;
+  --arms-top: 188px;
+  --legs-top: 334px;
+}
+
+.premium-avatar .avatar-body {
+  border-radius: 62px 62px 42px 42px !important;
+  box-shadow:
+    inset -16px -20px 28px rgba(0, 0, 0, 0.32),
+    inset 12px 10px 18px rgba(255, 255, 255, 0.08),
+    0 20px 30px rgba(0, 0, 0, 0.24),
+    0 0 22px color-mix(in srgb, var(--outfit-glow), transparent 78%) !important;
+}
+
+.premium-avatar .avatar-collar {
+  top: calc(var(--torso-top) - 18px) !important;
+}
+
+.premium-avatar .avatar-collar span {
+  height: 24px !important;
+  border-radius: 18px 18px 14px 14px !important;
+}
+
+.premium-avatar .avatar-chest-plate {
+  top: 52px;
+  left: 58px;
+  width: 54px;
+  height: 50px;
+  opacity: 0.24;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 72%);
+  background:
+    radial-gradient(circle at center, color-mix(in srgb, var(--outfit-glow), transparent 72%), transparent 64%),
+    rgba(2, 6, 23, 0.24);
+}
+
+.premium-avatar .avatar-core {
+  left: 50% !important;
+  top: 70px !important;
+  width: 54px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  font-size: 1.5rem;
+  transform: translateX(-50%) !important;
+  color: color-mix(in srgb, var(--outfit-glow), white 34%);
+  background: rgba(2, 6, 23, 0.42);
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 62%);
+  box-shadow:
+    inset 0 0 14px rgba(255, 255, 255, 0.06),
+    0 0 18px color-mix(in srgb, var(--outfit-glow), transparent 64%);
+}
+
+.premium-avatar .avatar-arms span {
+  border-radius: 999px 999px 26px 26px !important;
+}
+
+.premium-avatar .avatar-arms span i {
+  left: 2px !important;
+  right: 2px !important;
+  bottom: -15px !important;
+  height: 25px !important;
+  border-radius: 50% 50% 45% 45% !important;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.18), transparent 26%),
+    linear-gradient(145deg, color-mix(in srgb, var(--avatar-skin), white 8%), var(--avatar-skin)) !important;
+}
+
+.premium-avatar .avatar-legs span {
+  border-radius: 8px 8px 24px 24px !important;
+}
+
+.premium-avatar .avatar-legs span i {
+  height: 23px !important;
+  bottom: -14px !important;
+  border-radius: 999px 999px 14px 14px !important;
+}
+
+.premium-avatar .left-leg i {
+  transform: translateX(-7px) rotate(-4deg) !important;
+}
+
+.premium-avatar .right-leg i {
+  transform: translateX(7px) rotate(4deg) !important;
+}
+
+.premium-avatar .avatar-ground-ring {
+  left: 48px !important;
+  right: 48px !important;
+  bottom: 4px !important;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 62%);
+  background:
+    radial-gradient(ellipse at center, color-mix(in srgb, var(--outfit-glow), transparent 72%), transparent 68%);
+}
+
+.premium-avatar .avatar-shadow {
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.42);
+  filter: blur(8px);
+}

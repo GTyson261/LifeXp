@@ -1,3 +1,5 @@
+import { OUTFIT_STYLE_MAP } from "../data/avatarOptions";
+
 const BODY_TYPES = ["Lean", "Average", "Athletic", "Strong"];
 
 const HAIR_STYLES = [
@@ -19,6 +21,16 @@ const OUTFITS = [
   "Zen Robe",
   "Rhythm Jacket",
   "Battle Apron"
+];
+
+const SKIN_TONES = [
+  "#f1d1b5",
+  "#e0ac69",
+  "#c68642",
+  "#a66a3f",
+  "#8d5524",
+  "#6b3f28",
+  "#4b2a1f"
 ];
 
 export default function AvatarCustomizer({
@@ -46,13 +58,14 @@ export default function AvatarCustomizer({
 
       <div className="section-heading-row">
         <div>
-          <h3>Avatar Customizer</h3>
-          <p>Customize your avatar. Changes preview live.</p>
+          <p className="eyebrow">Customize everything</p>
+          <h3>Avatar Forge</h3>
+          <p>You are the hero of this story.</p>
         </div>
       </div>
 
       <section className="customizer-section">
-        <h4>🧍 Body Type</h4>
+        <h4>Body Type</h4>
 
         <div className="body-slider-card">
 
@@ -101,9 +114,27 @@ export default function AvatarCustomizer({
       </section>
 
       <section className="customizer-section">
-        <h4>🎨 Skin Tone</h4>
+        <h4>Skin Tone</h4>
+
+        <div className="skin-tone-strip" aria-label="Skin tone presets">
+          {SKIN_TONES.map((tone) => (
+            <button
+              key={tone}
+              type="button"
+              aria-label={`Set skin tone ${tone}`}
+              className={
+                (avatarDraft?.skinTone || "#8d5524") === tone
+                  ? "skin-tone-swatch active"
+                  : "skin-tone-swatch"
+              }
+              style={{ "--skin-tone": tone }}
+              onClick={() => updateAvatarField("skinTone", tone)}
+            />
+          ))}
+        </div>
 
         <input
+          className="skin-tone-input"
           type="color"
           value={avatarDraft?.skinTone || "#8d5524"}
           onChange={(event) =>
@@ -120,7 +151,7 @@ export default function AvatarCustomizer({
       </section>
 
       <section className="customizer-section">
-        <h4>💇 Hair Style</h4>
+        <h4>Hairstyles</h4>
 
         <div className="choice-card-grid hair-choice-grid">
 
@@ -146,13 +177,17 @@ export default function AvatarCustomizer({
       </section>
 
       <section className="customizer-section">
-        <h4>👕 Outfit</h4>
+        <h4>Fashion Styles</h4>
 
         <div className="choice-card-grid outfit-choice-grid">
 
           {OUTFITS.map((outfit) => (
             <button
               key={outfit}
+              style={{
+                "--outfit-trim": OUTFIT_STYLE_MAP[outfit]?.trim || "#94a3b8",
+                "--outfit-glow": OUTFIT_STYLE_MAP[outfit]?.glow || "#64748b"
+              }}
               className={
                 avatarDraft?.outfit === outfit
                   ? "choice-card active"

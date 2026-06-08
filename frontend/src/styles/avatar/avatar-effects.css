@@ -1,0 +1,297 @@
+/* LifeXP live avatar class effects */
+
+.premium-avatar .avatar-class-effects,
+.premium-avatar .avatar-class-effects span,
+.premium-avatar .avatar-class-effects::before,
+.premium-avatar .avatar-class-effects::after {
+  position: absolute;
+  pointer-events: none;
+}
+
+.premium-avatar .avatar-class-effects {
+  inset: 0;
+  z-index: 5;
+}
+
+.premium-avatar .avatar-class-effects::before,
+.premium-avatar .avatar-class-effects::after,
+.premium-avatar .avatar-class-effects span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+  color: color-mix(in srgb, var(--outfit-glow), white 22%);
+  font-size: 1rem;
+  font-weight: 900;
+  text-shadow: 0 0 12px var(--outfit-glow);
+  background: rgba(2, 6, 23, 0.36);
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 60%);
+  box-shadow:
+    inset 0 0 12px rgba(255, 255, 255, 0.04),
+    0 0 16px color-mix(in srgb, var(--outfit-glow), transparent 58%);
+  animation: avatarFxFloat 4.2s ease-in-out infinite alternate;
+}
+
+.premium-avatar .avatar-class-effects::before {
+  content: "";
+  left: 34px;
+  top: 82px;
+}
+
+.premium-avatar .avatar-class-effects::after {
+  content: "";
+  right: 30px;
+  top: 198px;
+  animation-delay: -1.4s;
+}
+
+.premium-avatar .avatar-class-effects span:nth-child(1) {
+  left: 26px;
+  top: 236px;
+  animation-delay: -0.5s;
+}
+
+.premium-avatar .avatar-class-effects span:nth-child(2) {
+  right: 22px;
+  top: 116px;
+  animation-delay: -1.8s;
+}
+
+.premium-avatar .avatar-class-effects span:nth-child(3) {
+  left: 62px;
+  bottom: 58px;
+  animation-delay: -2.5s;
+}
+
+.premium-avatar .avatar-class-effects span:nth-child(4) {
+  right: 64px;
+  bottom: 66px;
+  animation-delay: -3.1s;
+}
+
+.premium-avatar.coder .avatar-class-effects::before {
+  content: "</>";
+}
+
+.premium-avatar.coder .avatar-class-effects::after {
+  content: "{}";
+}
+
+.premium-avatar.coder .avatar-class-effects span:nth-child(1)::before {
+  content: "01";
+}
+
+.premium-avatar.coder .avatar-class-effects span:nth-child(2)::before {
+  content: "fn";
+}
+
+.premium-avatar.coder .avatar-class-effects span:nth-child(3)::before {
+  content: ">";
+}
+
+.premium-avatar.coder .avatar-class-effects span:nth-child(4)::before {
+  content: "_";
+}
+
+.premium-avatar.bookworm .avatar-class-effects::before {
+  content: "✦";
+}
+
+.premium-avatar.bookworm .avatar-class-effects::after {
+  content: "⌁";
+}
+
+.premium-avatar.bookworm .avatar-class-effects span:nth-child(1)::before {
+  content: "ᚱ";
+}
+
+.premium-avatar.bookworm .avatar-class-effects span:nth-child(2)::before {
+  content: "✧";
+}
+
+.premium-avatar.bookworm .avatar-class-effects span:nth-child(3)::before {
+  content: "◇";
+}
+
+.premium-avatar.bookworm .avatar-class-effects span:nth-child(4)::before {
+  content: "✦";
+}
+
+.premium-avatar.sport_master .avatar-class-effects::before {
+  content: "⚡";
+}
+
+.premium-avatar.sport_master .avatar-class-effects::after {
+  content: "⦿";
+}
+
+.premium-avatar.sport_master .avatar-class-effects span:nth-child(1)::before {
+  content: "▲";
+}
+
+.premium-avatar.sport_master .avatar-class-effects span:nth-child(2)::before {
+  content: "◆";
+}
+
+.premium-avatar.sport_master .avatar-class-effects span:nth-child(3)::before {
+  content: "⚡";
+}
+
+.premium-avatar.sport_master .avatar-class-effects span:nth-child(4)::before {
+  content: "▲";
+}
+
+.premium-avatar.gamer .avatar-class-effects::before {
+  content: "◇";
+}
+
+.premium-avatar.gamer .avatar-class-effects::after {
+  content: "XP";
+}
+
+.premium-avatar.gamer .avatar-class-effects span:nth-child(1)::before {
+  content: "▣";
+}
+
+.premium-avatar.gamer .avatar-class-effects span:nth-child(2)::before {
+  content: "✚";
+}
+
+.premium-avatar.gamer .avatar-class-effects span:nth-child(3)::before {
+  content: "▢";
+}
+
+.premium-avatar.gamer .avatar-class-effects span:nth-child(4)::before {
+  content: "◆";
+}
+
+.premium-avatar.explorer .avatar-class-effects::before {
+  content: "⌖";
+}
+
+.premium-avatar.explorer .avatar-class-effects::after {
+  content: "◎";
+}
+
+.premium-avatar.explorer .avatar-class-effects span:nth-child(1)::before {
+  content: "↗";
+}
+
+.premium-avatar.explorer .avatar-class-effects span:nth-child(2)::before {
+  content: "◌";
+}
+
+.premium-avatar.explorer .avatar-class-effects span:nth-child(3)::before {
+  content: "↟";
+}
+
+.premium-avatar.explorer .avatar-class-effects span:nth-child(4)::before {
+  content: "⌁";
+}
+
+.premium-avatar.zen .avatar-class-effects::before {
+  content: "✺";
+}
+
+.premium-avatar.zen .avatar-class-effects::after {
+  content: "○";
+}
+
+.premium-avatar.zen .avatar-class-effects span:nth-child(1)::before {
+  content: "☼";
+}
+
+.premium-avatar.zen .avatar-class-effects span:nth-child(2)::before {
+  content: "⋆";
+}
+
+.premium-avatar.zen .avatar-class-effects span:nth-child(3)::before {
+  content: "◦";
+}
+
+.premium-avatar.zen .avatar-class-effects span:nth-child(4)::before {
+  content: "✺";
+}
+
+.premium-avatar.musician .avatar-class-effects::before {
+  content: "♪";
+}
+
+.premium-avatar.musician .avatar-class-effects::after {
+  content: "♫";
+}
+
+.premium-avatar.musician .avatar-class-effects span:nth-child(1)::before {
+  content: "♬";
+}
+
+.premium-avatar.musician .avatar-class-effects span:nth-child(2)::before {
+  content: "♩";
+}
+
+.premium-avatar.musician .avatar-class-effects span:nth-child(3)::before {
+  content: "♪";
+}
+
+.premium-avatar.musician .avatar-class-effects span:nth-child(4)::before {
+  content: "♬";
+}
+
+.premium-avatar.chef .avatar-class-effects::before {
+  content: "✦";
+}
+
+.premium-avatar.chef .avatar-class-effects::after {
+  content: "🔥";
+}
+
+.premium-avatar.chef .avatar-class-effects span:nth-child(1)::before {
+  content: "✧";
+}
+
+.premium-avatar.chef .avatar-class-effects span:nth-child(2)::before {
+  content: "♨";
+}
+
+.premium-avatar.chef .avatar-class-effects span:nth-child(3)::before {
+  content: "✦";
+}
+
+.premium-avatar.chef .avatar-class-effects span:nth-child(4)::before {
+  content: "✧";
+}
+
+.premium-avatar.bookworm .avatar-class-effects::before,
+.premium-avatar.bookworm .avatar-class-effects::after,
+.premium-avatar.bookworm .avatar-class-effects span,
+.premium-avatar.zen .avatar-class-effects::before,
+.premium-avatar.zen .avatar-class-effects::after,
+.premium-avatar.zen .avatar-class-effects span {
+  border-radius: 999px;
+}
+
+.premium-avatar.explorer .avatar-class-effects::before,
+.premium-avatar.explorer .avatar-class-effects::after {
+  background:
+    radial-gradient(circle, transparent 38%, color-mix(in srgb, var(--outfit-glow), transparent 62%) 40% 44%, transparent 46%),
+    rgba(2, 6, 23, 0.32);
+}
+
+.premium-avatar.avatar-active .avatar-class-effects::before,
+.premium-avatar.avatar-active .avatar-class-effects::after,
+.premium-avatar.avatar-active .avatar-class-effects span {
+  animation-duration: 1.8s;
+}
+
+@keyframes avatarFxFloat {
+  from {
+    opacity: 0.5;
+    transform: translateY(0) scale(0.92);
+  }
+
+  to {
+    opacity: 0.95;
+    transform: translateY(-12px) scale(1.06);
+  }
+}

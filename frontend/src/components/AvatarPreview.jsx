@@ -145,6 +145,12 @@ export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classM
     >
       <div className={`avatar-aura ${auraClass(auraName)}`} />
       <div className="avatar-back-glow" />
+      <div className="avatar-class-effects" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
 
       <div className="avatar-head">
         <div className="avatar-ear left" />

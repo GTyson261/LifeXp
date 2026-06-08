@@ -18,6 +18,7 @@ import ClassPanel from "./components/ClassPanel";
 import ActivityPanel from "./components/ActivityPanel";
 import SanctuaryPanel from "./components/SanctuaryPanel";
 import TimerPanel from "./components/TimerPanel";
+import AvatarShowcase from "./components/AvatarShowcase";
 import {
   getGameState,
   completeActivity,
@@ -38,6 +39,7 @@ import "./styles/shop.css";
 import "./styles/intro.css";
 import "./styles/animations.css";
 import "./styles/avatar.css";
+import "./styles/avatarShowcase.css";
 import "./styles/heroCard.css";
 import "./styles/classes.css";
 import "./styles/responsive.css";
@@ -352,6 +354,13 @@ export default function App() {
 
             {activeView === "avatar" && (
               <>
+                <AvatarShowcase
+                  classes={CLASSES}
+                  classMeta={CLASS_META}
+                  activeClass={state.primaryClass || activeClass}
+                  onClassSelect={handleClassChoice}
+                />
+
                 <AvatarPreview
                   state={state}
                   classMeta={CLASS_META}

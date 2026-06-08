@@ -25,6 +25,30 @@
 
   .hero-panel,
   .avatar-panel,
+  .view-overview .hero-panel,
+  .view-overview .avatar-panel,
+  .view-overview .timer-panel,
+  .view-overview .activity-panel,
+  .view-overview .boss-panel,
+  .view-overview .quests-panel,
+  .view-avatar .avatar-panel,
+  .view-avatar .avatar-customizer,
+  .view-avatar .equipment-panel,
+  .view-avatar .class-panel,
+  .view-avatar .sanctuary-status,
+  .view-quests .quests-panel,
+  .view-quests .skill-panel,
+  .view-quests .achievements-panel,
+  .view-quests .activity-panel,
+  .view-shop .currency-panel,
+  .view-shop .shop-panel,
+  .view-shop .inventory-panel,
+  .view-shop .loot-panel,
+  .view-world .boss-panel,
+  .view-world .loot-panel,
+  .view-log .activity-log,
+  .view-log .sanctuary-status,
+  .view-log .currency-panel,
   .avatar-customizer,
   .sanctuary-status,
   .timer-panel,
@@ -41,6 +65,30 @@
   .achievements-panel,
   .activity-log {
     grid-column: span 12;
+  }
+
+  .view-avatar .avatar-panel {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.82fr) minmax(300px, 1fr);
+    column-gap: 1rem;
+    align-items: start;
+    min-height: 0;
+  }
+
+  .view-avatar .avatar-panel .premium-avatar {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin-top: 0.15rem;
+  }
+
+  .view-avatar .avatar-card-header,
+  .view-avatar .avatar-mode-toggle {
+    grid-column: 1;
+  }
+
+  .view-avatar .avatar-loadout-grid,
+  .view-avatar .avatar-evolution-panel {
+    grid-column: 1 / -1;
   }
 }
 
@@ -101,7 +149,24 @@
   }
 
   .avatar-panel {
-    min-height: 700px;
+    min-height: 0;
+  }
+
+  .avatar-card-header {
+    align-items: center;
+  }
+
+  .view-avatar .avatar-panel {
+    display: block;
+  }
+
+  .avatar-mode-toggle {
+    margin-top: 0.65rem;
+  }
+
+  .avatar-panel .premium-avatar {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
   }
 
   .hero-card-avatar {
