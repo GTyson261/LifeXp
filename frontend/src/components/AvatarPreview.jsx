@@ -65,7 +65,6 @@ export default function AvatarPreview({
           timerRunning={timerRunning}
           auraName={equippedAura}
           avatar={avatar}
-          classMeta={classMeta}
           level={state?.level || 1}
         />
       ) : (
@@ -121,12 +120,11 @@ export function LoadoutStat({ label, value }) {
   );
 }
 
-export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classMeta, level = 1 }) {
+export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, level = 1 }) {
   const skinTone = avatar?.skinTone || "#8d5524";
   const hairStyle = avatar?.hairStyle || "Fade";
   const bodyType = avatar?.bodyType || "Average";
   const outfit = avatar?.outfit || "Novice Jacket";
-  const icon = classMeta?.[activeClass]?.icon || "✨";
   const outfitTheme = getOutfitTheme(outfit);
   const playerLevel = Number(level || 1);
   const evolutionTier =
@@ -149,12 +147,6 @@ export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classM
     >
       <div className={`avatar-aura ${auraClass(auraName)}`} />
       <div className="avatar-back-glow" />
-      <div className="avatar-class-effects" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <span />
-      </div>
 
       <div className="avatar-head">
         <div className="avatar-ear left" />
@@ -218,7 +210,7 @@ export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, classM
           <div className="avatar-belt" />
           <div className="avatar-gauntlet left" />
           <div className="avatar-gauntlet right" />
-          <div className="avatar-core">{icon}</div>
+          <div className="avatar-core" />
         </div>
       </div>
 

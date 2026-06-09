@@ -1496,3 +1496,240 @@
     width: 34%;
   }
 }
+
+/* =========================================================
+   HERO CARD RPG PROFILE PASS
+   - player identity
+   - evolution badge
+   - XP meter
+   - useful bottom metadata
+   ========================================================= */
+
+.hero-card-top {
+  min-height: 78px;
+}
+
+.hero-card-top em {
+  margin-left: auto;
+  flex: 0 0 auto;
+  max-width: 118px;
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  color: #020617;
+  background: linear-gradient(90deg, white, var(--outfit-glow));
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 1000;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-card-evolution-badge {
+  position: absolute;
+  top: 96px;
+  left: 18px;
+  right: 18px;
+  z-index: 20;
+  display: grid;
+  gap: 0.18rem;
+  min-height: 76px;
+  padding: 0.75rem 0.9rem;
+  border-radius: 18px;
+  text-align: left;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.64)),
+    linear-gradient(135deg, color-mix(in srgb, var(--outfit-glow), transparent 82%), transparent);
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 58%);
+  backdrop-filter: blur(10px);
+}
+
+.hero-card-evolution-badge span,
+.hero-card-evolution-badge strong,
+.hero-card-evolution-badge small {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-card-evolution-badge span {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-card-evolution-badge strong {
+  color: white;
+  font-size: 0.98rem;
+}
+
+.hero-card-evolution-badge small {
+  color: color-mix(in srgb, var(--outfit-glow), white 58%);
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.hero-portrait {
+  top: 170px;
+  height: 310px;
+}
+
+.hero-card-stats {
+  bottom: 158px;
+}
+
+.hero-card-xp-track {
+  position: absolute;
+  z-index: 20;
+  left: 18px;
+  right: 18px;
+  bottom: 118px;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 16px;
+  background: rgba(2, 6, 23, 0.84);
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 62%);
+  backdrop-filter: blur(10px);
+}
+
+.hero-card-xp-track div {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+}
+
+.hero-card-xp-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--outfit-glow), white);
+  box-shadow: 0 0 14px var(--outfit-glow);
+}
+
+.hero-card-xp-track small {
+  color: #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.hero-card-bottom {
+  bottom: 18px;
+  min-height: 86px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  padding: 0.65rem;
+}
+
+.hero-card-bottom div {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.45rem;
+  border-right: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 72%);
+}
+
+.hero-card-bottom div:last-child {
+  border-right: none;
+}
+
+.hero-card-bottom small {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.hero-card-bottom strong {
+  max-width: 100%;
+  font-size: 0.76rem;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+@media (max-width: 700px) {
+  .hero-card-top {
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    min-height: 70px;
+    padding: 10px;
+  }
+
+  .hero-card-top > span {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+    border-radius: 14px;
+    font-size: 1.45rem;
+  }
+
+  .hero-card-top em {
+    max-width: 88px;
+    font-size: 0.62rem;
+  }
+
+  .hero-card-evolution-badge {
+    left: 14px;
+    right: 14px;
+    top: 86px;
+    min-height: 66px;
+    padding: 0.62rem;
+  }
+
+  .hero-card-evolution-badge small {
+    white-space: normal;
+  }
+
+  .hero-portrait {
+    top: 148px;
+    height: 246px;
+  }
+
+  .hero-card-stats {
+    left: 14px;
+    right: 14px;
+    bottom: 138px;
+    gap: 6px;
+  }
+
+  .hero-card-xp-track {
+    left: 14px;
+    right: 14px;
+    bottom: 94px;
+    gap: 0.18rem;
+    padding: 0.32rem 0.5rem;
+  }
+
+  .hero-card-xp-track div {
+    height: 6px;
+  }
+
+  .hero-card-xp-track small {
+    font-size: 0.62rem;
+  }
+
+  .hero-card-bottom {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    min-height: 78px;
+    gap: 0;
+  }
+
+  .hero-card-bottom strong {
+    font-size: 0.68rem;
+  }
+}

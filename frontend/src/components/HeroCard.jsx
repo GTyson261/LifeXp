@@ -4,6 +4,7 @@ import {
   getOutfitClass,
   getOutfitTheme,
 } from "../data/avatarOptions";
+import { getEvolution, getNextEvolution } from "../data/evolutionData";
 
 export default function HeroCard({
   activeClass,
@@ -22,11 +23,16 @@ export default function HeroCard({
   const icon = classMeta?.[safeClass]?.icon || "✨";
   const label = classMeta?.[safeClass]?.label || safeClass.replaceAll("_", " ");
   const outfitTheme = getOutfitTheme(outfit);
+  const playerName = avatar?.displayName || "PlayerOne";
+  const pronouns = avatar?.pronouns || "they/them";
+  const currentEvolution = getEvolution(safeClass, level);
+  const nextEvolution = getNextEvolution(safeClass, level);
+  const xpNeeded = Math.max(100, level * 100);
+  const xpPercent = Math.min(100, Math.round((xp / xpNeeded) * 100));
   const powerScore = Math.max(
     100,
     level * 120 + skillPoints * 40 + Math.floor(xp / 10),
   );
-  const subtitle = getHeroSubtitle(safeClass);
 
   return (
     <div
@@ -62,9 +68,16 @@ export default function HeroCard({
       <div className="hero-card-top">
         <span>{icon}</span>
         <div>
-          <strong>{label}</strong>
-          <small>{subtitle}</small>
+          <strong>{playerName}</strong>
+          <small>{title || currentEvolution?.title || getHeroSubtitle(safeClass)}</small>
         </div>
+        <em>{label}</em>
+      </div>
+
+      <div className="hero-card-evolution-badge">
+        <span>Current Evolution</span>
+        <strong>{currentEvolution?.title}</strong>
+        <small>{currentEvolution?.perk}</small>
       </div>
 
       <div className="hero-portrait">
@@ -104,22 +117,28 @@ export default function HeroCard({
         </div>
       </div>
 
+      <div className="hero-card-xp-track" aria-label={`${xp} of ${xpNeeded} XP`}>
+        <div>
+          <span style={{ width: `${xpPercent}%` }} />
+        </div>
+        <small>{xp} / {xpNeeded} XP</small>
+      </div>
+
       <div className="hero-card-bottom">
         <div>
           <small>OUTFIT</small>
-          <span>{outfit}</span>
+          <strong>{outfit}</strong>
         </div>
 
         <div>
-          <small>HAIR</small>
-          <strong>{hairStyle}</strong>
+          <small>NEXT</small>
+          <strong>{nextEvolution ? `${nextEvolution.title} L${nextEvolution.level}` : "Maxed"}</strong>
         </div>
-      </div>
 
-      <div className="hero-card-nav" aria-hidden="true">
-        <span>☆</span>
-        <span>♙</span>
-        <span>⚙</span>
+        <div>
+          <small>PRONOUNS</small>
+          <strong>{pronouns}</strong>
+        </div>
       </div>
     </div>
   );

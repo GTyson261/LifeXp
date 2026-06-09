@@ -570,21 +570,7 @@
 }
 
 .premium-avatar.outfit-cyber .outfit-strap {
-  left: 26px;
-  top: 32px;
-  width: 22px;
-  height: 13px;
-  border-radius: 4px 4px 6px 6px;
-  background:
-    repeating-linear-gradient(0deg, rgba(207, 250, 254, 0.58) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(90deg, rgba(103, 232, 249, 0.42) 0 3px, transparent 3px 6px),
-    linear-gradient(180deg, rgba(8, 47, 73, 0.62), rgba(2, 6, 23, 0.56));
-  border: 1px solid rgba(103, 232, 249, 0.32);
-  box-shadow:
-    inset 0 0 4px rgba(255, 255, 255, 0.05),
-    0 0 6px rgba(34, 211, 238, 0.18);
-  opacity: 0.34;
-  transform: rotate(-2deg);
+  display: none;
 }
 /* ---------- Coder Hoodie Detail Polish ---------- */
 .premium-avatar.outfit-cyber .avatar-chest-plate {
@@ -633,17 +619,7 @@
 }
 
 .premium-avatar.outfit-cyber .avatar-shoulder.left::after {
-  content: "";
-  position: absolute;
-  left: 11px;
-  right: 11px;
-  top: 11px;
-  height: 7px;
-  border-radius: 3px;
-  background:
-    repeating-linear-gradient(0deg, rgba(207, 250, 254, 0.58) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(90deg, rgba(207, 250, 254, 0.44) 0 3px, transparent 3px 6px);
-  opacity: 0.24;
+  content: none;
 }
 
 
