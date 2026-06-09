@@ -1,11 +1,13 @@
-export default function QuestPanel({ quests = [], onClaimQuest }) {
+export default function QuestPanel({ quests = [], onClaimQuest, className = "", primaryClass = "NOVICE" }) {
+  const storyQuests = quests.filter((quest) => (quest.id || "").startsWith("class_"));
+  const dailyQuests = quests.filter((quest) => !(quest.id || "").startsWith("class_"));
   const totalQuests = quests.length;
   const completedQuests = quests.filter((quest) => quest.completed).length;
   const claimedQuests = quests.filter((quest) => quest.claimed).length;
   const completionPercent = totalQuests === 0 ? 0 : Math.round((completedQuests / totalQuests) * 100);
 
   return (
-    <div className="panel quests-panel premium-quest-panel">
+    <div className={`panel quests-panel premium-quest-panel ${className}`.trim()}>
       <div className="section-heading-row">
         <div>
           <p className="eyebrow">Daily Objectives</p>
@@ -23,9 +25,29 @@ export default function QuestPanel({ quests = [], onClaimQuest }) {
         <div style={{ width: `${completionPercent}%` }} />
       </div>
 
+      {storyQuests.length > 0 && (
+        <div className="class-quest-chain">
+          <div className="class-chain-header">
+            <span>Class Story Chain</span>
+            <strong>{formatClassName(primaryClass)}</strong>
+          </div>
+
+          <div className="quest-list">
+            {storyQuests.map((quest, index) => (
+              <QuestCard
+                key={quest.id}
+                quest={quest}
+                onClaimQuest={onClaimQuest}
+                storyStep={index + 1}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="quest-list">
-        {quests.length > 0 ? (
-          quests.map((quest) => (
+        {dailyQuests.length > 0 ? (
+          dailyQuests.map((quest) => (
             <QuestCard key={quest.id} quest={quest} onClaimQuest={onClaimQuest} />
           ))
         ) : (
@@ -39,7 +61,7 @@ export default function QuestPanel({ quests = [], onClaimQuest }) {
   );
 }
 
-function QuestCard({ quest, onClaimQuest }) {
+function QuestCard({ quest, onClaimQuest, storyStep = null }) {
   const statusLabel = quest.claimed
     ? "Claimed"
     : quest.completed
@@ -58,7 +80,9 @@ function QuestCard({ quest, onClaimQuest }) {
 
   return (
     <div className={quest.completed ? "quest-card completed premium-quest-card" : "quest-card premium-quest-card"}>
-      <div className="quest-status-icon">{statusIcon}</div>
+      <div className="quest-status-icon">
+        {storyStep ? storyStep : statusIcon}
+      </div>
 
       <div className="quest-card-main">
         <div className="quest-card-title-row">
@@ -97,4 +121,12 @@ function QuestCard({ quest, onClaimQuest }) {
       </div>
     </div>
   );
+}
+
+function formatClassName(className = "") {
+  return className
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }

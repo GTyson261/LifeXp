@@ -1,0 +1,19 @@
+{
+  "name": "LifeXP",
+  "short_name": "LifeXP",
+  "description": "A real-life RPG dashboard for quests, avatars, worlds, and skill progression.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0891b2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/lifexp-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -55,7 +55,7 @@ function SkillCard({ skill, skillNamesById, unlockedById, skillPoints, onUnlockS
 
   return (
     <button
-      className={skill.unlocked ? "skill-card unlocked" : "skill-card"}
+      className={skill.unlocked ? "skill-card unlocked" : canUnlock ? "skill-card unlock-ready" : "skill-card"}
       disabled={!canUnlock}
       onClick={() => onUnlockSkill(skill.id)}
       type="button"

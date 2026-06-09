@@ -17,8 +17,10 @@ export default function HeroCard({
 }) {
   const safeClass = activeClass || "NOVICE";
   const skinTone = avatar?.skinTone || "#8d5524";
+  const hairColor = avatar?.hairColor || "#020617";
   const hairStyle = avatar?.hairStyle || "Fade";
   const bodyType = avatar?.bodyType || "Average";
+  const modelType = avatar?.gender === "Female" ? "model-female" : "model-male";
   const outfit = avatar?.outfit || "Novice Jacket";
   const icon = classMeta?.[safeClass]?.icon || "✨";
   const label = classMeta?.[safeClass]?.label || safeClass.replaceAll("_", " ");
@@ -36,9 +38,10 @@ export default function HeroCard({
 
   return (
     <div
-      className={`hero-card-avatar ${safeClass.toLowerCase()} ${getBodyClass(bodyType)} ${getHairClass(hairStyle)} ${getOutfitClass(outfit)}`}
+      className={`hero-card-avatar ${safeClass.toLowerCase()} ${modelType} ${getBodyClass(bodyType)} ${getHairClass(hairStyle)} ${getOutfitClass(outfit)}`}
       style={{
         "--avatar-skin": skinTone,
+        "--avatar-hair": hairColor,
         "--outfit-trim": outfitTheme.trim,
         "--outfit-glow": outfitTheme.glow,
       }}

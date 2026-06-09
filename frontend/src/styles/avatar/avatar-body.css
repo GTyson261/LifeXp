@@ -402,6 +402,142 @@
   transform: translateX(4px) rotate(2deg);
 }
 
+/* ---------- Avatar Model Silhouettes ---------- */
+.model-male.premium-avatar {
+  --head-left: 107px;
+  --head-width: 94px;
+  --neck-left: 138px;
+  --neck-width: 34px;
+  --torso-left: 64px;
+  --torso-width: 180px;
+  --arms-left: 34px;
+  --arms-width: 242px;
+  --arm-width: 35px;
+  --legs-left: 100px;
+  --legs-width: 110px;
+  --leg-width: 36px;
+}
+
+.model-male.premium-avatar .avatar-body {
+  border-radius: 48px 48px 34px 34px !important;
+}
+
+.model-male.premium-avatar .avatar-shoulder {
+  width: 48px !important;
+  height: 33px !important;
+}
+
+.model-male.premium-avatar .avatar-shoulder.left {
+  left: -13px !important;
+}
+
+.model-male.premium-avatar .avatar-shoulder.right {
+  right: -13px !important;
+}
+
+.model-male.premium-avatar .avatar-jacket-panel {
+  width: 54px;
+}
+
+.model-male.premium-avatar .avatar-chest-plate {
+  left: 58px;
+  width: 74px;
+  border-radius: 20px;
+}
+
+.model-female.premium-avatar {
+  --head-left: 111px;
+  --head-width: 88px;
+  --head-height: 98px;
+  --neck-left: 141px;
+  --neck-width: 28px;
+  --torso-left: 76px;
+  --torso-width: 154px;
+  --torso-height: 178px;
+  --arms-left: 44px;
+  --arms-width: 222px;
+  --arm-width: 29px;
+  --legs-left: 110px;
+  --legs-width: 90px;
+  --leg-width: 30px;
+}
+
+.model-female.premium-avatar .avatar-body {
+  border-radius: 60px 60px 46px 46px !important;
+  clip-path: polygon(8% 0, 92% 0, 100% 18%, 86% 100%, 14% 100%, 0 18%);
+}
+
+.model-female.premium-avatar .avatar-body::before {
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(255, 255, 255, 0.18), transparent 34%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2) 0%, transparent 18%, transparent 82%, rgba(0, 0, 0, 0.2) 100%) !important;
+}
+
+.model-female.premium-avatar .avatar-shoulder {
+  top: 26px !important;
+  width: 34px !important;
+  height: 27px !important;
+  opacity: 0.74 !important;
+}
+
+.model-female.premium-avatar .avatar-shoulder.left {
+  left: -7px !important;
+}
+
+.model-female.premium-avatar .avatar-shoulder.right {
+  right: -7px !important;
+}
+
+.model-female.premium-avatar .avatar-collar {
+  left: calc(var(--torso-left) + 16px) !important;
+  width: calc(var(--torso-width) - 32px) !important;
+}
+
+.model-female.premium-avatar .avatar-collar span {
+  width: 45px !important;
+}
+
+.model-female.premium-avatar .avatar-jacket-panel {
+  top: 24px;
+  width: 42px;
+  height: 128px;
+  border-radius: 32px 32px 26px 26px;
+}
+
+.model-female.premium-avatar .avatar-jacket-panel.left {
+  left: 13px;
+}
+
+.model-female.premium-avatar .avatar-jacket-panel.right {
+  right: 13px;
+}
+
+.model-female.premium-avatar .avatar-chest-plate {
+  left: 48px;
+  width: 58px;
+  height: 62px;
+  border-radius: 24px 24px 30px 30px;
+  opacity: 0.56;
+}
+
+.model-female.premium-avatar .avatar-belt {
+  left: 30px;
+  right: 30px;
+  bottom: 24px;
+}
+
+.model-female.premium-avatar .avatar-core {
+  transform: translateY(12px) scale(0.9);
+}
+
+.model-female.premium-avatar .avatar-arms span {
+  border-radius: 999px 999px 22px 22px;
+}
+
+.model-female.premium-avatar .avatar-legs span {
+  border-radius: 18px 18px 999px 999px !important;
+}
+
 .premium-avatar .avatar-ground-ring {
   left: 56px !important;
   right: 56px !important;
@@ -597,4 +733,64 @@
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.42);
   filter: blur(8px);
+}
+
+/* ---------- Final Model Shape Overrides ---------- */
+.model-male.premium-avatar .avatar-body {
+  border-radius: 52px 52px 34px 34px !important;
+  clip-path: none !important;
+}
+
+.model-male.premium-avatar .avatar-chest-plate {
+  left: 58px !important;
+  width: 74px !important;
+  height: 52px !important;
+  border-radius: 18px !important;
+  opacity: 0.3;
+}
+
+.model-male.premium-avatar .avatar-core {
+  transform: translateX(-50%) scale(1.04) !important;
+}
+
+.model-male.premium-avatar .avatar-legs span {
+  border-radius: 6px 6px 24px 24px !important;
+}
+
+.model-female.premium-avatar .avatar-body {
+  border-radius: 64px 64px 48px 48px !important;
+  clip-path: polygon(7% 0, 93% 0, 100% 20%, 84% 100%, 16% 100%, 0 20%) !important;
+}
+
+.model-female.premium-avatar .avatar-body::after {
+  left: 24px !important;
+  right: 24px !important;
+}
+
+.model-female.premium-avatar .avatar-chest-plate {
+  left: 48px !important;
+  width: 58px !important;
+  height: 62px !important;
+  border-radius: 24px 24px 30px 30px !important;
+  opacity: 0.2;
+}
+
+.model-female.premium-avatar .avatar-core {
+  transform: translateX(-50%) translateY(8px) scale(0.88) !important;
+}
+
+.model-female.premium-avatar .avatar-arms span {
+  border-radius: 999px 999px 22px 22px !important;
+}
+
+.model-female.premium-avatar .avatar-legs span {
+  border-radius: 18px 18px 999px 999px !important;
+}
+
+.model-female.premium-avatar .left-leg i {
+  transform: translateX(-5px) rotate(-2deg) !important;
+}
+
+.model-female.premium-avatar .right-leg i {
+  transform: translateX(5px) rotate(2deg) !important;
 }

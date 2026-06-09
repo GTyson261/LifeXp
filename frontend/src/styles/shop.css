@@ -54,11 +54,32 @@
   padding: 1rem;
 }
 
+.shop-card,
+.quest-card,
+.achievement,
+.world-card,
+.skill-card,
+.log-item {
+  animation: cardRiseIn 0.45s ease both;
+}
+
+.shop-card:hover,
+.quest-card:hover,
+.world-card:hover,
+.achievement:hover,
+.skill-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.24),
+    0 0 20px color-mix(in srgb, var(--class-color), transparent 82%);
+}
+
 .shop-card.equipped,
 .quest-card.completed,
 .achievement.unlocked {
   border-color: rgba(34, 197, 94, 0.45);
   box-shadow: 0 0 18px rgba(34, 197, 94, 0.12);
+  animation: completedCardPulse 3s ease-in-out infinite alternate;
 }
 
 .shop-card strong,
@@ -106,6 +127,107 @@
   color: #e2e8f0;
   font-size: 0.78rem;
   font-weight: 900;
+}
+
+.boss-showcase {
+  position: relative;
+  isolation: isolate;
+}
+
+.boss-phase-banner {
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--class-color), transparent 82%), rgba(2, 6, 23, 0.6));
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 62%);
+}
+
+.boss-phase-banner span {
+  color: color-mix(in srgb, var(--class-color), white 42%);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.boss-phase-banner strong {
+  color: white;
+  font-size: 0.92rem;
+}
+
+.boss-avatar-ring {
+  position: relative;
+  animation: bossRingDrift 4.2s ease-in-out infinite alternate;
+}
+
+.boss-avatar-ring::before,
+.boss-avatar-ring::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 48%);
+  animation: bossThreatRing 2.8s ease-out infinite;
+}
+
+.boss-avatar-ring::after {
+  inset: -18px;
+  animation-delay: 0.24s;
+}
+
+.boss-avatar-core {
+  animation: bossCoreIdle 2.8s ease-in-out infinite alternate;
+}
+
+.boss-threat-orbit {
+  position: absolute;
+  inset: -25px;
+  border-radius: 999px;
+  background:
+    conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--class-color), white 10%), transparent 35%, transparent 70%, color-mix(in srgb, var(--class-color), transparent 20%), transparent);
+  opacity: 0.5;
+  animation: bossThreatOrbit 5s linear infinite;
+}
+
+.boss-phase-wounded .boss-avatar-core {
+  animation: bossCoreWounded 1.7s ease-in-out infinite alternate;
+}
+
+.boss-phase-enraged .boss-avatar-ring {
+  animation: bossEnragedShake 0.42s ease-in-out infinite alternate;
+}
+
+.boss-phase-enraged .boss-avatar-core {
+  animation: bossCoreEnraged 0.9s ease-in-out infinite alternate;
+}
+
+.boss-footer-grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.boss-footer-grid p {
+  margin: 0;
+}
+
+.boss-reward-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.boss-reward-preview span {
+  padding: 0.4rem 0.55rem;
+  border-radius: 999px;
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 72%);
 }
 
 .world-requirement-grid,
@@ -177,12 +299,104 @@
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
 }
 
+.skill-card {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.skill-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 0 34%, rgba(255, 255, 255, 0.18) 48%, transparent 62% 100%);
+  opacity: 0;
+  transform: translateX(-120%);
+}
+
+.skill-card.unlock-ready {
+  border-color: color-mix(in srgb, var(--class-color), white 18%);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--class-color), transparent 72%);
+  animation: skillReadyPulse 1.9s ease-in-out infinite alternate;
+}
+
+.skill-card.unlock-ready::after {
+  animation: skillReadyShimmer 2.4s ease-in-out infinite;
+}
+
+.skill-card.unlocked {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.skill-card.unlocked .skill-icon {
+  animation: skillIconSpark 2.4s ease-in-out infinite alternate;
+}
+
 .quest-list,
 .achievement-list,
 .activity-timeline,
 .loot-history-list {
   display: grid;
   gap: 0.7rem;
+}
+
+.class-quest-chain {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 14% 0%, color-mix(in srgb, var(--class-color), transparent 76%), transparent 42%),
+    rgba(2, 6, 23, 0.48);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 68%);
+}
+
+.class-chain-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.class-chain-header span {
+  color: var(--lifexp-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.class-chain-header strong {
+  color: white;
+}
+
+.weekly-quest-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.weekly-quest {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.weekly-quest.complete {
+  border-color: rgba(34, 197, 94, 0.45);
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.1);
+}
+
+.weekly-quest small {
+  color: color-mix(in srgb, var(--class-color), white 42%);
+  font-weight: 850;
 }
 
 .shop-card,
@@ -245,4 +459,159 @@
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.84);
   white-space: nowrap;
+}
+
+@keyframes cardRiseIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes completedCardPulse {
+  from {
+    filter: brightness(0.96);
+  }
+
+  to {
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes bossRingDrift {
+  from {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  to {
+    transform: translateY(-4px) rotate(1deg);
+  }
+}
+
+@keyframes bossThreatRing {
+  from {
+    opacity: 0.56;
+    transform: scale(0.82);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.32);
+  }
+}
+
+@keyframes bossThreatOrbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bossCoreIdle {
+  from {
+    filter: brightness(0.95);
+  }
+
+  to {
+    filter: brightness(1.18);
+  }
+}
+
+@keyframes bossCoreWounded {
+  from {
+    transform: scale(0.98);
+  }
+
+  to {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes bossEnragedShake {
+  from {
+    transform: translateX(-2px) rotate(-1.5deg);
+  }
+
+  to {
+    transform: translateX(2px) rotate(1.5deg);
+  }
+}
+
+@keyframes bossCoreEnraged {
+  from {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+
+  to {
+    filter: brightness(1.4);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes skillReadyPulse {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes skillReadyShimmer {
+  0%, 48% {
+    opacity: 0;
+    transform: translateX(-120%);
+  }
+
+  66% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+
+@keyframes skillIconSpark {
+  from {
+    filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.35));
+    transform: scale(1);
+  }
+
+  to {
+    filter: drop-shadow(0 0 14px rgba(34, 197, 94, 0.7));
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-card,
+  .quest-card,
+  .achievement,
+  .world-card,
+  .skill-card,
+  .log-item,
+  .shop-card.equipped,
+  .quest-card.completed,
+  .achievement.unlocked,
+  .boss-avatar-ring,
+  .boss-avatar-ring::before,
+  .boss-avatar-ring::after,
+  .boss-avatar-core,
+  .boss-phase-wounded .boss-avatar-core,
+  .boss-phase-enraged .boss-avatar-ring,
+  .boss-phase-enraged .boss-avatar-core,
+  .skill-card.unlock-ready,
+  .skill-card.unlock-ready::after,
+  .skill-card.unlocked .skill-icon {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

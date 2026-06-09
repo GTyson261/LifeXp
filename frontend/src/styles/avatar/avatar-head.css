@@ -51,7 +51,7 @@
   border-radius: 32px 32px 18px 18px;
   background:
     radial-gradient(circle at 32% 20%, rgba(255, 255, 255, 0.12), transparent 14%),
-    linear-gradient(145deg, #111827, #020617);
+    linear-gradient(145deg, color-mix(in srgb, var(--avatar-hair, #111827), white 10%), color-mix(in srgb, var(--avatar-hair, #020617), black 28%));
   z-index: 10;
 }
 
@@ -63,7 +63,7 @@
   bottom: -8px;
   height: 12px;
   border-radius: 0 0 18px 18px;
-  background: linear-gradient(180deg, #111827, #020617);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--avatar-hair, #111827), white 8%), color-mix(in srgb, var(--avatar-hair, #020617), black 32%));
   opacity: 0.9;
 }
 
@@ -78,11 +78,11 @@
   height: 44px;
   border-radius: 34px 34px 20px 20px;
   background:
-    radial-gradient(circle at 18% 45%, #111827 0 9px, transparent 10px),
-    radial-gradient(circle at 36% 22%, #1f2937 0 10px, transparent 11px),
-    radial-gradient(circle at 58% 20%, #111827 0 11px, transparent 12px),
-    radial-gradient(circle at 78% 45%, #020617 0 9px, transparent 10px),
-    #020617;
+    radial-gradient(circle at 18% 45%, color-mix(in srgb, var(--avatar-hair, #111827), black 20%) 0 9px, transparent 10px),
+    radial-gradient(circle at 36% 22%, color-mix(in srgb, var(--avatar-hair, #1f2937), white 12%) 0 10px, transparent 11px),
+    radial-gradient(circle at 58% 20%, var(--avatar-hair, #111827) 0 11px, transparent 12px),
+    radial-gradient(circle at 78% 45%, color-mix(in srgb, var(--avatar-hair, #020617), black 34%) 0 9px, transparent 10px),
+    color-mix(in srgb, var(--avatar-hair, #020617), black 26%);
 }
 
 .hair-afro.premium-avatar .avatar-hair {
@@ -92,12 +92,12 @@
   height: 58px;
   border-radius: 999px 999px 28px 28px;
   background:
-    radial-gradient(circle at 12% 58%, #020617 0 13px, transparent 14px),
-    radial-gradient(circle at 28% 28%, #1f2937 0 14px, transparent 15px),
-    radial-gradient(circle at 50% 15%, #111827 0 16px, transparent 17px),
-    radial-gradient(circle at 72% 28%, #1e293b 0 14px, transparent 15px),
-    radial-gradient(circle at 88% 58%, #020617 0 13px, transparent 14px),
-    #020617;
+    radial-gradient(circle at 12% 58%, color-mix(in srgb, var(--avatar-hair, #020617), black 30%) 0 13px, transparent 14px),
+    radial-gradient(circle at 28% 28%, color-mix(in srgb, var(--avatar-hair, #1f2937), white 10%) 0 14px, transparent 15px),
+    radial-gradient(circle at 50% 15%, var(--avatar-hair, #111827) 0 16px, transparent 17px),
+    radial-gradient(circle at 72% 28%, color-mix(in srgb, var(--avatar-hair, #1e293b), white 6%) 0 14px, transparent 15px),
+    radial-gradient(circle at 88% 58%, color-mix(in srgb, var(--avatar-hair, #020617), black 30%) 0 13px, transparent 14px),
+    color-mix(in srgb, var(--avatar-hair, #020617), black 24%);
 }
 
 .hair-locs.premium-avatar .avatar-hair {
@@ -107,7 +107,7 @@
   height: 42px;
   border-radius: 28px 28px 16px 16px;
   clip-path: none;
-  background: repeating-linear-gradient(90deg, #020617 0 5px, #1e293b 5px 9px, #020617 9px 13px);
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--avatar-hair, #020617), black 26%) 0 5px, color-mix(in srgb, var(--avatar-hair, #1e293b), white 9%) 5px 9px, color-mix(in srgb, var(--avatar-hair, #020617), black 26%) 9px 13px);
 }
 
 .hair-locs.premium-avatar .avatar-hair::after {
@@ -118,7 +118,7 @@
   bottom: -8px;
   height: 14px;
   border-radius: 0 0 14px 14px;
-  background: repeating-linear-gradient(90deg, #020617 0 5px, #1e293b 5px 9px, #020617 9px 13px);
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--avatar-hair, #020617), black 26%) 0 5px, color-mix(in srgb, var(--avatar-hair, #1e293b), white 9%) 5px 9px, color-mix(in srgb, var(--avatar-hair, #020617), black 26%) 9px 13px);
 }
 
 .hair-long.premium-avatar .avatar-hair {
@@ -128,7 +128,7 @@
   height: 44px;
   border-radius: 36px 36px 18px 18px;
   clip-path: none;
-  background: linear-gradient(115deg, #020617 0 34%, #1e293b 35% 55%, #020617 56% 100%);
+  background: linear-gradient(115deg, color-mix(in srgb, var(--avatar-hair, #020617), black 28%) 0 34%, color-mix(in srgb, var(--avatar-hair, #1e293b), white 8%) 35% 55%, color-mix(in srgb, var(--avatar-hair, #020617), black 28%) 56% 100%);
 }
 
 .hair-long.premium-avatar .avatar-hair::after {
@@ -139,7 +139,7 @@
   bottom: -10px;
   height: 16px;
   border-radius: 0 0 22px 22px;
-  background: linear-gradient(180deg, #020617, rgba(2, 6, 23, 0.72));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--avatar-hair, #020617), black 30%), color-mix(in srgb, var(--avatar-hair, #020617), transparent 28%));
 }
 
 /* ---------- Live Avatar Face ---------- */

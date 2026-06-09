@@ -1,4 +1,4 @@
-export default function BossPanel({ boss, bossesDefeated = 0 }) {
+export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) {
   if (!boss) return null;
 
   const hpPercent = boss.maxHp > 0
@@ -11,8 +11,20 @@ export default function BossPanel({ boss, bossesDefeated = 0 }) {
       ? "Wounded"
       : "Active";
 
+  const phaseMessage = phase === "Enraged"
+    ? "Final stand: every action hits a desperate boss."
+    : phase === "Wounded"
+      ? "Armor cracked: keep pressure on the encounter."
+      : "Opening phase: build momentum and chip away.";
+
+  const nextRewards = [
+    `${75 + (boss.level || 1) * 10}+ Gold`,
+    `${3 + Math.max(1, Math.floor((boss.level || 1) / 2))}+ Crystals`,
+    "Cosmetic Drop"
+  ];
+
   return (
-    <div className="panel boss-panel premium-boss-panel">
+    <div className={`panel boss-panel premium-boss-panel boss-phase-${phase.toLowerCase()} ${className}`.trim()}>
       <div className="section-heading-row">
         <div>
           <p className="eyebrow">Raid Encounter</p>
@@ -22,8 +34,14 @@ export default function BossPanel({ boss, bossesDefeated = 0 }) {
         <div className="boss-win-chip">🏆 {bossesDefeated} wins</div>
       </div>
 
+      <div className="boss-phase-banner">
+        <span>{phase} Phase</span>
+        <strong>{phaseMessage}</strong>
+      </div>
+
       <div className="boss-showcase">
         <div className="boss-avatar-ring">
+          <span className="boss-threat-orbit" />
           <div className="boss-avatar-core">
             {phase === "Enraged" ? "🔥" : phase === "Wounded" ? "⚔️" : "👾"}
           </div>
@@ -44,7 +62,14 @@ export default function BossPanel({ boss, bossesDefeated = 0 }) {
         <div style={{ width: `${hpPercent}%` }} />
       </div>
 
-      <p>{boss.hp} / {boss.maxHp} HP</p>
+      <div className="boss-footer-grid">
+        <p>{boss.hp} / {boss.maxHp} HP</p>
+        <div className="boss-reward-preview">
+          {nextRewards.map((reward) => (
+            <span key={reward}>{reward}</span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

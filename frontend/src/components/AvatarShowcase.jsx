@@ -3,61 +3,69 @@ const CLASS_AVATARS = {
     hairStyle: "Short",
     bodyType: "Lean",
     outfit: "Coder Hoodie",
-    skinTone: "#8d5524"
+    skinTone: "#8d5524",
+    hairColor: "#0f172a"
   },
   BOOKWORM: {
     hairStyle: "Short",
     bodyType: "Average",
     outfit: "Scholar Cloak",
-    skinTone: "#c68642"
+    skinTone: "#c68642",
+    hairColor: "#4c1d95"
   },
   SPORT_MASTER: {
     hairStyle: "Fade",
     bodyType: "Strong",
     outfit: "Arena Gear",
-    skinTone: "#a0522d"
+    skinTone: "#a0522d",
+    hairColor: "#7c2d12"
   },
   GAMER: {
     hairStyle: "Curly",
     bodyType: "Athletic",
     outfit: "Arcade Jacket",
-    skinTone: "#f1c27d"
+    skinTone: "#f1c27d",
+    hairColor: "#14532d"
   },
   EXPLORER: {
     hairStyle: "Short",
     bodyType: "Average",
     outfit: "Explorer Coat",
-    skinTone: "#6b3f28"
+    skinTone: "#6b3f28",
+    hairColor: "#713f12"
   },
   ZEN: {
     hairStyle: "Short",
     bodyType: "Lean",
     outfit: "Zen Robe",
-    skinTone: "#d1a17a"
+    skinTone: "#d1a17a",
+    hairColor: "#e5e7eb"
   },
   MUSICIAN: {
     hairStyle: "Afro",
     bodyType: "Average",
     outfit: "Rhythm Jacket",
-    skinTone: "#7a4a2a"
+    skinTone: "#7a4a2a",
+    hairColor: "#831843"
   },
   CHEF: {
     hairStyle: "Curly",
     bodyType: "Athletic",
     outfit: "Battle Apron",
-    skinTone: "#b46b46"
+    skinTone: "#b46b46",
+    hairColor: "#7f1d1d"
   }
 };
 
 const SAMPLE_LINEUP = [
-  { hairStyle: "Fade", bodyType: "Lean", outfit: "Coder Hoodie", skinTone: "#7c4a2f", className: "CODER" },
-  { hairStyle: "Long", bodyType: "Average", outfit: "Scholar Cloak", skinTone: "#e0ac69", className: "BOOKWORM" },
-  { hairStyle: "Afro", bodyType: "Strong", outfit: "Arena Gear", skinTone: "#4b2a1f", className: "SPORT_MASTER" },
-  { hairStyle: "Short", bodyType: "Athletic", outfit: "Arcade Jacket", skinTone: "#c68642", className: "GAMER" },
-  { hairStyle: "Locs", bodyType: "Average", outfit: "Explorer Coat", skinTone: "#5c3526", className: "EXPLORER" },
-  { hairStyle: "Curly", bodyType: "Lean", outfit: "Zen Robe", skinTone: "#f1c27d", className: "ZEN" },
-  { hairStyle: "Long", bodyType: "Average", outfit: "Rhythm Jacket", skinTone: "#8d5524", className: "MUSICIAN" },
-  { hairStyle: "Curly", bodyType: "Athletic", outfit: "Battle Apron", skinTone: "#b06a45", className: "CHEF" }
+  { hairStyle: "Fade", bodyType: "Lean", outfit: "Coder Hoodie", skinTone: "#7c4a2f", hairColor: "#020617", className: "CODER" },
+  { hairStyle: "Long", bodyType: "Average", outfit: "Scholar Cloak", skinTone: "#e0ac69", hairColor: "#7c3aed", className: "BOOKWORM" },
+  { hairStyle: "Afro", bodyType: "Strong", outfit: "Arena Gear", skinTone: "#4b2a1f", hairColor: "#a16207", className: "SPORT_MASTER" },
+  { hairStyle: "Short", bodyType: "Athletic", outfit: "Arcade Jacket", skinTone: "#c68642", hairColor: "#22c55e", className: "GAMER" },
+  { hairStyle: "Locs", bodyType: "Average", outfit: "Explorer Coat", skinTone: "#5c3526", hairColor: "#d6a35d", className: "EXPLORER" },
+  { hairStyle: "Curly", bodyType: "Lean", outfit: "Zen Robe", skinTone: "#f1c27d", hairColor: "#e5e7eb", className: "ZEN" },
+  { hairStyle: "Long", bodyType: "Average", outfit: "Rhythm Jacket", skinTone: "#8d5524", hairColor: "#ec4899", className: "MUSICIAN" },
+  { hairStyle: "Curly", bodyType: "Athletic", outfit: "Battle Apron", skinTone: "#b06a45", hairColor: "#7f1d1d", className: "CHEF" }
 ];
 
 const FEATURE_LABELS = [
@@ -147,7 +155,9 @@ function AvatarPortrait({ avatar, color, compact = false }) {
       className={compact ? "showcase-portrait compact" : "showcase-portrait"}
       style={{
         "--portrait-skin": avatar.skinTone,
-        "--portrait-color": color
+        "--portrait-color": color,
+        "--portrait-eye": color,
+        "--portrait-hair": avatar.hairColor || "#020617"
       }}
     >
       <div className={`portrait-hair hair-${avatar.hairStyle.toLowerCase()}`} />

@@ -209,7 +209,7 @@
   border-radius: 48px 48px 22px 22px;
   background:
     radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.16), transparent 12%),
-    linear-gradient(145deg, #111827, #020617 80%);
+    linear-gradient(145deg, color-mix(in srgb, var(--avatar-hair, #111827), white 10%), color-mix(in srgb, var(--avatar-hair, #020617), black 28%) 80%);
 }
 
 .hero-portrait-face {
@@ -382,17 +382,17 @@
   right: -14px;
   height: 62px;
   background:
-    radial-gradient(circle at 18% 50%, #020617 0 12px, transparent 13px),
-    radial-gradient(circle at 40% 24%, #1e293b 0 13px, transparent 14px),
-    radial-gradient(circle at 62% 26%, #111827 0 13px, transparent 14px),
-    radial-gradient(circle at 82% 54%, #020617 0 12px, transparent 13px),
-    #020617;
+    radial-gradient(circle at 18% 50%, color-mix(in srgb, var(--avatar-hair, #020617), black 30%) 0 12px, transparent 13px),
+    radial-gradient(circle at 40% 24%, color-mix(in srgb, var(--avatar-hair, #1e293b), white 9%) 0 13px, transparent 14px),
+    radial-gradient(circle at 62% 26%, var(--avatar-hair, #111827) 0 13px, transparent 14px),
+    radial-gradient(circle at 82% 54%, color-mix(in srgb, var(--avatar-hair, #020617), black 30%) 0 12px, transparent 13px),
+    color-mix(in srgb, var(--avatar-hair, #020617), black 24%);
 }
 
 .hero-card-avatar.hair-locs .hero-portrait-hair {
   top: -16px;
   height: 66px;
-  background: repeating-linear-gradient(90deg, #020617 0 7px, #1e293b 7px 12px, #020617 12px 17px);
+  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--avatar-hair, #020617), black 26%) 0 7px, color-mix(in srgb, var(--avatar-hair, #1e293b), white 9%) 7px 12px, color-mix(in srgb, var(--avatar-hair, #020617), black 26%) 12px 17px);
 }
 
 .hero-card-avatar.hair-long .hero-portrait-hair {
@@ -1421,6 +1421,74 @@
 .hero-card-bottom,
 .hero-card-nav {
   backdrop-filter: blur(10px);
+}
+
+/* ---------- Hero Card Model Silhouettes ---------- */
+.hero-card-avatar.model-male .hero-portrait-head {
+  width: 136px;
+  height: 144px;
+  border-radius: 44% 44% 40% 40%;
+}
+
+.hero-card-avatar.model-male .hero-portrait-neck {
+  width: 58px;
+}
+
+.hero-card-avatar.model-male .hero-portrait-body {
+  width: 270px;
+  border-radius: 64px 64px 34px 34px;
+  clip-path: none;
+}
+
+.hero-card-avatar.model-male .hero-portrait-body::after {
+  left: 24px;
+  right: 24px;
+}
+
+.hero-card-avatar.model-male .hero-portrait-coat {
+  width: 98px;
+  border-radius: 34px 26px 34px 34px;
+}
+
+.hero-card-avatar.model-female .hero-portrait-head {
+  width: 126px;
+  height: 140px;
+  border-radius: 48% 48% 44% 44%;
+}
+
+.hero-card-avatar.model-female .hero-portrait-neck {
+  width: 48px;
+  height: 66px;
+}
+
+.hero-card-avatar.model-female .hero-portrait-body {
+  width: 236px;
+  border-radius: 76px 76px 48px 48px;
+  clip-path: polygon(7% 0, 93% 0, 100% 20%, 84% 100%, 16% 100%, 0 20%);
+}
+
+.hero-card-avatar.model-female .hero-portrait-body::after {
+  left: 32px;
+  right: 32px;
+}
+
+.hero-card-avatar.model-female .hero-portrait-coat {
+  width: 78px;
+  border-radius: 42px 34px 36px 36px;
+}
+
+.hero-card-avatar.model-female .hero-portrait-coat.left {
+  left: 22px;
+}
+
+.hero-card-avatar.model-female .hero-portrait-coat.right {
+  right: 22px;
+}
+
+.hero-card-avatar.model-female .hero-portrait-symbol {
+  width: 74px;
+  height: 74px;
+  border-radius: 28px;
 }
 
 .hero-card-stats div::before {

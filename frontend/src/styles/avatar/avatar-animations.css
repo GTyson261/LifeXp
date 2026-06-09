@@ -28,6 +28,24 @@
   animation: avatarGroundPulse 3.4s ease-in-out infinite alternate;
 }
 
+.premium-avatar .avatar-face .eye {
+  animation: avatarBlink 6.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.premium-avatar .avatar-face .iris {
+  animation: avatarEyeGlint 3.6s ease-in-out infinite alternate;
+}
+
+.premium-avatar .avatar-glow-line,
+.premium-avatar .avatar-core {
+  animation: avatarSuitGlow 2.8s ease-in-out infinite alternate;
+}
+
+.premium-avatar .avatar-collar span {
+  animation: avatarCollarPulse 3.4s ease-in-out infinite alternate;
+}
+
 @keyframes avatarFloatSoft {
   from {
     transform: translateY(0px);
@@ -35,6 +53,54 @@
 
   to {
     transform: translateY(-5px);
+  }
+}
+
+@keyframes avatarBlink {
+  0%, 88%, 100% {
+    transform: scaleY(1);
+  }
+
+  92% {
+    transform: scaleY(0.08);
+  }
+
+  95% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes avatarEyeGlint {
+  from {
+    filter: brightness(0.95);
+    transform: translateY(0);
+  }
+
+  to {
+    filter: brightness(1.35);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes avatarSuitGlow {
+  from {
+    opacity: 0.42;
+    filter: brightness(0.9);
+  }
+
+  to {
+    opacity: 0.9;
+    filter: brightness(1.28);
+  }
+}
+
+@keyframes avatarCollarPulse {
+  from {
+    filter: brightness(0.95);
+  }
+
+  to {
+    filter: brightness(1.35);
   }
 }
 
@@ -111,5 +177,15 @@
   to {
     opacity: 1;
     transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-avatar,
+  .premium-avatar *,
+  .avatar-active.premium-avatar,
+  .avatar-active .avatar-aura {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

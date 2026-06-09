@@ -12,7 +12,8 @@ export default function AvatarPreview({
   state,
   classMeta = {},
   avatarDraft,
-  timerRunning = false
+  timerRunning = false,
+  className = ""
 }) {
   const activeClass = state?.activeClass || "NOVICE";
   const avatar = avatarDraft || state?.avatar || {};
@@ -29,7 +30,7 @@ export default function AvatarPreview({
   const nextEvolution = getNextEvolution(activeClass, state?.level || 1);
 
   return (
-    <div className={`panel avatar-panel ${frameClass(equippedFrame)}`}>
+    <div className={`panel avatar-panel ${frameClass(equippedFrame)} ${className}`.trim()}>
       <div className="avatar-card-header">
         <div>
           <p className="eyebrow">Avatar Preview</p>
@@ -59,25 +60,27 @@ export default function AvatarPreview({
         </button>
       </div>
 
-      {avatarMode === "live" ? (
-        <FakeAvatar
-          activeClass={activeClass}
-          timerRunning={timerRunning}
-          auraName={equippedAura}
-          avatar={avatar}
-          level={state?.level || 1}
-        />
-      ) : (
-        <HeroCard
-          activeClass={activeClass}
-          avatar={avatar}
-          classMeta={classMeta}
-          title={state?.title || "Gatebound Novice"}
-          level={state?.level || 1}
-          xp={state?.xp || 0}
-          skillPoints={state?.skillPoints || 0}
-        />
-      )}
+      <div className={`avatar-stage avatar-stage-${avatarMode}`}>
+        {avatarMode === "live" ? (
+          <FakeAvatar
+            activeClass={activeClass}
+            timerRunning={timerRunning}
+            auraName={equippedAura}
+            avatar={avatar}
+            level={state?.level || 1}
+          />
+        ) : (
+          <HeroCard
+            activeClass={activeClass}
+            avatar={avatar}
+            classMeta={classMeta}
+            title={state?.title || "Gatebound Novice"}
+            level={state?.level || 1}
+            xp={state?.xp || 0}
+            skillPoints={state?.skillPoints || 0}
+          />
+        )}
+      </div>
       <div className="avatar-loadout-grid">
         <LoadoutStat label="Outfit" value={avatar?.outfit || "Novice Jacket"} />
         <LoadoutStat label="Hair" value={avatar?.hairStyle || "Fade"} />
@@ -122,8 +125,10 @@ export function LoadoutStat({ label, value }) {
 
 export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, level = 1 }) {
   const skinTone = avatar?.skinTone || "#8d5524";
+  const hairColor = avatar?.hairColor || "#020617";
   const hairStyle = avatar?.hairStyle || "Fade";
   const bodyType = avatar?.bodyType || "Average";
+  const modelType = avatar?.gender === "Female" ? "model-female" : "model-male";
   const outfit = avatar?.outfit || "Novice Jacket";
   const outfitTheme = getOutfitTheme(outfit);
   const playerLevel = Number(level || 1);
@@ -138,9 +143,10 @@ export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, level 
     <div
       className={`fake-avatar premium-avatar ${activeClass.toLowerCase()} ${evolutionTier} ${
         timerRunning ? "avatar-active" : ""
-      } ${getBodyClass(bodyType)} ${getHairClass(hairStyle)} ${getOutfitClass(outfit)}`}
+      } ${modelType} ${getBodyClass(bodyType)} ${getHairClass(hairStyle)} ${getOutfitClass(outfit)}`}
       style={{
         "--avatar-skin": skinTone,
+        "--avatar-hair": hairColor,
         "--outfit-trim": outfitTheme.trim,
         "--outfit-glow": outfitTheme.glow
       }}

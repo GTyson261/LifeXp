@@ -114,6 +114,7 @@ public class PlayerState {
         public String bodyType = "Average";
         public String skinTone = "#8d5524";
         public String hairStyle = "Fade";
+        public String hairColor = "#020617";
         public String outfit = "Novice Jacket";
         public String aura = "Starter Glow";
     }

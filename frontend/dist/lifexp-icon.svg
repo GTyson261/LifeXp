@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LifeXP">
+  <rect width="512" height="512" rx="112" fill="#020617"/>
+  <circle cx="256" cy="246" r="184" fill="#0f172a"/>
+  <circle cx="256" cy="246" r="142" fill="#0891b2" opacity="0.72"/>
+  <path fill="#22d3ee" d="M146 334h224v42H146z"/>
+  <path fill="#fff" d="M154 148h58v162h91v48H154z"/>
+  <path fill="#fff" d="M308 174h48l-52 78 56 84h-51l-33-53-34 53h-48l55-82-52-80h50l30 50z"/>
+</svg>

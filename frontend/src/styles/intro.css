@@ -1,5 +1,106 @@
 /* LifeXP intro gate screen */
 
+.auth-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  background:
+    radial-gradient(circle at 50% 24%, rgba(34, 211, 238, 0.22), transparent 34%),
+    linear-gradient(140deg, #020617, #08111f 52%, #020617);
+}
+
+.auth-card {
+  width: min(460px, 100%);
+  display: grid;
+  gap: 0.85rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.94)),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.12), transparent);
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  box-shadow: 0 26px 80px rgba(0, 0, 0, 0.44);
+}
+
+.auth-card h1,
+.auth-card p {
+  margin: 0;
+}
+
+.auth-card h1 {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  line-height: 0.98;
+}
+
+.auth-card p {
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.auth-card label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.auth-card label span {
+  color: var(--lifexp-muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.auth-card input {
+  min-height: 48px;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(2, 6, 23, 0.86);
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+}
+
+.auth-card button {
+  min-height: 48px;
+}
+
+.auth-mode-button {
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.72);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.auth-error {
+  color: #fecdd3;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(127, 29, 29, 0.34);
+  border: 1px solid rgba(251, 113, 133, 0.22);
+}
+
+.account-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.85rem 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  color: #cbd5e1;
+  background: rgba(2, 6, 23, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.account-strip button {
+  min-height: 38px;
+  padding: 0.45rem 0.8rem;
+}
+
 .intro-screen {
   min-height: 100vh;
   display: grid;
@@ -21,6 +122,91 @@
     linear-gradient(90deg, rgba(34, 211, 238, 0.1), transparent 30%, rgba(250, 204, 21, 0.08)),
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 28%, rgba(2, 6, 23, 0.35));
   opacity: 0.9;
+}
+
+.intro-class-effects {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.intro-class-effects span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  opacity: 0.62;
+  background: var(--intro-color);
+  box-shadow: 0 0 18px var(--intro-color);
+  animation: introEffectDrift 6s ease-in-out infinite;
+}
+
+.intro-class-effects span:nth-child(1) { left: 8%; top: 18%; animation-delay: -0.4s; }
+.intro-class-effects span:nth-child(2) { left: 22%; top: 72%; animation-delay: -1.8s; }
+.intro-class-effects span:nth-child(3) { left: 39%; top: 12%; animation-delay: -2.7s; }
+.intro-class-effects span:nth-child(4) { left: 57%; top: 82%; animation-delay: -0.9s; }
+.intro-class-effects span:nth-child(5) { left: 74%; top: 22%; animation-delay: -3.3s; }
+.intro-class-effects span:nth-child(6) { left: 88%; top: 58%; animation-delay: -1.2s; }
+.intro-class-effects span:nth-child(7) { left: 44%; top: 52%; animation-delay: -4.2s; }
+.intro-class-effects span:nth-child(8) { left: 68%; top: 68%; animation-delay: -2.1s; }
+
+.intro-coder .intro-class-effects {
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--intro-color), transparent 88%) 0 2px, transparent 2px 54px),
+    repeating-linear-gradient(180deg, color-mix(in srgb, var(--intro-color), transparent 92%) 0 1px, transparent 1px 42px);
+}
+
+.intro-coder .intro-class-effects span {
+  width: 36px;
+  height: 2px;
+  border-radius: 0;
+  animation-name: introCodeScan;
+}
+
+.intro-gamer .intro-class-effects span {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  image-rendering: pixelated;
+  animation-name: introPixelSpark;
+}
+
+.intro-bookworm .intro-class-effects span,
+.intro-zen .intro-class-effects span {
+  width: 70px;
+  height: 70px;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--intro-color), white 18%);
+  animation-name: introSoftRing;
+}
+
+.intro-sport_master .intro-class-effects span,
+.intro-explorer .intro-class-effects span {
+  width: 54px;
+  height: 4px;
+  border-radius: 999px;
+  transform: rotate(-18deg);
+  animation-name: introTrailDash;
+}
+
+.intro-musician .intro-class-effects span {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 2px solid var(--intro-color);
+  border-top-color: transparent;
+  animation-name: introRhythmNote;
+}
+
+.intro-chef .intro-class-effects span {
+  width: 14px;
+  height: 22px;
+  border-radius: 999px 999px 999px 0;
+  transform: rotate(-35deg);
+  background: linear-gradient(180deg, #fde68a, var(--intro-color), #ef4444);
+  animation-name: introEmberRise;
 }
 
 .intro-stage {
@@ -167,6 +353,7 @@
   color: #020617;
   background: linear-gradient(90deg, white, var(--intro-color));
   box-shadow: 0 18px 45px color-mix(in srgb, var(--intro-color), transparent 72%);
+  animation: gateButtonPulse 2.6s ease-in-out infinite alternate;
 }
 
 .portal-scene {
@@ -174,6 +361,31 @@
   display: grid;
   place-items: center;
   position: relative;
+}
+
+.portal-scene::before,
+.portal-scene::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: 999px;
+}
+
+.portal-scene::before {
+  width: min(430px, 84vw);
+  aspect-ratio: 1;
+  background:
+    conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--intro-color), white 8%), transparent 38%, color-mix(in srgb, var(--intro-color), transparent 34%), transparent 70%);
+  filter: blur(18px);
+  opacity: 0.42;
+  animation: portalRingSpin 12s linear infinite;
+}
+
+.portal-scene::after {
+  width: min(360px, 72vw);
+  aspect-ratio: 1;
+  background: radial-gradient(circle, color-mix(in srgb, var(--intro-color), transparent 54%), transparent 64%);
+  animation: portalBreath 3.6s ease-in-out infinite alternate;
 }
 
 .portal-door {
@@ -187,6 +399,35 @@
   box-shadow:
     0 0 80px color-mix(in srgb, var(--intro-color), transparent 42%),
     0 34px 90px rgba(0, 0, 0, 0.55);
+  position: relative;
+  z-index: 2;
+  animation: portalDoorFloat 4.4s ease-in-out infinite alternate;
+}
+
+.portal-door::before,
+.portal-door::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.portal-door::before {
+  inset: 12px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--intro-color), white 28%);
+  opacity: 0.65;
+  animation: portalOutlinePulse 2.4s ease-in-out infinite alternate;
+}
+
+.portal-door::after {
+  left: 18%;
+  right: 18%;
+  top: 12%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, white, transparent);
+  box-shadow: 0 0 18px white;
+  animation: portalScan 3.2s ease-in-out infinite;
 }
 
 .door-core {
@@ -201,6 +442,7 @@
 .door-core span {
   font-size: clamp(4rem, 10vw, 8rem);
   filter: drop-shadow(0 0 22px white);
+  animation: introClassIconPulse 2.1s ease-in-out infinite alternate;
 }
 
 .portal-floor {
@@ -215,6 +457,7 @@
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 32px),
     rgba(2, 6, 23, 0.8);
   box-shadow: 0 0 42px color-mix(in srgb, var(--intro-color), transparent 58%);
+  animation: portalFloorScan 4s linear infinite;
 }
 
 .origin-grid {
@@ -236,6 +479,18 @@
     linear-gradient(135deg, color-mix(in srgb, var(--origin-color), transparent 84%), transparent);
   color: white;
   text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.origin-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 0 36%, color-mix(in srgb, var(--origin-color), white 16%) 48%, transparent 62% 100%);
+  opacity: 0;
+  transform: translateX(-130%);
 }
 
 .origin-card span {
@@ -272,6 +527,11 @@
   box-shadow:
     0 0 28px color-mix(in srgb, var(--origin-color), transparent 72%),
     inset 0 0 24px color-mix(in srgb, var(--origin-color), transparent 84%);
+  animation: originSelectedPulse 2.8s ease-in-out infinite alternate;
+}
+
+.origin-card.selected::after {
+  animation: originCardShimmer 3.4s ease-in-out infinite;
 }
 
 .intro-footer-strip {
@@ -292,6 +552,628 @@
   border: 1px solid rgba(148, 163, 184, 0.14);
 }
 
+.intro-avatar-screen {
+  overflow-y: auto;
+  place-items: start center;
+}
+
+.intro-avatar-stage {
+  padding: clamp(0.25rem, 2vw, 1rem) 0;
+}
+
+.intro-avatar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(2, 6, 23, 0.82), rgba(15, 23, 42, 0.68)),
+    linear-gradient(90deg, color-mix(in srgb, var(--intro-color), transparent 82%), transparent);
+  border: 1px solid color-mix(in srgb, var(--intro-color), transparent 62%);
+}
+
+.intro-avatar-header h1,
+.intro-avatar-header p {
+  margin: 0;
+}
+
+.intro-avatar-header h1 {
+  margin-top: 0.25rem;
+  font-size: clamp(2.2rem, 6vw, 5.2rem);
+  line-height: 0.96;
+}
+
+.intro-avatar-header p {
+  max-width: 680px;
+  margin-top: 0.65rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.intro-avatar-class-chip {
+  min-width: 180px;
+  display: grid;
+  gap: 0.25rem;
+  justify-items: center;
+  padding: 0.9rem;
+  border-radius: 8px;
+  text-align: center;
+  background: rgba(2, 6, 23, 0.72);
+  border: 1px solid color-mix(in srgb, var(--intro-color), transparent 54%);
+}
+
+.intro-avatar-class-chip span {
+  font-size: 2rem;
+}
+
+.intro-avatar-class-chip strong,
+.intro-avatar-class-chip small {
+  display: block;
+}
+
+.intro-avatar-class-chip small {
+  color: var(--lifexp-muted);
+}
+
+.intro-model-picker {
+  min-width: min(100%, 360px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.68);
+  border: 1px solid color-mix(in srgb, var(--intro-color), transparent 60%);
+}
+
+.intro-model-picker button {
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  color: #e2e8f0;
+  text-align: center;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--intro-color), transparent 78%), transparent 58%),
+    rgba(15, 23, 42, 0.76);
+}
+
+.intro-model-picker button.active {
+  color: white;
+  border-color: color-mix(in srgb, var(--intro-color), white 18%);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--intro-color), transparent 64%),
+    inset 0 0 18px color-mix(in srgb, var(--intro-color), transparent 78%);
+}
+
+.intro-model-picker span,
+.intro-model-picker em,
+.intro-model-picker strong {
+  display: block;
+}
+
+.intro-model-picker em {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: white;
+  font-style: normal;
+  font-size: 1.18rem;
+  line-height: 1;
+  background: color-mix(in srgb, var(--intro-color), transparent 72%);
+  border: 1px solid color-mix(in srgb, var(--intro-color), white 12%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--intro-color), transparent 68%);
+}
+
+.intro-model-silhouette {
+  position: relative;
+  width: 54px;
+  height: 58px;
+  display: block;
+  margin: 0.1rem 0;
+  font-style: normal;
+}
+
+.intro-model-silhouette::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  transform: translateX(-50%);
+  border-radius: 46% 46% 42% 42%;
+  background: color-mix(in srgb, var(--intro-color), white 38%);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--intro-color), transparent 48%);
+}
+
+.intro-model-silhouette::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  width: 42px;
+  height: 34px;
+  transform: translateX(-50%);
+  border-radius: 14px 14px 8px 8px;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.34), transparent 34%),
+    linear-gradient(180deg, color-mix(in srgb, var(--intro-color), white 18%), color-mix(in srgb, var(--intro-color), #020617 48%));
+}
+
+.intro-model-silhouette b {
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 36px;
+  height: 18px;
+  transform: translateX(-50%);
+}
+
+.intro-model-silhouette b::before,
+.intro-model-silhouette b::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 13px;
+  height: 18px;
+  border-radius: 0 0 999px 999px;
+  background: color-mix(in srgb, var(--intro-color), #020617 42%);
+}
+
+.intro-model-silhouette b::before {
+  left: 3px;
+}
+
+.intro-model-silhouette b::after {
+  right: 3px;
+}
+
+.intro-model-silhouette.model-male::after {
+  width: 48px;
+  border-radius: 12px 12px 8px 8px;
+}
+
+.intro-model-silhouette.model-male b {
+  width: 42px;
+}
+
+.intro-model-silhouette.model-female::after {
+  width: 36px;
+  border-radius: 18px 18px 14px 14px;
+  clip-path: polygon(8% 0, 92% 0, 100% 22%, 82% 100%, 18% 100%, 0 22%);
+}
+
+.intro-model-silhouette.model-female b {
+  width: 30px;
+}
+
+.intro-model-picker span {
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.intro-model-picker strong {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.intro-model-picker button.active strong {
+  color: color-mix(in srgb, var(--intro-color), white 44%);
+}
+
+.intro-randomize-button {
+  min-height: 58px;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: #020617;
+  font-weight: 950;
+  background: linear-gradient(90deg, white, var(--intro-color));
+  border: 1px solid color-mix(in srgb, var(--intro-color), white 24%);
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--intro-color), transparent 74%);
+}
+
+.intro-avatar-grid {
+  display: grid;
+  grid-template-columns: minmax(330px, 0.82fr) minmax(420px, 1.18fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.intro-avatar-grid .avatar-panel,
+.intro-avatar-grid .avatar-customizer {
+  grid-column: auto;
+  width: 100%;
+}
+
+.intro-avatar-grid .avatar-panel {
+  min-height: 0;
+}
+
+.intro-avatar-grid .avatar-stage-live {
+  min-height: 420px;
+}
+
+.intro-avatar-grid .avatar-stage-live .premium-avatar {
+  animation: introAvatarIdle 3.4s ease-in-out infinite;
+}
+
+.intro-avatar-grid .avatar-aura-ring {
+  animation: introAvatarAuraPulse 2.8s ease-in-out infinite alternate;
+}
+
+.intro-avatar-grid .avatar-loadout-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.intro-avatar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.intro-secondary-button {
+  min-height: 52px;
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.intro-reveal-screen {
+  place-items: center;
+}
+
+.intro-reveal-card {
+  position: relative;
+  z-index: 1;
+  width: min(620px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-radius: 8px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 18%, color-mix(in srgb, var(--intro-color), transparent 68%), transparent 44%),
+    rgba(2, 6, 23, 0.88);
+  border: 1px solid color-mix(in srgb, var(--intro-color), transparent 48%);
+  box-shadow:
+    0 28px 90px rgba(0, 0, 0, 0.5),
+    0 0 46px color-mix(in srgb, var(--intro-color), transparent 62%);
+  animation: introRevealRise 0.7s ease both;
+}
+
+.intro-reveal-card h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 9vw, 5.6rem);
+  line-height: 0.95;
+}
+
+.intro-reveal-card > strong {
+  color: white;
+  font-size: clamp(1rem, 3vw, 1.35rem);
+}
+
+.intro-reveal-card > span {
+  color: color-mix(in srgb, var(--intro-color), white 42%);
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.intro-reveal-avatar {
+  width: min(420px, 100%);
+  max-height: 510px;
+  overflow: hidden;
+}
+
+.intro-reveal-avatar .avatar-panel {
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.intro-reveal-avatar .avatar-panel > p,
+.intro-reveal-avatar .avatar-panel > h3,
+.intro-reveal-avatar .avatar-tabs,
+.intro-reveal-avatar .avatar-loadout-grid,
+.intro-reveal-avatar .evolution-panel {
+  display: none;
+}
+
+.intro-reveal-avatar .avatar-stage-live {
+  min-height: 390px;
+}
+
+@keyframes gateButtonPulse {
+  from {
+    box-shadow: 0 18px 45px color-mix(in srgb, var(--intro-color), transparent 78%);
+  }
+
+  to {
+    box-shadow:
+      0 18px 48px color-mix(in srgb, var(--intro-color), transparent 62%),
+      0 0 22px color-mix(in srgb, var(--intro-color), transparent 60%);
+  }
+}
+
+@keyframes portalRingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes portalBreath {
+  from {
+    opacity: 0.32;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 0.62;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes portalDoorFloat {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes portalOutlinePulse {
+  from {
+    opacity: 0.28;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 0.78;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes portalScan {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  20%, 72% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(230px);
+  }
+}
+
+@keyframes introAvatarIdle {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+
+  45% {
+    transform: translateY(-5px) scale(1.012);
+  }
+
+  70% {
+    transform: translateY(-2px) scale(0.998);
+  }
+}
+
+@keyframes introAvatarAuraPulse {
+  from {
+    opacity: 0.58;
+    filter: blur(1px);
+  }
+
+  to {
+    opacity: 0.95;
+    filter: blur(0);
+  }
+}
+
+@keyframes introRevealRise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes introEffectDrift {
+  0%, 100% {
+    opacity: 0.18;
+    transform: translate3d(0, 14px, 0) scale(0.82);
+  }
+
+  50% {
+    opacity: 0.72;
+    transform: translate3d(10px, -18px, 0) scale(1.08);
+  }
+}
+
+@keyframes introCodeScan {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+
+  45% {
+    opacity: 0.78;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(64px);
+  }
+}
+
+@keyframes introPixelSpark {
+  0%, 100% {
+    opacity: 0.12;
+    transform: translateY(10px) scale(0.8) rotate(0deg);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: translateY(-22px) scale(1.16) rotate(90deg);
+  }
+}
+
+@keyframes introSoftRing {
+  from {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+
+  55% {
+    opacity: 0.55;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes introTrailDash {
+  0%, 100% {
+    opacity: 0.12;
+    transform: translateX(-24px) rotate(-18deg);
+  }
+
+  50% {
+    opacity: 0.78;
+    transform: translateX(34px) rotate(-18deg);
+  }
+}
+
+@keyframes introRhythmNote {
+  0%, 100% {
+    opacity: 0.18;
+    transform: translateY(8px) rotate(-12deg);
+  }
+
+  50% {
+    opacity: 0.78;
+    transform: translateY(-24px) rotate(18deg);
+  }
+}
+
+@keyframes introEmberRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) rotate(-35deg) scale(0.72);
+  }
+
+  55% {
+    opacity: 0.86;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-34px) rotate(-20deg) scale(1.08);
+  }
+}
+
+@keyframes introClassIconPulse {
+  from {
+    transform: scale(0.98);
+    filter: drop-shadow(0 0 18px white);
+  }
+
+  to {
+    transform: scale(1.05);
+    filter:
+      drop-shadow(0 0 20px white)
+      drop-shadow(0 0 28px var(--intro-color));
+  }
+}
+
+@keyframes portalFloorScan {
+  from {
+    background-position: 0 0, 0 0, 0 0;
+  }
+
+  to {
+    background-position: 84px 0, 0 64px, 0 0;
+  }
+}
+
+@keyframes originSelectedPulse {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes originCardShimmer {
+  0%, 55% {
+    opacity: 0;
+    transform: translateX(-130%);
+  }
+
+  72% {
+    opacity: 0.16;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(130%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-button,
+  .portal-scene::before,
+  .portal-scene::after,
+  .portal-door,
+  .portal-door::before,
+  .portal-door::after,
+  .door-core span,
+  .portal-floor,
+  .intro-class-effects span,
+  .intro-avatar-grid .avatar-stage-live .premium-avatar,
+  .intro-avatar-grid .avatar-aura-ring,
+  .intro-reveal-card,
+  .origin-card.selected,
+  .origin-card.selected::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
 @media (max-width: 1100px) {
   .intro-hero {
     grid-template-columns: 1fr;
@@ -304,6 +1186,29 @@
 
   .origin-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .intro-avatar-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .intro-avatar-class-chip {
+    width: 100%;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .intro-model-picker {
+    width: 100%;
+  }
+
+  .intro-randomize-button {
+    width: 100%;
+  }
+
+  .intro-avatar-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -337,5 +1242,62 @@
 
   .origin-card {
     min-height: 88px;
+  }
+
+  .intro-avatar-header,
+  .intro-avatar-actions {
+    padding: 1rem;
+  }
+
+  .intro-avatar-grid {
+    gap: 0.75rem;
+  }
+
+  .intro-model-picker button {
+    min-height: 118px;
+    padding: 0.55rem;
+  }
+
+  .intro-model-silhouette {
+    width: 48px;
+    height: 52px;
+  }
+
+  .intro-avatar-grid .avatar-stage-live {
+    min-height: 340px;
+  }
+
+  .intro-avatar-grid .avatar-stage-live .premium-avatar {
+    zoom: 0.72;
+  }
+
+  .intro-avatar-grid .avatar-loadout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .intro-avatar-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .intro-avatar-actions .gate-button,
+  .intro-secondary-button {
+    width: 100%;
+  }
+
+  .intro-reveal-card {
+    padding: 1rem;
+  }
+
+  .intro-reveal-avatar {
+    max-height: 390px;
+  }
+
+  .intro-reveal-avatar .avatar-stage-live {
+    min-height: 320px;
+  }
+
+  .intro-reveal-avatar .avatar-stage-live .premium-avatar {
+    zoom: 0.72;
   }
 }

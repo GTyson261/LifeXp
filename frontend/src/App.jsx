@@ -18,6 +18,12 @@ import ActivityPanel from "./components/ActivityPanel";
 import SanctuaryPanel from "./components/SanctuaryPanel";
 import TimerPanel from "./components/TimerPanel";
 import AvatarShowcase from "./components/AvatarShowcase";
+import ProfilePanel from "./components/ProfilePanel";
+import ClassMasteryPanel from "./components/ClassMasteryPanel";
+import WeeklyQuestPanel from "./components/WeeklyQuestPanel";
+import BattleRecap from "./components/BattleRecap";
+import AchievementToast from "./components/AchievementToast";
+import SettingsPanel from "./components/SettingsPanel";
 import {
   getGameState,
   completeActivity,
@@ -30,7 +36,11 @@ import {
   equipInventoryItem,
   travelToWorld,
   restEnergy,
-  resetGame
+  resetGame,
+  registerUser,
+  loginUser,
+  getStoredSession,
+  clearStoredSession
 } from "./services/api";
 import "./styles.css";
 import "./styles/dashboard.css";
@@ -48,6 +58,7 @@ import { CLASSES, CLASS_META, ACTIVITIES } from "./data/gameData";
 
 const DASHBOARD_TABS = [
   { key: "overview", label: "Overview", icon: "⌂" },
+  { key: "profile", label: "Profile", icon: "◉" },
   { key: "avatar", label: "Avatar", icon: "♙" },
   { key: "quests", label: "Quests", icon: "◇" },
   { key: "shop", label: "Shop", icon: "◈" },
@@ -116,15 +127,169 @@ const INTRO_OPENINGS = {
 
 const INTRO_CLASSES = CLASSES.filter((className) => className !== "NOVICE");
 
+const INTRO_MODEL_TYPES = ["Male", "Female"];
+
+const INTRO_BODY_TYPES = ["Lean", "Average", "Athletic", "Strong"];
+
+const INTRO_HAIR_STYLES = [
+  "Fade",
+  "Curly",
+  "Locs",
+  "Afro",
+  "Short",
+  "Long"
+];
+
+const INTRO_OUTFITS = [
+  "Novice Jacket",
+  "Coder Hoodie",
+  "Scholar Cloak",
+  "Arena Gear",
+  "Arcade Jacket",
+  "Explorer Coat",
+  "Zen Robe",
+  "Rhythm Jacket",
+  "Battle Apron"
+];
+
+const INTRO_SKIN_TONES = [
+  "#f1d1b5",
+  "#e0ac69",
+  "#c68642",
+  "#a66a3f",
+  "#8d5524",
+  "#6b3f28",
+  "#4b2a1f"
+];
+
+const INTRO_HAIR_COLORS = [
+  "#020617",
+  "#4b2a1f",
+  "#7c4a2f",
+  "#a16207",
+  "#d6a35d",
+  "#e5e7eb",
+  "#7c3aed",
+  "#22d3ee",
+  "#ec4899"
+];
+
+const INTRO_CLASS_OUTFITS = {
+  CODER: "Coder Hoodie",
+  BOOKWORM: "Scholar Cloak",
+  SPORT_MASTER: "Arena Gear",
+  GAMER: "Arcade Jacket",
+  EXPLORER: "Explorer Coat",
+  ZEN: "Zen Robe",
+  MUSICIAN: "Rhythm Jacket",
+  CHEF: "Battle Apron"
+};
+
+function getRandomIntroItem(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function normalizeAvatarDraft(avatar = {}) {
+  return JSON.stringify({
+    displayName: avatar.displayName || "",
+    gender: avatar.gender === "Female" ? "Female" : "Male",
+    pronouns: avatar.pronouns || "",
+    bodyType: avatar.bodyType || "Average",
+    skinTone: avatar.skinTone || "#8d5524",
+    hairStyle: avatar.hairStyle || "Fade",
+    hairColor: avatar.hairColor || "#020617",
+    outfit: avatar.outfit || "Novice Jacket",
+    aura: avatar.aura || "Starter Glow"
+  });
+}
+
+function cosmeticUnlocksFromState(state) {
+  const ownedOutfits = new Set([
+    "Novice Jacket",
+    state?.avatar?.outfit
+  ]);
+
+  const ownedAuras = new Set([
+    "Starter Glow",
+    state?.avatar?.aura
+  ]);
+
+  const ownedFrames = new Set([
+    "Starter Frame",
+    state?.equippedFrame
+  ]);
+
+  (state?.inventory || []).forEach((item) => {
+    if (item.type === "outfit") ownedOutfits.add(item.name);
+    if (item.type === "aura") ownedAuras.add(item.name);
+    if (item.type === "frame") ownedFrames.add(item.name);
+  });
+
+  return {
+    outfits: ownedOutfits,
+    auras: ownedAuras,
+    frames: ownedFrames
+  };
+}
+
+function bossPhase(boss) {
+  if (!boss?.maxHp) return "Active";
+  const percent = Math.max(0, Math.round((boss.hp / boss.maxHp) * 100));
+
+  if (percent <= 25) return "Enraged";
+  if (percent <= 50) return "Wounded";
+  return "Active";
+}
+
+function findNewAchievement(previousState, nextState) {
+  const previousUnlocked = new Set(
+    (previousState?.achievements || [])
+      .filter((achievement) => achievement.unlocked)
+      .map((achievement) => achievement.id)
+  );
+
+  return (nextState?.achievements || []).find(
+    (achievement) => achievement.unlocked && !previousUnlocked.has(achievement.id)
+  );
+}
+
+function createBattleRecap(previousState, nextState, label) {
+  const previousBoss = previousState?.currentBoss;
+  const nextBoss = nextState?.currentBoss;
+
+  if (!nextBoss) return null;
+
+  const previousHp = previousBoss?.hp ?? nextBoss.hp;
+  const damage = Math.max(0, previousHp - nextBoss.hp);
+  const phase = bossPhase(nextBoss);
+
+  return {
+    title: label,
+    summary: damage > 0
+      ? `${nextBoss.name} took ${damage} damage.`
+      : `${nextBoss.name} is still watching your next move.`,
+    xp: nextState?.lastXpGain || 0,
+    damage,
+    phase
+  };
+}
+
 export default function App() {
+  const [session, setSession] = useState(() => getStoredSession());
   const [state, setState] = useState(null);
   const [showIntro, setShowIntro] = useState(false);
   const [avatarDraft, setAvatarDraft] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [activeView, setActiveView] = useState("overview");
+  const [introStep, setIntroStep] = useState("origin");
   const [introClass, setIntroClass] = useState("CODER");
   const [introName, setIntroName] = useState("");
   const [introPronouns, setIntroPronouns] = useState("they/them");
+  const [avatarSaveStatus, setAvatarSaveStatus] = useState("saved");
+  const [battleRecap, setBattleRecap] = useState(null);
+  const [achievementToast, setAchievementToast] = useState(null);
+  const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem("lifexp_reduce_motion") === "true");
+  const [compactMobile, setCompactMobile] = useState(() => localStorage.getItem("lifexp_compact_mobile") === "true");
 
   const [activityType, setActivityType] = useState("coding");
   const [amount, setAmount] = useState("");
@@ -135,8 +300,18 @@ export default function App() {
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [floatingXp, setFloatingXp] = useState(null);
+  const [authMode, setAuthMode] = useState("login");
+  const [authUsername, setAuthUsername] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
 
   async function loadGame() {
+    if (!getStoredSession()) {
+      setState(null);
+      return;
+    }
+
     try {
       setLoadError("");
       const data = await getGameState();
@@ -150,14 +325,20 @@ export default function App() {
       setIntroName(data.playerName === "PlayerOne" ? "" : data.playerName || "");
       setIntroPronouns(data.pronouns || data.avatar?.pronouns || "they/them");
       setShowIntro(!data.introCompleted);
+      setIntroStep("origin");
     } catch (error) {
+      if ((error.message || "").toLowerCase().includes("log in")) {
+        setSession(null);
+      }
       setLoadError(error.message || "Could not connect to the LifeXP backend.");
     }
   }
 
   useEffect(() => {
-    loadGame();
-  }, []);
+    if (session) {
+      loadGame();
+    }
+  }, [session]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -168,6 +349,89 @@ export default function App() {
 
     return () => clearInterval(interval);
   }, [timerRunning]);
+
+  useEffect(() => {
+    localStorage.setItem("lifexp_reduce_motion", String(reduceMotion));
+  }, [reduceMotion]);
+
+  useEffect(() => {
+    localStorage.setItem("lifexp_compact_mobile", String(compactMobile));
+  }, [compactMobile]);
+
+  const hasUnsavedAvatarChanges = Boolean(
+    state?.avatar &&
+    avatarDraft &&
+    normalizeAvatarDraft(avatarDraft) !== normalizeAvatarDraft(state.avatar)
+  );
+
+  useEffect(() => {
+    if (hasUnsavedAvatarChanges) {
+      setAvatarSaveStatus("unsaved");
+    }
+  }, [hasUnsavedAvatarChanges]);
+
+  useEffect(() => {
+    function warnBeforeLeave(event) {
+      if (!hasUnsavedAvatarChanges) return;
+
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("beforeunload", warnBeforeLeave);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeave);
+  }, [hasUnsavedAvatarChanges]);
+
+  async function submitAuth(event) {
+    event.preventDefault();
+    setAuthBusy(true);
+    setAuthError("");
+
+    try {
+      const nextSession = authMode === "register"
+        ? await registerUser({ username: authUsername, password: authPassword })
+        : await loginUser({ username: authUsername, password: authPassword });
+
+      setSession({ token: nextSession.token, username: nextSession.username });
+      setState(nextSession.player);
+      setAvatarDraft({
+        ...(nextSession.player.avatar || {}),
+        displayName: nextSession.player.playerName || nextSession.player.avatar?.displayName || nextSession.username,
+        pronouns: nextSession.player.pronouns || nextSession.player.avatar?.pronouns || "they/them"
+      });
+      setShowIntro(!nextSession.player.introCompleted);
+      setIntroStep("origin");
+      setAuthPassword("");
+    } catch (error) {
+      setAuthError(error.message || "Could not sign in.");
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+
+  function logout() {
+    clearStoredSession();
+    setSession(null);
+    setState(null);
+    setAvatarDraft(null);
+    setLoadError("");
+  }
+
+  if (!session) {
+    return (
+      <AuthScreen
+        mode={authMode}
+        setMode={setAuthMode}
+        username={authUsername}
+        setUsername={setAuthUsername}
+        password={authPassword}
+        setPassword={setAuthPassword}
+        error={authError}
+        busy={authBusy}
+        onSubmit={submitAuth}
+      />
+    );
+  }
 
   if (!state && loadError) {
     return (
@@ -180,6 +444,9 @@ export default function App() {
           </p>
           <button type="button" onClick={loadGame}>
             Retry Connection
+          </button>
+          <button type="button" onClick={logout}>
+            Log Out
           </button>
           <small>{loadError}</small>
         </div>
@@ -201,9 +468,28 @@ export default function App() {
     setTimeout(() => setFloatingXp(null), 1200);
   }
 
+  function applyGameStateUpdate(updated, options = {}) {
+    const previousState = state;
+    const newAchievement = findNewAchievement(previousState, updated);
+
+    setState(updated);
+    setAvatarDraft(updated.avatar);
+
+    if (newAchievement) {
+      setAchievementToast(newAchievement);
+      setTimeout(() => setAchievementToast(null), 4200);
+    }
+
+    if (options.recapLabel) {
+      setBattleRecap(createBattleRecap(previousState, updated, options.recapLabel));
+    }
+  }
+
   async function openGate() {
     const trimmedName = introName.trim();
     const trimmedPronouns = introPronouns.trim() || "they/them";
+    const selectedGender =
+      avatarDraft?.gender === "Female" ? "Female" : "Male";
 
     if (!trimmedName) {
       return;
@@ -212,10 +498,24 @@ export default function App() {
     await updateAvatar({
       ...(avatarDraft || state.avatar || {}),
       displayName: trimmedName,
-      pronouns: trimmedPronouns
+      pronouns: trimmedPronouns,
+      gender: selectedGender
     });
 
-    await chooseIntroClass(introClass);
+    const updated = await chooseIntroClass(introClass);
+
+    setState(updated);
+    setAvatarDraft({
+      ...(updated.avatar || {}),
+      displayName: updated.playerName || trimmedName,
+      pronouns: updated.pronouns || trimmedPronouns,
+      gender: selectedGender
+    });
+    setIntroStep("avatar");
+  }
+
+  async function finishIntroCustomization() {
+    const saved = await updateAvatar(avatarDraft || state.avatar || {});
 
     const updated = await completeActivity({
       type: "intro",
@@ -224,13 +524,18 @@ export default function App() {
       verified: true
     });
 
-    setState(updated);
-    setAvatarDraft({
-      ...(updated.avatar || {}),
-      displayName: updated.playerName || trimmedName,
-      pronouns: updated.pronouns || trimmedPronouns
+    setState({
+      ...updated,
+      avatar: saved.avatar || updated.avatar
     });
-    setShowIntro(false);
+    setAvatarDraft(saved.avatar || updated.avatar);
+    setIntroStep("reveal");
+    setActiveView("avatar");
+
+    setTimeout(() => {
+      setShowIntro(false);
+      setIntroStep("origin");
+    }, 1900);
   }
 
   async function handleClassChoice(className) {
@@ -265,8 +570,7 @@ export default function App() {
     });
 
     showXp(updated.lastXpGain);
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated, { recapLabel: `${ACTIVITIES.find((activity) => activity.key === activityType)?.label || "Action"} complete` });
     setAmount("");
     setSummary("");
     setVerified(false);
@@ -283,45 +587,50 @@ export default function App() {
     });
 
     showXp(updated.lastXpGain);
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated, { recapLabel: `Timer ${timerActivity} complete` });
     setTimerRunning(false);
     setTimerSeconds(0);
   }
 
   async function saveAvatar() {
+    setAvatarSaveStatus("saving");
     const updated = await updateAvatar(avatarDraft);
     setState(updated);
     setAvatarDraft(updated.avatar);
+    setAvatarSaveStatus("saved");
+  }
+
+  function handleDashboardTabChange(nextView) {
+    if (hasUnsavedAvatarChanges && activeView === "avatar" && nextView !== "avatar") {
+      setAvatarSaveStatus("unsaved");
+    }
+
+    setActiveView(nextView);
   }
 
   async function handleBuyItem(itemId) {
     const updated = await buyShopItem(itemId);
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated);
   }
 
   async function handleEquipItem(itemId) {
     const updated = await equipInventoryItem(itemId);
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated);
   }
 
   async function handleTravel(worldId) {
     const updated = await travelToWorld(worldId);
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated, { recapLabel: "World travel" });
   }
 
   async function handleRest() {
     const updated = await restEnergy();
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated);
   }
 
   async function handleUnlockSkill(skillId) {
     const updated = await unlockSkill(skillId);
-    setState(updated);
+    applyGameStateUpdate(updated);
   }
 
   async function handleClaimQuest(questId) {
@@ -329,17 +638,19 @@ export default function App() {
     if (updated.lastXpGain > 0) {
       showXp(updated.lastXpGain);
     }
-    setState(updated);
-    setAvatarDraft(updated.avatar);
+    applyGameStateUpdate(updated, { recapLabel: "Quest reward claimed" });
   }
 
   async function hardReset() {
     const updated = await resetGame();
     setState(updated);
     setAvatarDraft(updated.avatar);
+    setBattleRecap(null);
+    setAchievementToast(null);
     setIntroClass("CODER");
     setIntroName("");
     setIntroPronouns("they/them");
+    setIntroStep("origin");
     setShowIntro(true);
     setTimerRunning(false);
     setTimerSeconds(0);
@@ -349,12 +660,173 @@ export default function App() {
     const introMeta = CLASS_META[introClass] || CLASS_META.CODER;
     const introOpening = INTRO_OPENINGS[introClass] || INTRO_OPENINGS.CODER;
     const canOpenGate = introName.trim().length > 0;
+    const introModelType = avatarDraft?.gender === "Female" ? "Female" : "Male";
+    const introPreviewState = {
+      ...state,
+      primaryClass: introClass,
+      activeClass: introClass,
+      avatar: {
+        ...(avatarDraft || state.avatar || {}),
+        gender: introModelType
+      },
+      playerName: avatarDraft?.displayName || introName || state.playerName,
+      pronouns: avatarDraft?.pronouns || introPronouns || state.pronouns,
+      title: `${introMeta.label} Initiate`
+    };
+
+    function setIntroModelType(modelType) {
+      setAvatarDraft({
+        ...(avatarDraft || state.avatar || {}),
+        displayName: avatarDraft?.displayName || introName || state.playerName,
+        pronouns: avatarDraft?.pronouns || introPronouns || state.pronouns,
+        gender: modelType
+      });
+    }
+
+    function randomizeIntroAvatar() {
+      setAvatarDraft({
+        ...(avatarDraft || state.avatar || {}),
+        displayName: avatarDraft?.displayName || introName || state.playerName,
+        pronouns: avatarDraft?.pronouns || introPronouns || state.pronouns,
+        gender: getRandomIntroItem(INTRO_MODEL_TYPES),
+        bodyType: getRandomIntroItem(INTRO_BODY_TYPES),
+        skinTone: getRandomIntroItem(INTRO_SKIN_TONES),
+        hairStyle: getRandomIntroItem(INTRO_HAIR_STYLES),
+        hairColor: getRandomIntroItem(INTRO_HAIR_COLORS),
+        outfit: INTRO_CLASS_OUTFITS[introClass] || getRandomIntroItem(INTRO_OUTFITS),
+        aura: "Starter Glow"
+      });
+    }
+
+    const introClassEffects = (
+      <div className="intro-class-effects" aria-hidden="true">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <span key={index} />
+        ))}
+      </div>
+    );
+
+    if (introStep === "reveal") {
+      return (
+        <div
+          className={`intro-screen intro-reveal-screen intro-${introClass.toLowerCase()}`}
+          style={{ "--intro-color": introMeta.color, "--class-color": introMeta.color }}
+        >
+          {introClassEffects}
+          <div className="intro-reveal-card">
+            <p className="eyebrow">Hero awakened</p>
+            <h1>{avatarDraft?.displayName || introName || "Your Hero"}</h1>
+            <div className="intro-reveal-avatar">
+              <AvatarPreview
+                state={introPreviewState}
+                classMeta={CLASS_META}
+                avatarDraft={avatarDraft}
+              />
+            </div>
+            <strong>
+              {introMeta.icon} {introMeta.label} of {introMeta.world}
+            </strong>
+            <span>Entering LifeXP...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (introStep === "avatar") {
+      return (
+        <div
+          className={`intro-screen intro-avatar-screen intro-${introClass.toLowerCase()}`}
+          style={{ "--intro-color": introMeta.color, "--class-color": introMeta.color }}
+        >
+          {introClassEffects}
+          <div className="intro-stage intro-avatar-stage">
+            <section className="intro-avatar-header">
+              <div>
+                <p className="eyebrow">Forge your hero</p>
+                <h1>Customize {avatarDraft?.displayName || introName || "your hero"}</h1>
+                <p>
+                  Your class is set. Shape the avatar players will see before you enter the world.
+                </p>
+              </div>
+
+              <div className="intro-avatar-class-chip">
+                <span>{introMeta.icon}</span>
+                <strong>{introMeta.label}</strong>
+                <small>{introMeta.world}</small>
+              </div>
+
+              <div className="intro-model-picker" role="group" aria-label="First character model">
+                {INTRO_MODEL_TYPES.map((modelType) => (
+                  <button
+                    key={modelType}
+                    type="button"
+                    className={introModelType === modelType ? "active" : ""}
+                    aria-pressed={introModelType === modelType}
+                    onClick={() => setIntroModelType(modelType)}
+                  >
+                    <em aria-hidden="true">{modelType === "Male" ? "♂" : "♀"}</em>
+                    <i
+                      className={`intro-model-silhouette ${modelType === "Male" ? "model-male" : "model-female"}`}
+                      aria-hidden="true"
+                    >
+                      <b />
+                    </i>
+                    <span>{modelType}</span>
+                    <strong>{modelType === "Male" ? "Broader build" : "Tapered build"}</strong>
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="intro-randomize-button"
+                onClick={randomizeIntroAvatar}
+              >
+                Random Hero
+              </button>
+            </section>
+
+            <section className="intro-avatar-grid">
+              <AvatarPreview
+                state={introPreviewState}
+                classMeta={CLASS_META}
+                avatarDraft={avatarDraft}
+              />
+
+              <AvatarCustomizer
+                avatarDraft={avatarDraft}
+                setAvatarDraft={setAvatarDraft}
+                onSave={saveAvatar}
+              />
+            </section>
+
+            <div className="intro-avatar-actions">
+              <button
+                type="button"
+                className="intro-secondary-button"
+                onClick={() => setIntroStep("origin")}
+              >
+                Back to Class Choice
+              </button>
+              <button
+                type="button"
+                className="gate-button"
+                onClick={finishIntroCustomization}
+              >
+                Enter LifeXP
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div
         className={`intro-screen intro-${introClass.toLowerCase()}`}
         style={{ "--intro-color": introMeta.color }}
       >
+        {introClassEffects}
         <div className="intro-stage">
           <section className="intro-hero">
             <div className="intro-copy">
@@ -443,12 +915,24 @@ export default function App() {
     );
   }
 
+  const cosmeticUnlocks = cosmeticUnlocksFromState(state);
+
   return (
     <main
-      className={`app-shell ${themeClass(state.equippedTheme)} class-${activeClass.toLowerCase()}`}
+      className={[
+        "app-shell",
+        themeClass(state.equippedTheme),
+        `class-${activeClass.toLowerCase()}`,
+        reduceMotion ? "reduce-motion" : "",
+        compactMobile ? "compact-mobile" : ""
+      ].filter(Boolean).join(" ")}
       style={{ "--class-color": meta.color }}
     >
       {floatingXp && <div className="floating-xp">{floatingXp}</div>}
+      <AchievementToast
+        achievement={achievementToast}
+        onDismiss={() => setAchievementToast(null)}
+      />
 
       <div className="premium-dashboard-layout">
         <div className="premium-dashboard-main">
@@ -465,13 +949,34 @@ export default function App() {
                 aria-label={`Show ${tab.label} view`}
                 aria-pressed={activeView === tab.key}
                 className={activeView === tab.key ? "dashboard-tab active" : "dashboard-tab"}
-                onClick={() => setActiveView(tab.key)}
+                onClick={() => handleDashboardTabChange(tab.key)}
               >
                 <span>{tab.icon}</span>
                 <strong>{tab.label}</strong>
               </button>
             ))}
           </nav>
+
+          <nav className="mobile-bottom-nav" aria-label="Mobile dashboard views">
+            {DASHBOARD_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                aria-label={`Show ${tab.label} view`}
+                aria-pressed={activeView === tab.key}
+                className={activeView === tab.key ? "mobile-nav-button active" : "mobile-nav-button"}
+                onClick={() => handleDashboardTabChange(tab.key)}
+              >
+                <span>{tab.icon}</span>
+                <strong>{tab.label}</strong>
+              </button>
+            ))}
+          </nav>
+
+          <div className="account-strip">
+            <span>Signed in as <strong>{session.username}</strong></span>
+            <button type="button" onClick={logout}>Log Out</button>
+          </div>
 
           <section className={`dashboard-grid view-${activeView}`}>
             {activeView === "overview" && (
@@ -483,6 +988,7 @@ export default function App() {
                 />
 
                 <AvatarPreview
+                  className="overview-detail-panel"
                   state={state}
                   classMeta={CLASS_META}
                   avatarDraft={avatarDraft}
@@ -516,11 +1022,43 @@ export default function App() {
                 />
 
                 <BossPanel
+                  className="overview-detail-panel"
                   boss={state.currentBoss}
                   bossesDefeated={state.bossesDefeated}
                 />
 
-                <QuestPanel quests={state.dailyQuests || []} onClaimQuest={handleClaimQuest} />
+                <QuestPanel
+                  className="overview-detail-panel"
+                  quests={state.dailyQuests || []}
+                  onClaimQuest={handleClaimQuest}
+                  primaryClass={state.primaryClass}
+                />
+
+                <BattleRecap
+                  recap={battleRecap}
+                  onDismiss={() => setBattleRecap(null)}
+                />
+              </>
+            )}
+
+            {activeView === "profile" && (
+              <>
+                <ProfilePanel
+                  state={state}
+                  classMeta={CLASS_META}
+                  xpNeeded={xpNeeded}
+                  xpPercent={xpPercent}
+                />
+
+                <ClassMasteryPanel
+                  state={state}
+                  classMeta={CLASS_META}
+                />
+
+                <WeeklyQuestPanel
+                  state={state}
+                  classMeta={CLASS_META}
+                />
               </>
             )}
 
@@ -544,6 +1082,9 @@ export default function App() {
                   avatarDraft={avatarDraft}
                   setAvatarDraft={setAvatarDraft}
                   onSave={saveAvatar}
+                  saveStatus={avatarSaveStatus}
+                  hasUnsavedChanges={hasUnsavedAvatarChanges}
+                  cosmeticUnlocks={cosmeticUnlocks}
                 />
 
                 <EquipmentPanel
@@ -567,7 +1108,16 @@ export default function App() {
 
             {activeView === "quests" && (
               <>
-                <QuestPanel quests={state.dailyQuests || []} onClaimQuest={handleClaimQuest} />
+                <QuestPanel
+                  quests={state.dailyQuests || []}
+                  onClaimQuest={handleClaimQuest}
+                  primaryClass={state.primaryClass}
+                />
+
+                <WeeklyQuestPanel
+                  state={state}
+                  classMeta={CLASS_META}
+                />
 
                 <SkillTreePanel
                   skills={state.skills || []}
@@ -633,6 +1183,11 @@ export default function App() {
                   bossesDefeated={state.bossesDefeated}
                 />
 
+                <BattleRecap
+                  recap={battleRecap}
+                  onDismiss={() => setBattleRecap(null)}
+                />
+
                 <LootPanel
                   bossesDefeated={state.bossesDefeated}
                   lastLootDrops={state.lastLootDrops || []}
@@ -655,12 +1210,89 @@ export default function App() {
                   lastRestTimestamp={state.lastRestTimestamp}
                   onRest={handleRest}
                 />
+
+                <SettingsPanel
+                  username={session.username}
+                  reduceMotion={reduceMotion}
+                  setReduceMotion={setReduceMotion}
+                  compactMobile={compactMobile}
+                  setCompactMobile={setCompactMobile}
+                  onReset={hardReset}
+                  onLogout={logout}
+                />
               </>
             )}
           </section>
         </div>
       </div>
     </main>
+  );
+}
+
+function AuthScreen({
+  mode,
+  setMode,
+  username,
+  setUsername,
+  password,
+  setPassword,
+  error,
+  busy,
+  onSubmit
+}) {
+  const isRegister = mode === "register";
+
+  return (
+    <div className="auth-screen">
+      <form className="auth-card" onSubmit={onSubmit}>
+        <p className="eyebrow">Private LifeXP Account</p>
+        <h1>{isRegister ? "Create your save" : "Log in to LifeXP"}</h1>
+        <p>
+          Your password is hashed before it is stored, and your game progress is saved under your username.
+        </p>
+
+        <label>
+          <span>Username</span>
+          <input
+            type="text"
+            value={username}
+            placeholder="glenn"
+            autoComplete="username"
+            minLength="3"
+            maxLength="32"
+            onChange={(event) => setUsername(event.target.value)}
+          />
+        </label>
+
+        <label>
+          <span>Password</span>
+          <input
+            type="password"
+            value={password}
+            placeholder="8+ characters"
+            autoComplete={isRegister ? "new-password" : "current-password"}
+            minLength="8"
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </label>
+
+        {error && <strong className="auth-error">{error}</strong>}
+
+        <button type="submit" disabled={busy}>
+          {busy ? "Working..." : isRegister ? "Create Account" : "Log In"}
+        </button>
+
+        <button
+          type="button"
+          className="auth-mode-button"
+          onClick={() => {
+            setMode(isRegister ? "login" : "register");
+          }}
+        >
+          {isRegister ? "Already have an account? Log in" : "Need an account? Create one"}
+        </button>
+      </form>
+    </div>
   );
 }
 

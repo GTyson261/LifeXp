@@ -2,10 +2,13 @@ package com.lifexp.demo.controller;
 
 import org.springframework.stereotype.Service;
 
+import java.util.function.Supplier;
+
 @Service
 public class GameService {
     private final SaveService saveService;
     private final DailyResetService dailyResetService;
+    private UserAccount currentAccount;
     private PlayerState state;
 
     public GameService(SaveService saveService, DailyResetService dailyResetService) {
@@ -19,6 +22,23 @@ public class GameService {
         saveState();
     }
 
+    public synchronized PlayerState withAccount(UserAccount account, Supplier<PlayerState> action) {
+        currentAccount = account;
+        state = saveService.loadOrCreateNew(account);
+
+        dailyResetService.applyDailyResetIfNeeded(state);
+        syncCatalog();
+        unlockAvailableWorlds();
+
+        try {
+            PlayerState result = action.get();
+            saveState();
+            return result;
+        } finally {
+            currentAccount = null;
+        }
+    }
+
     public PlayerState getState() {
         dailyResetService.applyDailyResetIfNeeded(state);
         syncCatalog();
@@ -27,7 +47,7 @@ public class GameService {
     }
 
     public PlayerState reset() {
-        state = saveService.resetSave();
+        state = currentAccount == null ? saveService.resetSave() : saveService.resetSave(currentAccount);
         syncCatalog();
         return state;
     }
@@ -768,6 +788,33 @@ public class GameService {
             }
         }
 
+        String questClass = state.primaryClass == null || state.primaryClass.equals("NOVICE")
+                ? "CODER"
+                : state.primaryClass;
+
+        state.dailyQuests.removeIf(quest ->
+                quest.id != null &&
+                quest.id.startsWith("class_") &&
+                !quest.id.startsWith("class_" + questClass.toLowerCase() + "_"));
+
+        for (PlayerState.Quest classQuest : classChainQuests(questClass)) {
+            PlayerState.Quest existing = findQuest(classQuest.id);
+            if (existing == null) {
+                state.dailyQuests.add(classQuest);
+            } else {
+                existing.name = classQuest.name;
+                existing.description = classQuest.description;
+                existing.rewardXp = classQuest.rewardXp;
+                existing.rewardGold = classQuest.rewardGold;
+                existing.rewardEssence = classQuest.rewardEssence;
+                existing.actionType = classQuest.actionType;
+                existing.target = classQuest.target;
+                if (existing.completed && existing.progress == 0) {
+                    existing.progress = existing.target;
+                }
+            }
+        }
+
         for (PlayerState.Skill defaultSkill : defaults.skills) {
             PlayerState.Skill existing = findSkill(defaultSkill.id);
             if (existing == null) {
@@ -862,6 +909,75 @@ public class GameService {
             }
         }
         return null;
+    }
+
+    private PlayerState.Quest[] classChainQuests(String className) {
+        switch (className) {
+            case "BOOKWORM":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Pagefire Initiation", "Read once to light the first memory rune.", "reading", 1, 70, 24, 1),
+                        classQuest(className, 2, "Margin Mage", "Complete 2 reading or focus sessions to reinforce your notes.", "focus", 2, 95, 32, 2),
+                        classQuest(className, 3, "Wraith Counterspell", "Damage a boss after studying.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "SPORT_MASTER":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Warmup Spark", "Complete one walk or workout.", "movement", 1, 70, 24, 1),
+                        classQuest(className, 2, "Arena Pressure", "Complete 2 movement actions today.", "movement", 2, 95, 32, 2),
+                        classQuest(className, 3, "Titan Breaker", "Damage a boss after training.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "GAMER":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Combo Start", "Complete one purposeful gaming action.", "gaming", 1, 70, 24, 1),
+                        classQuest(className, 2, "Quest Combo", "Claim progress on 2 real actions.", "any", 2, 95, 32, 2),
+                        classQuest(className, 3, "Phantom Punish", "Damage a boss with your combo active.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "EXPLORER":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "First Bearing", "Travel to any unlocked world.", "travel", 1, 70, 24, 1),
+                        classQuest(className, 2, "Route Sketch", "Complete 2 real actions after scouting.", "any", 2, 95, 32, 2),
+                        classQuest(className, 3, "Unknown Faced", "Damage a boss in the field.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "ZEN":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Quiet Breath", "Complete one meditation action.", "meditation", 1, 70, 24, 2),
+                        classQuest(className, 2, "Still Water", "Complete 2 calm-focus actions.", "focus", 2, 95, 32, 2),
+                        classQuest(className, 3, "Serpent Uncoiled", "Damage a boss while steady.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "MUSICIAN":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Find the Beat", "Complete one music practice action.", "music", 1, 70, 24, 1),
+                        classQuest(className, 2, "Rhythm Chain", "Complete 2 practice or focus actions.", "focus", 2, 95, 32, 2),
+                        classQuest(className, 3, "Silence Splitter", "Damage a boss with rhythm momentum.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "CHEF":
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Prep Flame", "Complete one cooking action.", "cooking", 1, 70, 24, 1),
+                        classQuest(className, 2, "Kitchen Tempo", "Complete 2 cooking or focus actions.", "focus", 2, 95, 32, 2),
+                        classQuest(className, 3, "Chaos Plated", "Damage a boss after prep.", "boss_damage", 1, 120, 42, 3)
+                };
+            case "CODER":
+            default:
+                return new PlayerState.Quest[] {
+                        classQuest(className, 1, "Boot Sequence", "Complete one coding action.", "coding", 1, 70, 24, 1),
+                        classQuest(className, 2, "Debug Loop", "Complete 2 focused build actions.", "focus", 2, 95, 32, 2),
+                        classQuest(className, 3, "Bug Lord Trace", "Damage a boss after debugging.", "boss_damage", 1, 120, 42, 3)
+                };
+        }
+    }
+
+    private PlayerState.Quest classQuest(String className, int step, String name, String description, String actionType, int target, int rewardXp, int rewardGold, int rewardEssence) {
+        return new PlayerState.Quest(
+                "class_" + className.toLowerCase() + "_" + step,
+                name,
+                description,
+                false,
+                false,
+                rewardXp,
+                rewardGold,
+                rewardEssence,
+                actionType,
+                target
+        );
     }
 
     private PlayerState.Skill findSkill(String skillId) {
@@ -1121,7 +1237,7 @@ public class GameService {
     }
 
     public PlayerState reloadSave() {
-        state = saveService.loadOrCreateNew();
+        state = currentAccount == null ? saveService.loadOrCreateNew() : saveService.loadOrCreateNew(currentAccount);
         return state;
     }
 
@@ -1167,6 +1283,10 @@ public class GameService {
         }
     }
     private void saveState() {
-        saveService.save(state);
+        if (currentAccount == null) {
+            saveService.save(state);
+        } else {
+            saveService.save(currentAccount, state);
+        }
     }
 }

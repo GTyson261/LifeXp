@@ -11,17 +11,7 @@ const HAIR_STYLES = [
   "Long"
 ];
 
-const OUTFITS = [
-  "Novice Jacket",
-  "Coder Hoodie",
-  "Scholar Cloak",
-  "Arena Gear",
-  "Arcade Jacket",
-  "Explorer Coat",
-  "Zen Robe",
-  "Rhythm Jacket",
-  "Battle Apron"
-];
+const OUTFITS = Object.keys(OUTFIT_STYLE_MAP);
 
 const SKIN_TONES = [
   "#f1d1b5",
@@ -33,6 +23,18 @@ const SKIN_TONES = [
   "#4b2a1f"
 ];
 
+const HAIR_COLORS = [
+  "#020617",
+  "#4b2a1f",
+  "#7c4a2f",
+  "#a16207",
+  "#d6a35d",
+  "#e5e7eb",
+  "#7c3aed",
+  "#22d3ee",
+  "#ec4899"
+];
+
 const PRONOUN_OPTIONS = [
   "they/them",
   "she/her",
@@ -42,10 +44,15 @@ const PRONOUN_OPTIONS = [
   "any"
 ];
 
+const MODEL_TYPES = ["Male", "Female"];
+
 export default function AvatarCustomizer({
   avatarDraft,
   setAvatarDraft,
-  onSave
+  onSave,
+  saveStatus = "saved",
+  hasUnsavedChanges = true,
+  cosmeticUnlocks = null
 }) {
   function updateAvatarField(field, value) {
     setAvatarDraft({
@@ -54,13 +61,41 @@ export default function AvatarCustomizer({
     });
   }
 
+  function getRandomItem(items) {
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
+  function randomizeColorIdentity() {
+    setAvatarDraft({
+      ...avatarDraft,
+      skinTone: getRandomItem(SKIN_TONES),
+      hairColor: getRandomItem(HAIR_COLORS)
+    });
+  }
+
   const selectedBodyType =
     avatarDraft?.bodyType || "Average";
+
+  const selectedModelType =
+    avatarDraft?.gender === "Female" ? "Female" : "Male";
 
   const selectedBodyIndex = Math.max(
     0,
     BODY_TYPES.indexOf(selectedBodyType)
   );
+
+  const unlockedOutfits = cosmeticUnlocks?.outfits;
+
+  function isOutfitUnlocked(outfit) {
+    if (!unlockedOutfits) return true;
+    return unlockedOutfits.has(outfit);
+  }
+
+  const saveLabel = saveStatus === "saving"
+    ? "Saving..."
+    : hasUnsavedChanges
+      ? "Save Avatar Changes"
+      : "Avatar Saved";
 
   return (
     <div className="panel avatar-customizer premium-customizer">
@@ -108,6 +143,28 @@ export default function AvatarCustomizer({
               ))}
             </datalist>
           </label>
+        </div>
+      </section>
+
+      <section className="customizer-section">
+        <h4>Model</h4>
+
+        <div className="model-toggle" role="group" aria-label="Avatar model type">
+          {MODEL_TYPES.map((modelType) => (
+            <button
+              key={modelType}
+              type="button"
+              className={
+                selectedModelType === modelType
+                  ? "model-toggle-button active"
+                  : "model-toggle-button"
+              }
+              onClick={() => updateAvatarField("gender", modelType)}
+            >
+              <span>{modelType === "Male" ? "♂" : "♀"}</span>
+              <strong>{modelType}</strong>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -161,7 +218,16 @@ export default function AvatarCustomizer({
       </section>
 
       <section className="customizer-section">
-        <h4>Skin Tone</h4>
+        <div className="customizer-section-title-row">
+          <h4>Skin Tone</h4>
+          <button
+            className="randomize-colors-button"
+            type="button"
+            onClick={randomizeColorIdentity}
+          >
+            Randomize Colors
+          </button>
+        </div>
 
         <div className="skin-tone-strip" aria-label="Skin tone presets">
           {SKIN_TONES.map((tone) => (
@@ -198,6 +264,43 @@ export default function AvatarCustomizer({
       </section>
 
       <section className="customizer-section">
+        <h4>Hair Color</h4>
+
+        <div className="hair-color-strip" aria-label="Hair color presets">
+          {HAIR_COLORS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              aria-label={`Set hair color ${color}`}
+              className={
+                (avatarDraft?.hairColor || "#020617") === color
+                  ? "hair-color-swatch active"
+                  : "hair-color-swatch"
+              }
+              style={{ "--hair-color": color }}
+              onClick={() => updateAvatarField("hairColor", color)}
+            />
+          ))}
+        </div>
+
+        <input
+          className="hair-color-input"
+          type="color"
+          value={avatarDraft?.hairColor || "#020617"}
+          onChange={(event) =>
+            updateAvatarField(
+              "hairColor",
+              event.target.value
+            )
+          }
+        />
+
+        <code>
+          {avatarDraft?.hairColor || "#020617"}
+        </code>
+      </section>
+
+      <section className="customizer-section">
         <h4>Hairstyles</h4>
 
         <div className="choice-card-grid hair-choice-grid">
@@ -215,7 +318,10 @@ export default function AvatarCustomizer({
               }
               type="button"
             >
-              <span className="hair-preview-dot" />
+              <span
+                className="hair-preview-dot"
+                style={{ "--hair-color": avatarDraft?.hairColor || "#020617" }}
+              />
               <strong>{style}</strong>
             </button>
           ))}
@@ -236,17 +342,21 @@ export default function AvatarCustomizer({
                 "--outfit-glow": OUTFIT_STYLE_MAP[outfit]?.glow || "#64748b"
               }}
               className={
-                avatarDraft?.outfit === outfit
-                  ? "choice-card active"
-                  : "choice-card"
+                [
+                  "choice-card",
+                  avatarDraft?.outfit === outfit ? "active" : "",
+                  !isOutfitUnlocked(outfit) ? "locked-choice" : ""
+                ].filter(Boolean).join(" ")
               }
               onClick={() =>
-                updateAvatarField("outfit", outfit)
+                isOutfitUnlocked(outfit) && updateAvatarField("outfit", outfit)
               }
+              disabled={!isOutfitUnlocked(outfit)}
               type="button"
             >
               <span className="outfit-preview-tile" />
               <strong>{outfit}</strong>
+              {!isOutfitUnlocked(outfit) && <small>Unlock in shop or boss loot</small>}
             </button>
           ))}
 
@@ -254,12 +364,21 @@ export default function AvatarCustomizer({
       </section>
 
       <button
-        className="save-avatar-button"
+        className={
+          hasUnsavedChanges
+            ? "save-avatar-button unsaved"
+            : "save-avatar-button saved"
+        }
         onClick={onSave}
+        disabled={saveStatus === "saving" || !hasUnsavedChanges}
         type="button"
       >
-        Save Avatar
+        {saveLabel}
       </button>
+
+      {hasUnsavedChanges && (
+        <p className="avatar-save-hint">Unsaved avatar changes are previewing live.</p>
+      )}
 
     </div>
   );
