@@ -1,17 +1,8 @@
 /* LifeXP responsive-only overrides */
 
 @media (max-width: 1200px) {
-  .premium-dashboard-layout {
-    grid-template-columns: 1fr;
-  }
-
   .dashboard-tabs {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .lifexp-sidebar {
-    position: relative;
-    min-height: auto;
   }
 
   .premium-brand-row {
@@ -21,6 +12,7 @@
 
   .hud-stat-row {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .hero-panel,

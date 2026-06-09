@@ -14,14 +14,21 @@ public class GameService {
         this.state = saveService.loadOrCreateNew();
 
         dailyResetService.applyDailyResetIfNeeded(this.state);
+        syncCatalog();
+        unlockAvailableWorlds();
+        saveState();
     }
 
     public PlayerState getState() {
+        dailyResetService.applyDailyResetIfNeeded(state);
+        syncCatalog();
+        unlockAvailableWorlds();
         return state;
     }
 
     public PlayerState reset() {
         state = saveService.resetSave();
+        syncCatalog();
         return state;
     }
 
@@ -30,25 +37,41 @@ public class GameService {
             return state;
         }
 
+        syncCatalog();
+        unlockAvailableWorlds();
+
         for (PlayerState.WorldZone world : state.worlds) {
             if (world.id.equals(worldId)) {
                 if (!world.unlocked) {
-                    state.activityLog.add(0, "World locked: " + world.name);
+                    state.activityLog.add(0, "World locked: " + world.name + " needs level " + world.minLevel + " and " + world.requiredBosses + " boss win(s).");
                     trimLog();
                     return state;
                 }
 
+                int travelCost = hasSkill("s5") ? 0 : classAdjustedTravelCost(world.travelCost);
+
+                if (state.energy < travelCost) {
+                    state.activityLog.add(0, "Not enough energy to travel to " + world.name + ".");
+                    trimLog();
+                    return state;
+                }
+
+                state.energy -= travelCost;
                 state.currentWorldId = world.id;
                 state.activeClass = world.classTheme;
 
-                int bossHp = 500 + state.level * 75;
+                state.currentBoss = createBossForWorld(world);
+                advanceQuest("travel", 1);
 
-                state.currentBoss = new PlayerState.Boss(
-                        world.bossName,
-                        world.description,
-                        bossHp,
-                        bossHp
-                );
+                if (state.primaryClass.equals("EXPLORER")) {
+                    int travelXp = 25 + Math.max(0, world.requiredBosses * 5) + classUpgradeBonusStep() * 8;
+                    int travelGold = 10 + classUpgradeBonusStep() * 4;
+                    state.xp += travelXp;
+                    state.gold += travelGold;
+                    state.lastXpGain = travelXp;
+                    checkLevelUp();
+                    state.activityLog.add(0, "Explorer upgrade perk: +" + travelXp + " XP and +" + travelGold + " Gold for scouting " + world.name + ".");
+                }
 
                 state.activityLog.add(0, "Traveled to " + world.name + ". Boss appeared: " + world.bossName + ".");
                 trimLog();
@@ -80,17 +103,26 @@ public class GameService {
         }
 
         state.gold -= 25;
-        state.primaryClass = className;
-        state.activeClass = className;
+        applyClassTheme(className);
         state.classMastery = 0;
         state.xpPenaltyActionsLeft = 3;
 
-        state.title = titleForClass(className);
-        state.avatar.outfit = outfitForClass(className);
-        state.avatar.aura = auraForClass(className);
-
         state.activityLog.add(0, "Class Sanctuary complete. Primary class changed to " + className + ".");
         state.activityLog.add(0, "Class mastery reset. Temporary XP penalty active for 3 actions.");
+        trimLog();
+        saveState();
+        return state;
+    }
+
+    public PlayerState chooseIntroClass(String className) {
+        if (className == null || className.isBlank() || state.introCompleted) {
+            return state;
+        }
+
+        applyClassTheme(className);
+        state.classMastery = 0;
+        state.xpPenaltyActionsLeft = 0;
+        state.activityLog.add(0, "Origin chosen: " + className + ".");
         trimLog();
         saveState();
         return state;
@@ -100,12 +132,14 @@ public class GameService {
         if (request == null) return state;
 
         dailyResetService.applyDailyResetIfNeeded(state);
+        syncCatalog();
+        unlockAvailableWorlds();
 
         String type = safe(request.type);
         int amount = dailyResetService.sanitizeActivityAmount((int) Math.min(request.amount, 60));
         String summary = safe(request.summary);
 
-        int energyCost = Math.max(1, amount / 5);
+        int energyCost = classAdjustedEnergyCost(type, Math.max(1, amount / 5));
 
         if (!type.equals("intro") && state.energy < energyCost) {
             state.activityLog.add(0, "Not enough energy for this activity.");
@@ -158,10 +192,17 @@ public class GameService {
             state.gold += 5;
         }
 
+        applyPrimaryClassPerks(type, amount, summary);
+
         int damage = Math.max(5, xpGain / 2);
+        damage += primaryClassBossDamageBonus(type);
 
         if (hasSkill("s2") && (type.equals("coding") || type.equals("focus"))) {
             damage += 15;
+        }
+
+        if (hasSkill("s6")) {
+            damage = (int) Math.round(damage * 1.25);
         }
 
         damageBoss(damage);
@@ -176,6 +217,7 @@ public class GameService {
 
         state.activityLog.add(0, log);
         trimLog();
+        unlockAvailableWorlds();
         saveState();
         return state;
     }
@@ -183,8 +225,26 @@ public class GameService {
     public PlayerState updateAvatar(PlayerState.Avatar avatar) {
         if (avatar == null) return state;
 
+        String displayName = safe(avatar.displayName);
+        String pronouns = safe(avatar.pronouns);
+
+        if (displayName.isBlank()) {
+            displayName = state.playerName == null || state.playerName.isBlank()
+                    ? "PlayerOne"
+                    : state.playerName;
+        }
+
+        if (pronouns.isBlank()) {
+            pronouns = state.pronouns == null || state.pronouns.isBlank()
+                    ? "they/them"
+                    : state.pronouns;
+        }
+
+        avatar.displayName = displayName;
+        avatar.pronouns = pronouns;
         state.avatar = avatar;
-        state.pronouns = avatar.pronouns;
+        state.playerName = displayName;
+        state.pronouns = pronouns;
         state.activityLog.add(0, "Avatar updated live.");
         trimLog();
         saveState();
@@ -222,14 +282,28 @@ public class GameService {
     }
 
     public PlayerState unlockSkill(String skillId) {
-        if (state.skillPoints <= 0) return state;
+        syncCatalog();
 
         for (PlayerState.Skill skill : state.skills) {
             if (skill.id.equals(skillId) && !skill.unlocked) {
+                int cost = Math.max(1, skill.cost);
+                if (state.skillPoints < cost) {
+                    state.activityLog.add(0, "Not enough skill points for " + skill.name + ".");
+                    trimLog();
+                    return state;
+                }
+
+                if (!skill.prerequisiteId.isBlank() && !hasSkill(skill.prerequisiteId)) {
+                    state.activityLog.add(0, "Skill locked: unlock its prerequisite first.");
+                    trimLog();
+                    return state;
+                }
+
                 skill.unlocked = true;
-                state.skillPoints -= 1;
+                state.skillPoints -= cost;
                 state.activityLog.add(0, "Unlocked skill: " + skill.name);
                 trimLog();
+                unlockAvailableWorlds();
                 saveState();
                 break;
             }
@@ -238,46 +312,103 @@ public class GameService {
         return state;
     }
 
+    public PlayerState claimQuest(String questId) {
+        if (questId == null || questId.isBlank()) {
+            return state;
+        }
+
+        syncCatalog();
+
+        for (PlayerState.Quest quest : state.dailyQuests) {
+            if (!quest.id.equals(questId)) {
+                continue;
+            }
+
+            if (!quest.completed) {
+                state.activityLog.add(0, "Quest not complete yet: " + quest.name + ".");
+                trimLog();
+                return state;
+            }
+
+            if (quest.claimed) {
+                state.activityLog.add(0, "Quest already claimed: " + quest.name + ".");
+                trimLog();
+                return state;
+            }
+
+            int rewardXp = quest.rewardXp + (hasSkill("s7") ? 20 : 0);
+            int rewardGold = quest.rewardGold + (hasSkill("s3") ? 10 : 0);
+
+            if (state.primaryClass.equals("GAMER")) {
+                rewardXp += 15 + classUpgradeBonusStep() * 5;
+                rewardGold += 10 + classUpgradeBonusStep() * 5;
+            }
+
+            quest.claimed = true;
+            state.xp += rewardXp;
+            state.gold += rewardGold;
+            state.essence += quest.rewardEssence;
+            state.lastXpGain = rewardXp;
+
+            checkLevelUp();
+            unlockAvailableWorlds();
+            state.activityLog.add(0, "Quest claimed: " + quest.name + " (+" + rewardXp + " XP, +" + rewardGold + " Gold).");
+            trimLog();
+            saveState();
+            return state;
+        }
+
+        state.activityLog.add(0, "Quest not found.");
+        trimLog();
+        return state;
+    }
+
     private int calculateXp(String type, int amount, String summary, boolean verified) {
         int xp;
+        int upgradeStep = classUpgradeBonusStep();
 
         switch (type) {
             case "coding":
                 xp = amount * 3;
-                if (state.primaryClass.equals("CODER")) xp += 25;
+                if (state.primaryClass.equals("CODER")) xp += 25 + upgradeStep * 8;
                 break;
             case "reading":
                 xp = amount * 2;
                 if (summary.length() > 80) xp += 20;
                 else if (summary.length() > 30) xp += 10;
-                if (state.primaryClass.equals("BOOKWORM")) xp += 25;
+                if (state.primaryClass.equals("BOOKWORM")) xp += 25 + upgradeStep * (summary.length() >= 30 ? 10 : 6);
+                if (state.primaryClass.equals("EXPLORER")) xp += 12 + upgradeStep * 5;
                 break;
             case "walking":
                 xp = amount * 2;
-                if (state.primaryClass.equals("SPORT_MASTER")) xp += 20;
+                if (state.primaryClass.equals("SPORT_MASTER")) xp += 20 + upgradeStep * 7;
+                if (state.primaryClass.equals("EXPLORER")) xp += 18 + upgradeStep * 5;
                 break;
             case "workout":
                 xp = amount * 4;
-                if (state.primaryClass.equals("SPORT_MASTER")) xp += 25;
+                if (state.primaryClass.equals("SPORT_MASTER")) xp += 25 + upgradeStep * 9;
                 break;
             case "focus":
                 xp = amount * 3;
+                if (state.primaryClass.equals("CODER")) xp += 15 + upgradeStep * 6;
+                if (state.primaryClass.equals("ZEN")) xp += 18 + upgradeStep * 6;
+                if (state.primaryClass.equals("EXPLORER")) xp += 12 + upgradeStep * 5;
                 break;
             case "meditation":
                 xp = amount * 2;
-                if (state.primaryClass.equals("ZEN")) xp += 25;
+                if (state.primaryClass.equals("ZEN")) xp += 25 + upgradeStep * 8;
                 break;
             case "music":
                 xp = amount * 3;
-                if (state.primaryClass.equals("MUSICIAN")) xp += 25;
+                if (state.primaryClass.equals("MUSICIAN")) xp += 25 + upgradeStep * 8;
                 break;
             case "cooking":
                 xp = amount * 3;
-                if (state.primaryClass.equals("CHEF")) xp += 25;
+                if (state.primaryClass.equals("CHEF")) xp += 25 + upgradeStep * 8;
                 break;
             case "gaming":
                 xp = amount * 2;
-                if (state.primaryClass.equals("GAMER")) xp += 25;
+                if (state.primaryClass.equals("GAMER")) xp += 25 + upgradeStep * 8;
                 break;
             default:
                 xp = amount;
@@ -291,6 +422,146 @@ public class GameService {
         }
 
         return Math.max(1, xp);
+    }
+
+    private int classAdjustedEnergyCost(String type, int baseCost) {
+        int cost = Math.max(1, baseCost);
+        int upgradeStep = classUpgradeBonusStep();
+
+        if (state.primaryClass.equals("CODER") && (type.equals("coding") || type.equals("focus"))) {
+            return Math.max(1, cost - 1 - Math.min(2, upgradeStep));
+        }
+
+        if (state.primaryClass.equals("SPORT_MASTER") && (type.equals("walking") || type.equals("workout"))) {
+            return Math.max(1, cost / 2 - Math.min(1, upgradeStep));
+        }
+
+        if (state.primaryClass.equals("ZEN") && (type.equals("meditation") || type.equals("focus"))) {
+            return Math.max(1, cost - 2 - Math.min(2, upgradeStep));
+        }
+
+        if (state.primaryClass.equals("MUSICIAN") && type.equals("music")) {
+            return Math.max(1, cost - 1 - Math.min(2, upgradeStep));
+        }
+
+        if (state.primaryClass.equals("CHEF") && type.equals("cooking")) {
+            return Math.max(1, cost - 1 - Math.min(2, upgradeStep));
+        }
+
+        return cost;
+    }
+
+    private int classAdjustedTravelCost(int baseCost) {
+        int cost = Math.max(0, baseCost);
+
+        if (state.primaryClass.equals("EXPLORER")) {
+            return Math.max(0, cost / 2 - classUpgradeBonusStep());
+        }
+
+        return cost;
+    }
+
+    private void applyPrimaryClassPerks(String type, int amount, String summary) {
+        int upgradeStep = classUpgradeBonusStep();
+
+        switch (state.primaryClass) {
+            case "CODER":
+                if (type.equals("coding") || type.equals("focus")) {
+                    int gold = 5 + upgradeStep * 3;
+                    state.gold += gold;
+                    state.activityLog.add(0, "Coder upgrade perk: +" + gold + " Gold from clean execution.");
+                }
+                break;
+            case "BOOKWORM":
+                if (type.equals("reading") && summary.length() >= 30) {
+                    int essence = 1 + Math.max(0, upgradeStep / 2);
+                    state.essence += essence;
+                    state.activityLog.add(0, "Bookworm upgrade perk: +" + essence + " Essence from thoughtful notes.");
+                }
+                break;
+            case "SPORT_MASTER":
+                if (type.equals("walking") || type.equals("workout")) {
+                    int recovered = Math.max(2, amount / 12) + upgradeStep * 2;
+                    state.energy = Math.min(100, state.energy + recovered);
+                    state.activityLog.add(0, "Sport Master upgrade perk: recovered " + recovered + " Energy.");
+                }
+                break;
+            case "GAMER":
+                if (type.equals("gaming")) {
+                    int gold = 15 + upgradeStep * 5;
+                    state.gold += gold;
+                    state.activityLog.add(0, "Gamer upgrade perk: +" + gold + " Gold combo bonus.");
+                }
+                break;
+            case "EXPLORER":
+                if (type.equals("walking") || type.equals("reading") || type.equals("focus")) {
+                    int gold = 8 + upgradeStep * 4;
+                    state.gold += gold;
+                    state.activityLog.add(0, "Explorer upgrade perk: +" + gold + " Gold from discovery.");
+                }
+                break;
+            case "ZEN":
+                if (type.equals("meditation") || type.equals("focus")) {
+                    int recovered = 8 + upgradeStep * 3;
+                    state.energy = Math.min(100, state.energy + recovered);
+                    state.activityLog.add(0, "Zen upgrade perk: restored " + recovered + " Energy.");
+                }
+                break;
+            case "MUSICIAN":
+                if (type.equals("music")) {
+                    int crystals = 1 + Math.max(0, upgradeStep / 2);
+                    state.crystals += crystals;
+                    state.activityLog.add(0, "Musician upgrade perk: +" + crystals + " Crystal(s) from rhythm practice.");
+                }
+                break;
+            case "CHEF":
+                if (type.equals("cooking")) {
+                    int recovered = 10 + upgradeStep * 3;
+                    int gold = 5 + upgradeStep * 4;
+                    state.energy = Math.min(100, state.energy + recovered);
+                    state.gold += gold;
+                    state.activityLog.add(0, "Chef upgrade perk: +" + recovered + " Energy and +" + gold + " Gold from meal prep.");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private int primaryClassBossDamageBonus(String type) {
+        int upgradeStep = classUpgradeBonusStep();
+
+        switch (state.primaryClass) {
+            case "CODER":
+                return (type.equals("coding") || type.equals("focus")) ? 15 + upgradeStep * 6 : 0;
+            case "BOOKWORM":
+                return type.equals("reading") ? 12 + upgradeStep * 5 : 0;
+            case "SPORT_MASTER":
+                return (type.equals("walking") || type.equals("workout")) ? 14 + upgradeStep * 6 : 0;
+            case "GAMER":
+                return type.equals("gaming") ? 18 + upgradeStep * 7 : 0;
+            case "EXPLORER":
+                return (type.equals("walking") || type.equals("focus")) ? 10 + upgradeStep * 5 : 0;
+            case "ZEN":
+                return (type.equals("meditation") || type.equals("focus")) ? 10 + upgradeStep * 5 : 0;
+            case "MUSICIAN":
+                return type.equals("music") ? 12 + upgradeStep * 6 : 0;
+            case "CHEF":
+                return type.equals("cooking") ? 12 + upgradeStep * 6 : 0;
+            default:
+                return 0;
+        }
+    }
+
+    private int classUpgradeBonusStep() {
+        return classUpgradeTier() - 1;
+    }
+
+    private int classUpgradeTier() {
+        if (state.level >= 50) return 4;
+        if (state.level >= 25) return 3;
+        if (state.level >= 10) return 2;
+        return 1;
     }
 
     private void checkLevelUp() {
@@ -320,15 +591,16 @@ public class GameService {
             }
 
             grantBossLoot(defeatedBossName);
+            markCurrentWorldBossDefeated();
+            unlockAvailableWorlds();
 
-            int bossHp = 800 + state.level * 100;
+            if (hasSkill("s8") && state.bossesDefeated % 3 == 0) {
+                state.skillPoints++;
+                state.activityLog.add(0, "Legend Pulse granted +1 skill point.");
+            }
 
-            state.currentBoss = new PlayerState.Boss(
-                    nextBossName(defeatedBossName),
-                    nextBossDescription(defeatedBossName),
-                    bossHp,
-                    bossHp
-            );
+            PlayerState.WorldZone currentWorld = findWorld(state.currentWorldId);
+            state.currentBoss = createBossForWorld(currentWorld == null ? state.worlds.get(0) : currentWorld);
 
             state.activityLog.add(0, "Boss defeated: " + defeatedBossName + ". New boss appeared: " + state.currentBoss.name + ".");
         }
@@ -345,6 +617,11 @@ public class GameService {
         state.crystals += crystalReward;
         state.essence += essenceReward;
 
+        if (hasSkill("s4")) {
+            state.essence += 5;
+            addLootDrop("5 Bonus Essence");
+        }
+
         addLootDrop(goldReward + " Gold");
         addLootDrop(crystalReward + " Crystals");
         addLootDrop(essenceReward + " Essence");
@@ -353,10 +630,18 @@ public class GameService {
             addCosmeticDrop("inv_shadow_crown", "Shadow Crown Frame", "frame");
         } else if (bossName.equals("Bug Lord")) {
             addCosmeticDrop("inv_glitch_aura", "Glitch Debug Aura", "aura");
+        } else if (bossName.equals("Forgetfulness Wraith")) {
+            addCosmeticDrop("inv_wraith_pages_theme", "Wraith Pages Theme", "theme");
         } else if (bossName.equals("Burnout Titan")) {
             addCosmeticDrop("inv_titan_flame_outfit", "Titan Flame Outfit", "outfit");
         } else if (bossName.equals("Doomscroll Phantom")) {
             addCosmeticDrop("inv_phantom_arcade_theme", "Phantom Arcade Theme", "theme");
+        } else if (bossName.equals("Stress Serpent")) {
+            addCosmeticDrop("inv_serpent_calm_aura", "Serpent Calm Aura", "aura");
+        } else if (bossName.equals("Silence Reaper")) {
+            addCosmeticDrop("inv_soundwave_frame", "Soundwave Frame", "frame");
+        } else if (bossName.equals("Chaos Chef")) {
+            addCosmeticDrop("inv_steam_flame_aura", "Steam Flame Aura", "aura");
         } else {
             addCosmeticDrop("inv_victory_neon_frame_" + state.bossesDefeated, "Victory Neon Frame", "frame");
         }
@@ -415,6 +700,17 @@ public class GameService {
     }
 
     private void completeQuests(String type) {
+        advanceQuest("any", 1);
+        advanceQuest(type, 1);
+
+        if (type.equals("coding") || type.equals("reading") || type.equals("focus")) {
+            advanceQuest("focus", 1);
+        }
+
+        if (type.equals("walking") || type.equals("workout")) {
+            advanceQuest("movement", 1);
+        }
+
         for (PlayerState.Quest quest : state.dailyQuests) {
             if (quest.id.equals("q1")) quest.completed = true;
 
@@ -445,7 +741,186 @@ public class GameService {
     }
 
     private boolean hasSkill(String skillId) {
+        if (skillId == null || skillId.isBlank()) {
+            return true;
+        }
         return state.skills.stream().anyMatch(skill -> skill.id.equals(skillId) && skill.unlocked);
+    }
+
+    private void syncCatalog() {
+        PlayerState defaults = new PlayerState();
+
+        for (PlayerState.Quest defaultQuest : defaults.dailyQuests) {
+            PlayerState.Quest existing = findQuest(defaultQuest.id);
+            if (existing == null) {
+                state.dailyQuests.add(defaultQuest);
+            } else {
+                existing.name = defaultQuest.name;
+                existing.description = defaultQuest.description;
+                existing.rewardXp = defaultQuest.rewardXp;
+                existing.rewardGold = defaultQuest.rewardGold;
+                existing.rewardEssence = defaultQuest.rewardEssence;
+                existing.actionType = defaultQuest.actionType;
+                existing.target = defaultQuest.target;
+                if (existing.completed && existing.progress == 0) {
+                    existing.progress = existing.target;
+                }
+            }
+        }
+
+        for (PlayerState.Skill defaultSkill : defaults.skills) {
+            PlayerState.Skill existing = findSkill(defaultSkill.id);
+            if (existing == null) {
+                state.skills.add(defaultSkill);
+            } else {
+                existing.name = defaultSkill.name;
+                existing.description = defaultSkill.description;
+                existing.cost = defaultSkill.cost;
+                existing.prerequisiteId = defaultSkill.prerequisiteId;
+                existing.tier = defaultSkill.tier;
+                existing.category = defaultSkill.category;
+            }
+        }
+
+        for (PlayerState.WorldZone defaultWorld : defaults.worlds) {
+            PlayerState.WorldZone existing = findWorld(defaultWorld.id);
+            if (existing == null) {
+                state.worlds.add(defaultWorld);
+            } else {
+                existing.name = defaultWorld.name;
+                existing.classTheme = defaultWorld.classTheme;
+                existing.bossName = defaultWorld.bossName;
+                existing.description = defaultWorld.description;
+                existing.minLevel = defaultWorld.minLevel;
+                existing.requiredBosses = defaultWorld.requiredBosses;
+                existing.travelCost = defaultWorld.travelCost;
+                existing.unlocked = existing.unlocked || defaultWorld.unlocked;
+            }
+        }
+
+        if (state.currentBoss.worldId == null || state.currentBoss.worldId.isBlank()) {
+            state.currentBoss.worldId = state.currentWorldId;
+        }
+
+        if (state.currentBoss.level <= 0) {
+            state.currentBoss.level = Math.max(1, state.level);
+        }
+
+        if (state.currentBoss.element == null || state.currentBoss.element.isBlank()) {
+            state.currentBoss.element = elementForClass(state.activeClass);
+        }
+
+        if (state.playerName == null || state.playerName.isBlank()) {
+            state.playerName = state.avatar != null && state.avatar.displayName != null && !state.avatar.displayName.isBlank()
+                    ? state.avatar.displayName
+                    : "PlayerOne";
+        }
+
+        if (state.pronouns == null || state.pronouns.isBlank()) {
+            state.pronouns = state.avatar != null && state.avatar.pronouns != null && !state.avatar.pronouns.isBlank()
+                    ? state.avatar.pronouns
+                    : "they/them";
+        }
+
+        if (state.avatar != null) {
+            state.avatar.displayName = state.playerName;
+            state.avatar.pronouns = state.pronouns;
+        }
+    }
+
+    private void unlockAvailableWorlds() {
+        for (PlayerState.WorldZone world : state.worlds) {
+            boolean shouldUnlock = world.unlocked
+                    || (state.level >= world.minLevel && state.bossesDefeated >= world.requiredBosses)
+                    || (hasSkill("s5") && state.level + 1 >= world.minLevel && state.bossesDefeated >= world.requiredBosses);
+
+            if (shouldUnlock && !world.unlocked) {
+                world.unlocked = true;
+                state.activityLog.add(0, "World unlocked: " + world.name + ".");
+                trimLog();
+            }
+        }
+    }
+
+    private void advanceQuest(String actionType, int amount) {
+        for (PlayerState.Quest quest : state.dailyQuests) {
+            if (quest.claimed || quest.completed || quest.actionType == null) {
+                continue;
+            }
+
+            if (quest.actionType.equals(actionType)) {
+                quest.progress = Math.min(Math.max(1, quest.target), quest.progress + amount);
+                quest.completed = quest.progress >= quest.target;
+            }
+        }
+    }
+
+    private PlayerState.Quest findQuest(String questId) {
+        for (PlayerState.Quest quest : state.dailyQuests) {
+            if (quest.id.equals(questId)) {
+                return quest;
+            }
+        }
+        return null;
+    }
+
+    private PlayerState.Skill findSkill(String skillId) {
+        for (PlayerState.Skill skill : state.skills) {
+            if (skill.id.equals(skillId)) {
+                return skill;
+            }
+        }
+        return null;
+    }
+
+    private PlayerState.WorldZone findWorld(String worldId) {
+        for (PlayerState.WorldZone world : state.worlds) {
+            if (world.id.equals(worldId)) {
+                return world;
+            }
+        }
+        return null;
+    }
+
+    private PlayerState.Boss createBossForWorld(PlayerState.WorldZone world) {
+        int bossLevel = Math.max(1, state.level + world.requiredBosses);
+        int bossHp = 420 + bossLevel * 90 + world.requiredBosses * 120;
+
+        return new PlayerState.Boss(
+                world.bossName,
+                bossDescriptionForWorld(world),
+                bossHp,
+                bossHp,
+                world.id,
+                bossLevel,
+                elementForClass(world.classTheme)
+        );
+    }
+
+    private String bossDescriptionForWorld(PlayerState.WorldZone world) {
+        return world.description + " Recommended level " + world.minLevel + ". Defeat it to push the world map forward.";
+    }
+
+    private String elementForClass(String className) {
+        switch (className) {
+            case "CODER": return "Cyber";
+            case "BOOKWORM": return "Memory";
+            case "SPORT_MASTER": return "Titan";
+            case "GAMER": return "Arcade";
+            case "EXPLORER": return "Frontier";
+            case "ZEN": return "Spirit";
+            case "MUSICIAN": return "Rhythm";
+            case "CHEF": return "Flame";
+            default: return "Shadow";
+        }
+    }
+
+    private void markCurrentWorldBossDefeated() {
+        PlayerState.WorldZone world = findWorld(state.currentWorldId);
+        if (world != null) {
+            world.bossDefeated = true;
+        }
+        advanceQuest("boss_damage", 1);
     }
 
     private String activeClassForActivity(String type) {
@@ -511,6 +986,14 @@ public class GameService {
             case "CHEF": return "Steam Flame Aura";
             default: return "Starter Glow";
         }
+    }
+
+    private void applyClassTheme(String className) {
+        state.primaryClass = className;
+        state.activeClass = className;
+        state.title = titleForClass(className);
+        state.avatar.outfit = outfitForClass(className);
+        state.avatar.aura = auraForClass(className);
     }
 
     private void trimLog() {

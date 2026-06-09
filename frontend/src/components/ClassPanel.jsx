@@ -1,4 +1,6 @@
-export default function ClassPanel({ classes = [], classMeta = {}, primaryClass, onClassSelect }) {
+import { getEvolution, getNextEvolution } from "../data/evolutionData";
+
+export default function ClassPanel({ classes = [], classMeta = {}, primaryClass, level = 1, onClassSelect }) {
   return (
     <div className="panel class-panel premium-class-panel">
       <div className="section-heading-row">
@@ -18,6 +20,8 @@ export default function ClassPanel({ classes = [], classMeta = {}, primaryClass,
             icon: "✨",
             world: "Unknown World"
           };
+          const currentUpgrade = getEvolution(className, level);
+          const nextUpgrade = getNextEvolution(className, level);
 
           return (
             <button
@@ -29,6 +33,12 @@ export default function ClassPanel({ classes = [], classMeta = {}, primaryClass,
               <span className="class-choice-icon">{meta.icon}</span>
               <strong>{meta.label}</strong>
               <small>{meta.world}</small>
+              <em>{currentUpgrade?.title}</em>
+              {nextUpgrade && (
+                <span className="class-choice-next">
+                  Next: {nextUpgrade.title} at L{nextUpgrade.level}
+                </span>
+              )}
             </button>
           );
         })}

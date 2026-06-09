@@ -4,7 +4,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/game")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174"
+})
 public class GameController {
     private final GameService gameService;
 
@@ -27,6 +32,11 @@ public class GameController {
         return gameService.changePrimaryClassAtSanctuary(request.className);
     }
 
+    @PostMapping("/intro/class")
+    public PlayerState chooseIntroClass(@RequestBody ClassRequest request) {
+        return gameService.chooseIntroClass(request.className);
+    }
+
     @PostMapping("/avatar")
     public PlayerState updateAvatar(@RequestBody PlayerState.Avatar avatar) {
         return gameService.updateAvatar(avatar);
@@ -35,6 +45,11 @@ public class GameController {
     @PostMapping("/skill")
     public PlayerState unlockSkill(@RequestBody SkillRequest request) {
         return gameService.unlockSkill(request.skillId);
+    }
+
+    @PostMapping("/quest/claim")
+    public PlayerState claimQuest(@RequestBody QuestClaimRequest request) {
+        return gameService.claimQuest(request.questId);
     }
 
     @PostMapping("/shop/buy")

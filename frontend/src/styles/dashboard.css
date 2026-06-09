@@ -2,9 +2,11 @@
 
 .premium-dashboard-layout {
   display: grid;
-  grid-template-columns: 290px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
   align-items: start;
+  max-width: 1760px;
+  margin: 0 auto;
 }
 
 .premium-dashboard-main {
@@ -46,8 +48,10 @@
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
+.hud-player-card,
 .hud-stat {
   min-width: 112px;
   padding: 0.85rem;
@@ -55,6 +59,34 @@
   background: rgba(15, 23, 42, 0.72);
   border: 1px solid rgba(148, 163, 184, 0.13);
   text-align: center;
+}
+
+.hud-player-card {
+  min-width: 190px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.hud-player-card > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  color: var(--class-color);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hud-player-card strong,
+.hud-player-card small {
+  display: block;
+}
+
+.hud-player-card small {
+  color: var(--lifexp-muted);
 }
 
 .hud-stat span {
@@ -571,4 +603,39 @@
 
 .avatar-evolution-panel h4 {
   margin-bottom: 0;
+}
+
+.avatar-evolution-current p,
+.avatar-evolution-next p {
+  margin: 0.45rem 0 0;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.avatar-evolution-current em,
+.avatar-evolution-next em {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--class-color);
+  font-size: 0.82rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.class-choice {
+  min-width: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.class-choice em {
+  color: white;
+  font-size: 0.82rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.class-choice-next {
+  color: var(--lifexp-muted);
+  font-size: 0.75rem;
 }

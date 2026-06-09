@@ -5,6 +5,8 @@ export default function DashboardHUD({ state, classMeta = {} }) {
     icon: "✨",
     label: displayClass
   };
+  const playerName = state?.playerName || state?.avatar?.displayName || "PlayerOne";
+  const pronouns = state?.pronouns || state?.avatar?.pronouns || "they/them";
 
   return (
     <section className="premium-top-hud">
@@ -16,6 +18,13 @@ export default function DashboardHUD({ state, classMeta = {} }) {
         </div>
 
         <div className="hud-stat-row">
+          <div className="hud-player-card">
+            <span>{meta.icon}</span>
+            <div>
+              <strong>{playerName}</strong>
+              <small>{pronouns}</small>
+            </div>
+          </div>
           <HudStat icon={meta.icon} label="Class" value={meta.label} />
           <HudStat icon="⭐" label="Level" value={state?.level || 1} />
           <HudStat icon="⚡" label="XP" value={state?.xp || 0} />

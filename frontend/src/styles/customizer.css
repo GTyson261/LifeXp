@@ -103,6 +103,37 @@
   font-size: 0.9rem;
 }
 
+.identity-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+}
+
+.identity-field span {
+  color: var(--lifexp-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.identity-field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+  background: rgba(2, 6, 23, 0.82);
+  color: white;
+  font: inherit;
+}
+
+.identity-field input:focus {
+  outline: none;
+  border-color: var(--class-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--class-color), transparent 78%);
+}
+
 .save-avatar-button {
   width: 100%;
   margin-top: 0.85rem;

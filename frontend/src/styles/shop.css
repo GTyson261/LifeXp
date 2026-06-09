@@ -78,6 +78,61 @@
   padding: 1rem;
 }
 
+.world-card,
+.premium-quest-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.world-card-header,
+.world-boss-row,
+.skill-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.world-state-chip,
+.world-requirement-grid small,
+.boss-meta-row span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.86);
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.world-requirement-grid,
+.boss-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.locked-world {
+  opacity: 0.68;
+  border-style: dashed;
+}
+
+.cleared-world {
+  border-color: rgba(250, 204, 21, 0.44);
+}
+
+.quest-mini-progress {
+  height: 10px;
+}
+
+.quest-claim-button {
+  width: fit-content;
+  min-width: 136px;
+}
+
 .world-card p,
 .quest-card p,
 .achievement p {
@@ -175,6 +230,7 @@
 
 .shop-card button,
 .world-card button,
+.quest-card button,
 .premium-inventory-card button {
   flex: 0 0 auto;
 }

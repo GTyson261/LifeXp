@@ -13,23 +13,59 @@ export default function WorldMapPanel({ worlds = [], currentWorldId, onTravel })
 
       <div className="world-grid premium-world-grid">
         {worlds.map((world) => (
-          <div
+          <WorldCard
             key={world.id}
-            className={currentWorldId === world.id ? "world-card active-world premium-world-card" : "world-card premium-world-card"}
-          >
-            <strong>{world.name}</strong>
-            <p>{world.description}</p>
-            <span>Boss: {world.bossName}</span>
-
-            <button
-              disabled={!world.unlocked || currentWorldId === world.id}
-              onClick={() => onTravel(world.id)}
-            >
-              {currentWorldId === world.id ? "Current Zone" : "Travel"}
-            </button>
-          </div>
+            world={world}
+            isCurrent={currentWorldId === world.id}
+            onTravel={onTravel}
+          />
         ))}
       </div>
+    </div>
+  );
+}
+
+function WorldCard({ world, isCurrent, onTravel }) {
+  const className = [
+    "world-card",
+    "premium-world-card",
+    isCurrent ? "active-world" : "",
+    !world.unlocked ? "locked-world" : "",
+    world.bossDefeated ? "cleared-world" : ""
+  ].filter(Boolean).join(" ");
+
+  return (
+    <div className={className}>
+      <div className="world-card-header">
+        <div>
+          <strong>{world.name}</strong>
+          <span>{world.classTheme}</span>
+        </div>
+        <div className="world-state-chip">
+          {world.bossDefeated ? "Cleared" : world.unlocked ? "Open" : "Locked"}
+        </div>
+      </div>
+
+      <p>{world.description}</p>
+
+      <div className="world-boss-row">
+        <span>Boss</span>
+        <strong>{world.bossName}</strong>
+      </div>
+
+      <div className="world-requirement-grid">
+        <small>Level {world.minLevel || 1}</small>
+        <small>{world.requiredBosses || 0} wins</small>
+        <small>{world.travelCost || 0} energy</small>
+      </div>
+
+      <button
+        type="button"
+        disabled={!world.unlocked || isCurrent}
+        onClick={() => onTravel(world.id)}
+      >
+        {isCurrent ? "Current Zone" : world.unlocked ? "Travel" : "Locked"}
+      </button>
     </div>
   );
 }

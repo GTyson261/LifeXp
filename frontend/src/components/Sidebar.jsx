@@ -1,21 +1,11 @@
-const NAV_ITEMS = [
-  { key: "dashboard", label: "Dashboard", icon: "⌂" },
-  { key: "CODER", label: "Coder", icon: "⌨️" },
-  { key: "BOOKWORM", label: "Bookworm", icon: "📖" },
-  { key: "SPORT_MASTER", label: "Sport Master", icon: "💪" },
-  { key: "GAMER", label: "Gamer", icon: "🎮" },
-  { key: "EXPLORER", label: "Explorer", icon: "🧭" },
-  { key: "ZEN", label: "Zen", icon: "🪷" },
-  { key: "MUSICIAN", label: "Musician", icon: "🎵" },
-  { key: "CHEF", label: "Chef", icon: "👨‍🍳" }
-];
-
-export default function Sidebar({ state, classMeta = {}, onClassSelect }) {
+export default function Sidebar({ state, classMeta = {} }) {
   const primaryClass = state?.primaryClass || "NOVICE";
   const level = state?.level || 1;
   const xp = state?.xp || 0;
   const xpNeeded = level * 100;
   const xpPercent = Math.min(100, Math.round((xp / xpNeeded) * 100));
+  const playerName = state?.playerName || state?.avatar?.displayName || "PlayerOne";
+  const pronouns = state?.pronouns || state?.avatar?.pronouns || "they/them";
 
   return (
     <aside className="lifexp-sidebar">
@@ -24,35 +14,15 @@ export default function Sidebar({ state, classMeta = {}, onClassSelect }) {
         <p>Real-Life RPG Simulator</p>
       </div>
 
-      <nav className="sidebar-nav">
-        {NAV_ITEMS.map((item) => {
-          const isActive = item.key === "dashboard" || item.key === primaryClass;
-
-          return (
-            <button
-              key={item.key}
-              className={isActive ? "sidebar-link active" : "sidebar-link"}
-              onClick={() => {
-                if (item.key !== "dashboard" && onClassSelect) {
-                  onClassSelect(item.key);
-                }
-              }}
-            >
-              <span>{item.icon}</span>
-              <strong>{item.label}</strong>
-            </button>
-          );
-        })}
-      </nav>
-
       <div className="sidebar-card player-card">
         <div className="mini-avatar">
           {classMeta?.[primaryClass]?.icon || "✨"}
         </div>
 
         <div>
-          <strong>PlayerOne</strong>
+          <strong>{playerName}</strong>
           <p>Level {level}</p>
+          <span>{pronouns}</span>
         </div>
       </div>
 

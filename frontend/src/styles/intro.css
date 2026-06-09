@@ -1,50 +1,341 @@
-
-
 /* LifeXP intro gate screen */
 
 .intro-screen {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+  padding: clamp(1rem, 3vw, 2rem);
   background:
-    radial-gradient(circle, rgba(0,245,255,.2), transparent 40%),
-    linear-gradient(135deg,#050510,#111827,#020617);
+    linear-gradient(120deg, color-mix(in srgb, var(--intro-color), #03040c 76%), #08111f 46%, #02030a),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 70px);
 }
 
-.intro-card {
-  width: min(900px,92vw);
-  padding: 3rem;
-  border-radius: 32px;
-  text-align: center;
-  background: rgba(2,6,23,.75);
-  backdrop-filter: blur(18px);
-  border:1px solid rgba(34,211,238,.2);
+.intro-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.1), transparent 30%, rgba(250, 204, 21, 0.08)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 28%, rgba(2, 6, 23, 0.35));
+  opacity: 0.9;
+}
+
+.intro-stage {
+  width: min(1400px, 100%);
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+}
+
+.intro-hero {
+  min-height: min(660px, calc(100vh - 230px));
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.72fr);
+  align-items: center;
+  gap: clamp(1rem, 4vw, 4rem);
+  padding: clamp(1.1rem, 4vw, 3rem);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(2, 6, 23, 0.76), rgba(15, 23, 42, 0.56)),
+    linear-gradient(90deg, color-mix(in srgb, var(--intro-color), transparent 82%), rgba(255, 255, 255, 0.03));
+  border: 1px solid color-mix(in srgb, var(--intro-color), transparent 58%);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.intro-copy {
+  display: grid;
+  gap: 1rem;
+  max-width: 760px;
+}
+
+.intro-copy h1 {
+  margin: 0;
+  font-size: clamp(3rem, 7vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.intro-copy h2 {
+  max-width: 720px;
+  margin: 0;
+  color: #e2e8f0;
+  font-size: clamp(1.25rem, 2.2vw, 2.35rem);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+.intro-copy p {
+  max-width: 680px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 1.08rem;
+  line-height: 1.65;
+}
+
+.intro-signal-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1rem;
+  width: fit-content;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.intro-identity-panel {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.7fr);
+  gap: 0.75rem;
+  width: min(620px, 100%);
+  padding: 0.9rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.86), rgba(2, 6, 23, 0.78)),
+    linear-gradient(90deg, color-mix(in srgb, var(--intro-color), transparent 88%), transparent);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.intro-identity-panel label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.intro-identity-panel span {
+  color: var(--lifexp-muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.intro-identity-panel input {
+  min-height: 46px;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(2, 6, 23, 0.84);
+}
+
+.intro-identity-panel input:focus {
+  outline: none;
+  border-color: var(--intro-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--intro-color), transparent 76%);
+}
+
+.intro-signal-row span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--intro-color);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.intro-signal-row strong,
+.intro-signal-row small,
+.intro-signal-row em {
+  display: block;
+}
+
+.intro-signal-row small {
+  color: var(--lifexp-muted);
+}
+
+.intro-signal-row em {
+  flex-basis: 100%;
+  color: color-mix(in srgb, var(--intro-color), white 24%);
+  font-style: normal;
+  font-weight: 800;
 }
 
 .gate-button {
-  border:none;
-  margin-top:1rem;
-  padding:1rem 2rem;
-  border-radius:999px;
-  font-weight:900;
-  color:black;
-  background:linear-gradient(90deg,#00f5ff,#a855f7,#f97316);
+  width: fit-content;
+  min-height: 58px;
+  margin-top: 0.25rem;
+  padding: 0.95rem 1.35rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--intro-color), white 28%);
+  font-weight: 900;
+  color: #020617;
+  background: linear-gradient(90deg, white, var(--intro-color));
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--intro-color), transparent 72%);
+}
+
+.portal-scene {
+  min-height: 430px;
+  display: grid;
+  place-items: center;
+  position: relative;
 }
 
 .portal-door {
-  width:170px;
-  height:260px;
-  margin:2rem auto 0;
-  border-radius:90px 90px 12px 12px;
-  padding:8px;
-  background:linear-gradient(#00f5ff,#a855f7);
+  width: min(270px, 70vw);
+  aspect-ratio: 0.62;
+  display: grid;
+  padding: 10px;
+  border-radius: 140px 140px 8px 8px;
+  background:
+    linear-gradient(180deg, white, var(--intro-color) 38%, #111827);
+  box-shadow:
+    0 0 80px color-mix(in srgb, var(--intro-color), transparent 42%),
+    0 34px 90px rgba(0, 0, 0, 0.55);
 }
 
 .door-core {
-  width:100%;
-  height:100%;
-  border-radius:inherit;
-  background:radial-gradient(circle,white,#00f5ff 35%,#111827 70%);
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 50% 38%, white, color-mix(in srgb, var(--intro-color), white 10%) 24%, #111827 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent);
+}
+
+.door-core span {
+  font-size: clamp(4rem, 10vw, 8rem);
+  filter: drop-shadow(0 0 22px white);
+}
+
+.portal-floor {
+  width: min(430px, 84vw);
+  height: 78px;
+  position: absolute;
+  bottom: 0.25rem;
+  transform: perspective(420px) rotateX(68deg);
+  border: 1px solid color-mix(in srgb, var(--intro-color), transparent 45%);
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--intro-color), transparent 56%) 0 2px, transparent 2px 42px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 32px),
+    rgba(2, 6, 23, 0.8);
+  box-shadow: 0 0 42px color-mix(in srgb, var(--intro-color), transparent 58%);
+}
+
+.origin-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
+  gap: 0.65rem;
+}
+
+.origin-card {
+  min-height: 150px;
+  display: grid;
+  align-content: center;
+  gap: 0.25rem;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.82)),
+    linear-gradient(135deg, color-mix(in srgb, var(--origin-color), transparent 84%), transparent);
+  color: white;
+  text-align: left;
+}
+
+.origin-card span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--origin-color), transparent 82%);
+}
+
+.origin-card strong,
+.origin-card small {
+  overflow-wrap: anywhere;
+}
+
+.origin-card small,
+.origin-card em {
+  color: var(--lifexp-muted);
+}
+
+.origin-card em {
+  margin-top: 0.15rem;
+  color: #dbeafe;
+  font-size: 0.78rem;
+  font-style: normal;
+  line-height: 1.3;
+}
+
+.origin-card.selected {
+  border-color: var(--origin-color);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--origin-color), #020617 78%), rgba(2, 6, 23, 0.9));
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--origin-color), transparent 72%),
+    inset 0 0 24px color-mix(in srgb, var(--origin-color), transparent 84%);
+}
+
+.intro-footer-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.intro-footer-strip span {
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  padding: 0.65rem;
+  border-radius: 8px;
+  color: #cbd5e1;
+  text-align: center;
+  background: rgba(2, 6, 23, 0.68);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+@media (max-width: 1100px) {
+  .intro-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .portal-scene {
+    min-height: 340px;
+  }
+
+  .origin-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .intro-screen {
+    padding: 0.75rem;
+  }
+
+  .intro-hero {
+    padding: 1rem;
+  }
+
+  .intro-copy h1 {
+    font-size: clamp(2.45rem, 14vw, 4rem);
+  }
+
+  .gate-button,
+  .intro-signal-row,
+  .intro-identity-panel {
+    width: 100%;
+  }
+
+  .intro-identity-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .origin-grid,
+  .intro-footer-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .origin-card {
+    min-height: 88px;
+  }
 }

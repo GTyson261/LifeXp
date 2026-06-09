@@ -1,4 +1,4 @@
-export default function QuestPanel({ quests = [] }) {
+export default function QuestPanel({ quests = [], onClaimQuest }) {
   const totalQuests = quests.length;
   const completedQuests = quests.filter((quest) => quest.completed).length;
   const claimedQuests = quests.filter((quest) => quest.claimed).length;
@@ -26,7 +26,7 @@ export default function QuestPanel({ quests = [] }) {
       <div className="quest-list">
         {quests.length > 0 ? (
           quests.map((quest) => (
-            <QuestCard key={quest.id} quest={quest} />
+            <QuestCard key={quest.id} quest={quest} onClaimQuest={onClaimQuest} />
           ))
         ) : (
           <div className="empty-state-card">
@@ -39,7 +39,7 @@ export default function QuestPanel({ quests = [] }) {
   );
 }
 
-function QuestCard({ quest }) {
+function QuestCard({ quest, onClaimQuest }) {
   const statusLabel = quest.claimed
     ? "Claimed"
     : quest.completed
@@ -51,9 +51,13 @@ function QuestCard({ quest }) {
     : quest.completed
       ? "✅"
       : "⬡";
+  const target = Math.max(1, quest.target || 1);
+  const progress = quest.completed ? target : Math.min(target, quest.progress || 0);
+  const progressPercent = Math.round((progress / target) * 100);
+  const canClaim = quest.completed && !quest.claimed;
 
   return (
-    <div className={quest.completed ? "quest-card completed" : "quest-card"}>
+    <div className={quest.completed ? "quest-card completed premium-quest-card" : "quest-card premium-quest-card"}>
       <div className="quest-status-icon">{statusIcon}</div>
 
       <div className="quest-card-main">
@@ -66,12 +70,30 @@ function QuestCard({ quest }) {
 
         <p>{quest.description}</p>
 
+        <div className="mini-progress quest-mini-progress" aria-label={`${progress} of ${target} progress`}>
+          <div style={{ width: `${progressPercent}%` }} />
+        </div>
+
+        <small>
+          {progress} / {target} • {quest.actionType || "any"}
+        </small>
+
         <div className="quest-reward-row">
           <span>Reward</span>
           <strong>
             {quest.rewardXp ?? 0} XP + {quest.rewardGold ?? 0} Gold
+            {quest.rewardEssence ? ` + ${quest.rewardEssence} Essence` : ""}
           </strong>
         </div>
+
+        <button
+          type="button"
+          className="quest-claim-button"
+          disabled={!canClaim}
+          onClick={() => onClaimQuest?.(quest.id)}
+        >
+          {quest.claimed ? "Claimed" : canClaim ? "Claim Reward" : "Keep Going"}
+        </button>
       </div>
     </div>
   );

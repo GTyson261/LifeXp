@@ -8,22 +8,24 @@
   "lastXpGain" : 0,
   "bossesDefeated" : 0,
   "classMastery" : 0,
-  "xpPenaltyActionsLeft" : 3,
-  "gold" : 50,
+  "xpPenaltyActionsLeft" : 0,
+  "gold" : 100,
   "crystals" : 10,
   "essence" : 0,
   "energy" : 100,
-  "lastDailyReset" : 1780933023020,
+  "lastDailyReset" : 1781009780445,
   "loginStreak" : 1,
-  "lastActivityTimestamp" : 1780933023020,
+  "lastActivityTimestamp" : 1781009780445,
   "lastRestTimestamp" : 0,
   "title" : "Cyber Architect",
+  "playerName" : "PlayerOne",
   "pronouns" : "they/them",
   "equippedTheme" : "Default Cyber Grid",
   "equippedFrame" : "Starter Frame",
   "equippedAura" : "Starter Glow",
   "currentWorldId" : "world_gate",
   "avatar" : {
+    "displayName" : "PlayerOne",
     "gender" : "Custom",
     "pronouns" : "they/them",
     "bodyType" : "Average",
@@ -36,9 +38,12 @@
     "name" : "Procrastination King",
     "description" : "A shadow ruler that grows stronger whenever you delay your goals.",
     "hp" : 500,
-    "maxHp" : 500
+    "maxHp" : 500,
+    "worldId" : "world_gate",
+    "level" : 1,
+    "element" : "Shadow"
   },
-  "activityLog" : [ "Class mastery reset. Temporary XP penalty active for 3 actions.", "Class Sanctuary complete. Primary class changed to CODER.", "Class mastery reset. Temporary XP penalty active for 3 actions.", "Class Sanctuary complete. Primary class changed to BOOKWORM.", "The LifeXP Gate opened.", "LifeXP initialized. The gate is waiting." ],
+  "activityLog" : [ "The LifeXP Gate opened.", "Origin chosen: CODER.", "LifeXP initialized. The gate is waiting." ],
   "lastLootDrops" : [ ],
   "lootHistory" : [ ],
   "dailyQuests" : [ {
@@ -48,7 +53,11 @@
     "completed" : false,
     "claimed" : false,
     "rewardXp" : 40,
-    "rewardGold" : 15
+    "rewardGold" : 15,
+    "rewardEssence" : 0,
+    "actionType" : "any",
+    "target" : 1,
+    "progress" : 0
   }, {
     "id" : "q2",
     "name" : "Focus Spark",
@@ -56,7 +65,11 @@
     "completed" : false,
     "claimed" : false,
     "rewardXp" : 55,
-    "rewardGold" : 20
+    "rewardGold" : 20,
+    "rewardEssence" : 1,
+    "actionType" : "focus",
+    "target" : 1,
+    "progress" : 0
   }, {
     "id" : "q3",
     "name" : "Boss Damage",
@@ -64,28 +77,96 @@
     "completed" : false,
     "claimed" : false,
     "rewardXp" : 65,
-    "rewardGold" : 25
+    "rewardGold" : 25,
+    "rewardEssence" : 1,
+    "actionType" : "boss_damage",
+    "target" : 1,
+    "progress" : 0
+  }, {
+    "id" : "q4",
+    "name" : "World Scout",
+    "description" : "Travel to a world and challenge its boss.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 50,
+    "rewardGold" : 20,
+    "rewardEssence" : 1,
+    "actionType" : "travel",
+    "target" : 1,
+    "progress" : 0
   } ],
   "skills" : [ {
     "id" : "s1",
     "name" : "XP Flow",
     "description" : "Gain +5 bonus XP from every activity.",
-    "unlocked" : false
+    "unlocked" : false,
+    "cost" : 1,
+    "prerequisiteId" : "",
+    "tier" : 1,
+    "category" : "Core"
   }, {
     "id" : "s2",
     "name" : "Iron Focus",
     "description" : "Focus and coding actions deal extra boss damage.",
-    "unlocked" : false
+    "unlocked" : false,
+    "cost" : 1,
+    "prerequisiteId" : "s1",
+    "tier" : 2,
+    "category" : "Combat"
   }, {
     "id" : "s3",
     "name" : "Loot Sense",
-    "description" : "Gain more gold from completed actions.",
-    "unlocked" : false
+    "description" : "Gain more gold from completed actions and quest claims.",
+    "unlocked" : false,
+    "cost" : 1,
+    "prerequisiteId" : "s1",
+    "tier" : 2,
+    "category" : "Loot"
   }, {
     "id" : "s4",
     "name" : "Aura Control",
-    "description" : "Unlock stronger visual aura effects.",
-    "unlocked" : false
+    "description" : "Unlock stronger visual aura effects and +5 Essence from boss wins.",
+    "unlocked" : false,
+    "cost" : 1,
+    "prerequisiteId" : "s2",
+    "tier" : 3,
+    "category" : "Avatar"
+  }, {
+    "id" : "s5",
+    "name" : "Worldwalker",
+    "description" : "Travel without energy cost and unlock frontier zones earlier.",
+    "unlocked" : false,
+    "cost" : 2,
+    "prerequisiteId" : "s3",
+    "tier" : 3,
+    "category" : "World"
+  }, {
+    "id" : "s6",
+    "name" : "Boss Breaker",
+    "description" : "Deal +25% damage to world bosses.",
+    "unlocked" : false,
+    "cost" : 2,
+    "prerequisiteId" : "s2",
+    "tier" : 4,
+    "category" : "Combat"
+  }, {
+    "id" : "s7",
+    "name" : "Quest Engine",
+    "description" : "Daily quest claims grant +20 bonus XP.",
+    "unlocked" : false,
+    "cost" : 2,
+    "prerequisiteId" : "s3",
+    "tier" : 4,
+    "category" : "Quests"
+  }, {
+    "id" : "s8",
+    "name" : "Legend Pulse",
+    "description" : "Boss victories grant an extra skill point every third win.",
+    "unlocked" : false,
+    "cost" : 3,
+    "prerequisiteId" : "s6",
+    "tier" : 5,
+    "category" : "Legend"
   } ],
   "achievements" : [ {
     "id" : "a1",
@@ -190,62 +271,98 @@
     "classTheme" : "NOVICE",
     "bossName" : "Procrastination King",
     "description" : "Your starting zone.",
-    "unlocked" : true
+    "unlocked" : true,
+    "minLevel" : 1,
+    "requiredBosses" : 0,
+    "travelCost" : 0,
+    "bossDefeated" : false
   }, {
     "id" : "world_cyber",
     "name" : "Cyber District",
     "classTheme" : "CODER",
     "bossName" : "Bug Lord",
     "description" : "A neon city powered by code.",
-    "unlocked" : true
+    "unlocked" : true,
+    "minLevel" : 1,
+    "requiredBosses" : 0,
+    "travelCost" : 5,
+    "bossDefeated" : false
   }, {
     "id" : "world_knowledge",
     "name" : "Knowledge Forest",
     "classTheme" : "BOOKWORM",
     "bossName" : "Forgetfulness Wraith",
     "description" : "A glowing forest of books and memory.",
-    "unlocked" : true
+    "unlocked" : true,
+    "minLevel" : 2,
+    "requiredBosses" : 0,
+    "travelCost" : 5,
+    "bossDefeated" : false
   }, {
     "id" : "world_arena",
     "name" : "Titan Arena",
     "classTheme" : "SPORT_MASTER",
     "bossName" : "Burnout Titan",
     "description" : "A battle zone for physical discipline.",
-    "unlocked" : true
+    "unlocked" : false,
+    "minLevel" : 3,
+    "requiredBosses" : 1,
+    "travelCost" : 8,
+    "bossDefeated" : false
   }, {
     "id" : "world_arcade",
     "name" : "Arcade Nexus",
     "classTheme" : "GAMER",
     "bossName" : "Doomscroll Phantom",
     "description" : "A chaotic RGB world of focus and reflex.",
-    "unlocked" : true
+    "unlocked" : false,
+    "minLevel" : 4,
+    "requiredBosses" : 1,
+    "travelCost" : 8,
+    "bossDefeated" : false
   }, {
     "id" : "world_frontier",
     "name" : "Lost Frontier",
     "classTheme" : "EXPLORER",
     "bossName" : "Fear of Unknown",
     "description" : "A map-based world for discovery.",
-    "unlocked" : true
+    "unlocked" : false,
+    "minLevel" : 5,
+    "requiredBosses" : 2,
+    "travelCost" : 10,
+    "bossDefeated" : false
   }, {
     "id" : "world_temple",
     "name" : "Spirit Temple",
     "classTheme" : "ZEN",
     "bossName" : "Stress Serpent",
     "description" : "A calm temple for meditation and balance.",
-    "unlocked" : true
+    "unlocked" : false,
+    "minLevel" : 6,
+    "requiredBosses" : 2,
+    "travelCost" : 10,
+    "bossDefeated" : false
   }, {
     "id" : "world_rhythm",
     "name" : "Rhythm Realm",
     "classTheme" : "MUSICIAN",
     "bossName" : "Silence Reaper",
     "description" : "A soundwave world for practice and flow.",
-    "unlocked" : true
+    "unlocked" : false,
+    "minLevel" : 7,
+    "requiredBosses" : 3,
+    "travelCost" : 12,
+    "bossDefeated" : false
   }, {
     "id" : "world_culinary",
     "name" : "Culinary Kingdom",
     "classTheme" : "CHEF",
     "bossName" : "Chaos Chef",
     "description" : "A fire-and-steam world for cooking mastery.",
-    "unlocked" : true
+    "unlocked" : false,
+    "minLevel" : 8,
+    "requiredBosses" : 4,
+    "travelCost" : 12,
+    "bossDefeated" : false
   } ]
 }

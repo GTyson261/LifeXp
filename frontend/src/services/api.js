@@ -34,6 +34,13 @@ export function changePrimaryClassAtSanctuary(className) {
   });
 }
 
+export function chooseIntroClass(className) {
+  return request("/intro/class", {
+    method: "POST",
+    body: JSON.stringify({ className })
+  });
+}
+
 export function updateAvatar(avatar) {
   return request("/avatar", {
     method: "POST",
@@ -45,6 +52,13 @@ export function unlockSkill(skillId) {
   return request("/skill", {
     method: "POST",
     body: JSON.stringify({ skillId })
+  });
+}
+
+export function claimQuest(questId) {
+  return request("/quest/claim", {
+    method: "POST",
+    body: JSON.stringify({ questId })
   });
 }
 

@@ -32,6 +32,11 @@ export default function BossPanel({ boss, bossesDefeated = 0 }) {
         <div>
           <h2>{boss.name}</h2>
           <p>{boss.description}</p>
+          <div className="boss-meta-row">
+            <span>Level {boss.level || 1}</span>
+            <span>{boss.element || "Shadow"}</span>
+            <span>{phase}</span>
+          </div>
         </div>
       </div>
 

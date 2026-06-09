@@ -29,6 +29,7 @@ public class PlayerState {
     public long lastRestTimestamp = 0L;
 
     public String title = "Gatebound Novice";
+    public String playerName = "PlayerOne";
     public String pronouns = "they/them";
 
     public String equippedTheme = "Default Cyber Grid";
@@ -43,7 +44,10 @@ public class PlayerState {
             "Procrastination King",
             "A shadow ruler that grows stronger whenever you delay your goals.",
             500,
-            500
+            500,
+            "world_gate",
+            1,
+            "Shadow"
     );
 
     public List<String> activityLog = new ArrayList<>();
@@ -59,14 +63,19 @@ public class PlayerState {
     public PlayerState() {
         activityLog.add("LifeXP initialized. The gate is waiting.");
 
-        dailyQuests.add(new Quest("q1", "Start Your Grind", "Complete any real-life action today.", false, false, 40, 15));
-        dailyQuests.add(new Quest("q2", "Focus Spark", "Complete a focus, coding, or reading session.", false, false, 55, 20));
-        dailyQuests.add(new Quest("q3", "Boss Damage", "Damage the current boss with any activity.", false, false, 65, 25));
+        dailyQuests.add(new Quest("q1", "Start Your Grind", "Complete any real-life action today.", false, false, 40, 15, 0, "any", 1));
+        dailyQuests.add(new Quest("q2", "Focus Spark", "Complete a focus, coding, or reading session.", false, false, 55, 20, 1, "focus", 1));
+        dailyQuests.add(new Quest("q3", "Boss Damage", "Damage the current boss with any activity.", false, false, 65, 25, 1, "boss_damage", 1));
+        dailyQuests.add(new Quest("q4", "World Scout", "Travel to a world and challenge its boss.", false, false, 50, 20, 1, "travel", 1));
 
-        skills.add(new Skill("s1", "XP Flow", "Gain +5 bonus XP from every activity.", false));
-        skills.add(new Skill("s2", "Iron Focus", "Focus and coding actions deal extra boss damage.", false));
-        skills.add(new Skill("s3", "Loot Sense", "Gain more gold from completed actions.", false));
-        skills.add(new Skill("s4", "Aura Control", "Unlock stronger visual aura effects.", false));
+        skills.add(new Skill("s1", "XP Flow", "Gain +5 bonus XP from every activity.", false, 1, "", 1, "Core"));
+        skills.add(new Skill("s2", "Iron Focus", "Focus and coding actions deal extra boss damage.", false, 1, "s1", 2, "Combat"));
+        skills.add(new Skill("s3", "Loot Sense", "Gain more gold from completed actions and quest claims.", false, 1, "s1", 2, "Loot"));
+        skills.add(new Skill("s4", "Aura Control", "Unlock stronger visual aura effects and +5 Essence from boss wins.", false, 1, "s2", 3, "Avatar"));
+        skills.add(new Skill("s5", "Worldwalker", "Travel without energy cost and unlock frontier zones earlier.", false, 2, "s3", 3, "World"));
+        skills.add(new Skill("s6", "Boss Breaker", "Deal +25% damage to world bosses.", false, 2, "s2", 4, "Combat"));
+        skills.add(new Skill("s7", "Quest Engine", "Daily quest claims grant +20 bonus XP.", false, 2, "s3", 4, "Quests"));
+        skills.add(new Skill("s8", "Legend Pulse", "Boss victories grant an extra skill point every third win.", false, 3, "s6", 5, "Legend"));
 
         achievements.add(new Achievement("a1", "Night Architect", "Complete a coding action.", false));
         achievements.add(new Achievement("a2", "Lore Keeper", "Complete a reading action.", false));
@@ -87,18 +96,19 @@ public class PlayerState {
         inventory.add(new InventoryItem("starter_aura", "Starter Glow", "aura", true));
         inventory.add(new InventoryItem("starter_theme", "Default Cyber Grid", "theme", true));
 
-        worlds.add(new WorldZone("world_gate", "Awakening Gate", "NOVICE", "Procrastination King", "Your starting zone.", true));
-        worlds.add(new WorldZone("world_cyber", "Cyber District", "CODER", "Bug Lord", "A neon city powered by code.", true));
-        worlds.add(new WorldZone("world_knowledge", "Knowledge Forest", "BOOKWORM", "Forgetfulness Wraith", "A glowing forest of books and memory.", true));
-        worlds.add(new WorldZone("world_arena", "Titan Arena", "SPORT_MASTER", "Burnout Titan", "A battle zone for physical discipline.", true));
-        worlds.add(new WorldZone("world_arcade", "Arcade Nexus", "GAMER", "Doomscroll Phantom", "A chaotic RGB world of focus and reflex.", true));
-        worlds.add(new WorldZone("world_frontier", "Lost Frontier", "EXPLORER", "Fear of Unknown", "A map-based world for discovery.", true));
-        worlds.add(new WorldZone("world_temple", "Spirit Temple", "ZEN", "Stress Serpent", "A calm temple for meditation and balance.", true));
-        worlds.add(new WorldZone("world_rhythm", "Rhythm Realm", "MUSICIAN", "Silence Reaper", "A soundwave world for practice and flow.", true));
-        worlds.add(new WorldZone("world_culinary", "Culinary Kingdom", "CHEF", "Chaos Chef", "A fire-and-steam world for cooking mastery.", true));
+        worlds.add(new WorldZone("world_gate", "Awakening Gate", "NOVICE", "Procrastination King", "Your starting zone.", true, 1, 0, 0, false));
+        worlds.add(new WorldZone("world_cyber", "Cyber District", "CODER", "Bug Lord", "A neon city powered by code.", true, 1, 0, 5, false));
+        worlds.add(new WorldZone("world_knowledge", "Knowledge Forest", "BOOKWORM", "Forgetfulness Wraith", "A glowing forest of books and memory.", true, 2, 0, 5, false));
+        worlds.add(new WorldZone("world_arena", "Titan Arena", "SPORT_MASTER", "Burnout Titan", "A battle zone for physical discipline.", false, 3, 1, 8, false));
+        worlds.add(new WorldZone("world_arcade", "Arcade Nexus", "GAMER", "Doomscroll Phantom", "A chaotic RGB world of focus and reflex.", false, 4, 1, 8, false));
+        worlds.add(new WorldZone("world_frontier", "Lost Frontier", "EXPLORER", "Fear of Unknown", "A map-based world for discovery.", false, 5, 2, 10, false));
+        worlds.add(new WorldZone("world_temple", "Spirit Temple", "ZEN", "Stress Serpent", "A calm temple for meditation and balance.", false, 6, 2, 10, false));
+        worlds.add(new WorldZone("world_rhythm", "Rhythm Realm", "MUSICIAN", "Silence Reaper", "A soundwave world for practice and flow.", false, 7, 3, 12, false));
+        worlds.add(new WorldZone("world_culinary", "Culinary Kingdom", "CHEF", "Chaos Chef", "A fire-and-steam world for cooking mastery.", false, 8, 4, 12, false));
     }
 
     public static class Avatar {
+        public String displayName = "PlayerOne";
         public String gender = "Custom";
         public String pronouns = "they/them";
         public String bodyType = "Average";
@@ -113,12 +123,24 @@ public class PlayerState {
         public String description;
         public int hp;
         public int maxHp;
+        public String worldId;
+        public int level;
+        public String element;
+
+        public Boss() {}
 
         public Boss(String name, String description, int hp, int maxHp) {
+            this(name, description, hp, maxHp, "", 1, "Shadow");
+        }
+
+        public Boss(String name, String description, int hp, int maxHp, String worldId, int level, String element) {
             this.name = name;
             this.description = description;
             this.hp = hp;
             this.maxHp = maxHp;
+            this.worldId = worldId;
+            this.level = level;
+            this.element = element;
         }
     }
 
@@ -130,8 +152,18 @@ public class PlayerState {
         public boolean claimed;
         public int rewardXp;
         public int rewardGold;
+        public int rewardEssence;
+        public String actionType;
+        public int target;
+        public int progress;
+
+        public Quest() {}
 
         public Quest(String id, String name, String description, boolean completed, boolean claimed, int rewardXp, int rewardGold) {
+            this(id, name, description, completed, claimed, rewardXp, rewardGold, 0, "any", 1);
+        }
+
+        public Quest(String id, String name, String description, boolean completed, boolean claimed, int rewardXp, int rewardGold, int rewardEssence, String actionType, int target) {
             this.id = id;
             this.name = name;
             this.description = description;
@@ -139,6 +171,10 @@ public class PlayerState {
             this.claimed = claimed;
             this.rewardXp = rewardXp;
             this.rewardGold = rewardGold;
+            this.rewardEssence = rewardEssence;
+            this.actionType = actionType;
+            this.target = target;
+            this.progress = completed ? target : 0;
         }
     }
 
@@ -147,12 +183,26 @@ public class PlayerState {
         public String name;
         public String description;
         public boolean unlocked;
+        public int cost;
+        public String prerequisiteId;
+        public int tier;
+        public String category;
+
+        public Skill() {}
 
         public Skill(String id, String name, String description, boolean unlocked) {
+            this(id, name, description, unlocked, 1, "", 1, "Core");
+        }
+
+        public Skill(String id, String name, String description, boolean unlocked, int cost, String prerequisiteId, int tier, String category) {
             this.id = id;
             this.name = name;
             this.description = description;
             this.unlocked = unlocked;
+            this.cost = cost;
+            this.prerequisiteId = prerequisiteId;
+            this.tier = tier;
+            this.category = category;
         }
     }
 
@@ -209,14 +259,28 @@ public class PlayerState {
         public String bossName;
         public String description;
         public boolean unlocked;
+        public int minLevel;
+        public int requiredBosses;
+        public int travelCost;
+        public boolean bossDefeated;
+
+        public WorldZone() {}
 
         public WorldZone(String id, String name, String classTheme, String bossName, String description, boolean unlocked) {
+            this(id, name, classTheme, bossName, description, unlocked, 1, 0, 0, false);
+        }
+
+        public WorldZone(String id, String name, String classTheme, String bossName, String description, boolean unlocked, int minLevel, int requiredBosses, int travelCost, boolean bossDefeated) {
             this.id = id;
             this.name = name;
             this.classTheme = classTheme;
             this.bossName = bossName;
             this.description = description;
             this.unlocked = unlocked;
+            this.minLevel = minLevel;
+            this.requiredBosses = requiredBosses;
+            this.travelCost = travelCost;
+            this.bossDefeated = bossDefeated;
         }
     }
 }

@@ -33,6 +33,15 @@ const SKIN_TONES = [
   "#4b2a1f"
 ];
 
+const PRONOUN_OPTIONS = [
+  "they/them",
+  "she/her",
+  "he/him",
+  "she/they",
+  "he/they",
+  "any"
+];
+
 export default function AvatarCustomizer({
   avatarDraft,
   setAvatarDraft,
@@ -63,6 +72,44 @@ export default function AvatarCustomizer({
           <p>You are the hero of this story.</p>
         </div>
       </div>
+
+      <section className="customizer-section">
+        <h4>Identity</h4>
+
+        <div className="identity-field-grid">
+          <label className="identity-field">
+            <span>Name</span>
+            <input
+              type="text"
+              value={avatarDraft?.displayName || ""}
+              placeholder="PlayerOne"
+              maxLength="32"
+              onChange={(event) =>
+                updateAvatarField("displayName", event.target.value)
+              }
+            />
+          </label>
+
+          <label className="identity-field">
+            <span>Pronouns</span>
+            <input
+              type="text"
+              list="pronoun-options"
+              value={avatarDraft?.pronouns || ""}
+              placeholder="they/them"
+              maxLength="24"
+              onChange={(event) =>
+                updateAvatarField("pronouns", event.target.value)
+              }
+            />
+            <datalist id="pronoun-options">
+              {PRONOUN_OPTIONS.map((pronouns) => (
+                <option key={pronouns} value={pronouns} />
+              ))}
+            </datalist>
+          </label>
+        </div>
+      </section>
 
       <section className="customizer-section">
         <h4>Body Type</h4>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Sidebar from "./components/Sidebar";
 import DashboardHUD from "./components/DashboardHUD";
 import AvatarCustomizer from "./components/AvatarCustomizer";
 import AvatarPreview from "./components/AvatarPreview";
@@ -23,8 +22,10 @@ import {
   getGameState,
   completeActivity,
   changePrimaryClassAtSanctuary,
+  chooseIntroClass,
   updateAvatar,
   unlockSkill,
+  claimQuest,
   buyShopItem,
   equipInventoryItem,
   travelToWorld,
@@ -54,12 +55,76 @@ const DASHBOARD_TABS = [
   { key: "log", label: "Log", icon: "☰" }
 ];
 
+const INTRO_OPENINGS = {
+  CODER: {
+    title: "Enter the Cyber District",
+    hook: "Turn debugging, focus, and late-night builds into power.",
+    promise: "Your first gate opens in neon code and clean momentum.",
+    signal: "Compile discipline. Break the Bug Lord.",
+    perk: "Coding and focus cost less energy, earn bonus XP, gold, and boss damage."
+  },
+  BOOKWORM: {
+    title: "Enter the Knowledge Forest",
+    hook: "Every page, note, and study session becomes living magic.",
+    promise: "Your first gate opens through glowing shelves and memory runes.",
+    signal: "Read deeper. Outlast the Forgetfulness Wraith.",
+    perk: "Reading notes create bonus XP, Essence, and extra boss damage."
+  },
+  SPORT_MASTER: {
+    title: "Enter Titan Arena",
+    hook: "Movement becomes strength, streaks become armor.",
+    promise: "Your first gate opens under arena lights and electric pressure.",
+    signal: "Train the body. Stand down the Burnout Titan.",
+    perk: "Walking and workouts cost less energy, restore energy, and hit harder."
+  },
+  GAMER: {
+    title: "Enter Arcade Nexus",
+    hook: "Stack real actions like combos and turn quests into score.",
+    promise: "Your first gate opens in green neon, pixel sparks, and challenge runs.",
+    signal: "Play with purpose. Defeat the Doomscroll Phantom.",
+    perk: "Gaming earns combo gold and boss damage; quest claims pay extra."
+  },
+  EXPLORER: {
+    title: "Enter the Lost Frontier",
+    hook: "Trying new things, routes, and ideas becomes map progress.",
+    promise: "Your first gate opens onto compass light and unknown roads.",
+    signal: "Move beyond routine. Face the Fear of Unknown.",
+    perk: "Travel costs less, grants XP and gold, and discovery actions pay more."
+  },
+  ZEN: {
+    title: "Enter Spirit Temple",
+    hook: "Reflection, rest, and calm effort become quiet force.",
+    promise: "Your first gate opens in blue air, still water, and steady breath.",
+    signal: "Protect your peace. Break the Stress Serpent.",
+    perk: "Meditation and focus cost less energy, restore energy, and damage bosses."
+  },
+  MUSICIAN: {
+    title: "Enter Rhythm Realm",
+    hook: "Practice, timing, and creative flow become soundwave XP.",
+    promise: "Your first gate opens on stage light and pulsing rhythm.",
+    signal: "Keep time. Challenge the Silence Reaper.",
+    perk: "Music practice costs less energy and earns bonus Crystals and damage."
+  },
+  CHEF: {
+    title: "Enter Culinary Kingdom",
+    hook: "Cooking, prep, and nourishment become flame-forged mastery.",
+    promise: "Your first gate opens through steam, copper light, and recipe fire.",
+    signal: "Feed the grind. Tame the Chaos Chef.",
+    perk: "Cooking costs less energy, restores energy, earns gold, and hits bosses."
+  }
+};
+
+const INTRO_CLASSES = CLASSES.filter((className) => className !== "NOVICE");
+
 export default function App() {
   const [state, setState] = useState(null);
   const [showIntro, setShowIntro] = useState(false);
   const [avatarDraft, setAvatarDraft] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [activeView, setActiveView] = useState("overview");
+  const [introClass, setIntroClass] = useState("CODER");
+  const [introName, setIntroName] = useState("");
+  const [introPronouns, setIntroPronouns] = useState("they/them");
 
   const [activityType, setActivityType] = useState("coding");
   const [amount, setAmount] = useState("");
@@ -76,7 +141,14 @@ export default function App() {
       setLoadError("");
       const data = await getGameState();
       setState(data);
-      setAvatarDraft(data.avatar);
+      setAvatarDraft({
+        ...(data.avatar || {}),
+        displayName: data.playerName || data.avatar?.displayName || "PlayerOne",
+        pronouns: data.pronouns || data.avatar?.pronouns || "they/them"
+      });
+      setIntroClass(data.primaryClass && data.primaryClass !== "NOVICE" ? data.primaryClass : "CODER");
+      setIntroName(data.playerName === "PlayerOne" ? "" : data.playerName || "");
+      setIntroPronouns(data.pronouns || data.avatar?.pronouns || "they/them");
       setShowIntro(!data.introCompleted);
     } catch (error) {
       setLoadError(error.message || "Could not connect to the LifeXP backend.");
@@ -130,15 +202,34 @@ export default function App() {
   }
 
   async function openGate() {
+    const trimmedName = introName.trim();
+    const trimmedPronouns = introPronouns.trim() || "they/them";
+
+    if (!trimmedName) {
+      return;
+    }
+
+    await updateAvatar({
+      ...(avatarDraft || state.avatar || {}),
+      displayName: trimmedName,
+      pronouns: trimmedPronouns
+    });
+
+    await chooseIntroClass(introClass);
+
     const updated = await completeActivity({
       type: "intro",
       amount: 0,
-      summary: "Opened the LifeXP Gate",
+      summary: `Opened the ${CLASS_META[introClass]?.world || "LifeXP"} Gate`,
       verified: true
     });
 
     setState(updated);
-    setAvatarDraft(updated.avatar);
+    setAvatarDraft({
+      ...(updated.avatar || {}),
+      displayName: updated.playerName || trimmedName,
+      pronouns: updated.pronouns || trimmedPronouns
+    });
     setShowIntro(false);
   }
 
@@ -148,7 +239,9 @@ export default function App() {
 
     const preservedAvatar = {
       ...(updated.avatar || {}),
-      ...currentAvatar
+      ...currentAvatar,
+      displayName: currentAvatar.displayName || updated.playerName || "PlayerOne",
+      pronouns: currentAvatar.pronouns || updated.pronouns || "they/them"
     };
 
     setState({
@@ -231,34 +324,119 @@ export default function App() {
     setState(updated);
   }
 
+  async function handleClaimQuest(questId) {
+    const updated = await claimQuest(questId);
+    if (updated.lastXpGain > 0) {
+      showXp(updated.lastXpGain);
+    }
+    setState(updated);
+    setAvatarDraft(updated.avatar);
+  }
+
   async function hardReset() {
     const updated = await resetGame();
     setState(updated);
     setAvatarDraft(updated.avatar);
+    setIntroClass("CODER");
+    setIntroName("");
+    setIntroPronouns("they/them");
     setShowIntro(true);
     setTimerRunning(false);
     setTimerSeconds(0);
   }
 
   if (showIntro) {
+    const introMeta = CLASS_META[introClass] || CLASS_META.CODER;
+    const introOpening = INTRO_OPENINGS[introClass] || INTRO_OPENINGS.CODER;
+    const canOpenGate = introName.trim().length > 0;
+
     return (
-      <div className="intro-screen">
-        <div className="intro-card">
-          <p className="eyebrow">Real-Life RPG Simulator</p>
-          <h1>Tired of normal video games?</h1>
-          <h2>Tired of grinding for rewards that achieve nothing in real life?</h2>
+      <div
+        className={`intro-screen intro-${introClass.toLowerCase()}`}
+        style={{ "--intro-color": introMeta.color }}
+      >
+        <div className="intro-stage">
+          <section className="intro-hero">
+            <div className="intro-copy">
+              <p className="eyebrow">Choose your origin</p>
+              <h1>{introOpening.title}</h1>
+              <h2>{introOpening.hook}</h2>
+              <p>{introOpening.promise}</p>
 
-          <p>
-            Welcome to <strong>LifeXP</strong>. Your real actions become XP,
-            loot, class mastery, and boss damage.
-          </p>
+              <div className="intro-identity-panel">
+                <label>
+                  <span>Name</span>
+                  <input
+                    type="text"
+                    value={introName}
+                    placeholder="Choose your hero name"
+                    maxLength="32"
+                    onChange={(event) => setIntroName(event.target.value)}
+                  />
+                </label>
 
-          <button className="gate-button" onClick={openGate}>
-            Open The Gate
-          </button>
+                <label>
+                  <span>Pronouns</span>
+                  <input
+                    type="text"
+                    value={introPronouns}
+                    placeholder="they/them"
+                    maxLength="24"
+                    onChange={(event) => setIntroPronouns(event.target.value)}
+                  />
+                </label>
+              </div>
 
-          <div className="portal-door">
-            <div className="door-core" />
+              <div className="intro-signal-row">
+                <span>{introMeta.icon}</span>
+                <strong>{introMeta.archetype}</strong>
+                <small>{introOpening.signal}</small>
+                <em>{introOpening.perk}</em>
+              </div>
+
+              <button className="gate-button" disabled={!canOpenGate} onClick={openGate}>
+                {canOpenGate ? `Open ${introMeta.world} Gate` : "Name Your Hero First"}
+              </button>
+            </div>
+
+            <div className="portal-scene" aria-hidden="true">
+              <div className="portal-door">
+                <div className="door-core">
+                  <span>{introMeta.icon}</span>
+                </div>
+              </div>
+              <div className="portal-floor" />
+            </div>
+          </section>
+
+          <section className="origin-grid" aria-label="Class origin choices">
+            {INTRO_CLASSES.map((className) => {
+              const classMeta = CLASS_META[className];
+              const opening = INTRO_OPENINGS[className];
+              const selected = introClass === className;
+
+              return (
+                <button
+                  key={className}
+                  type="button"
+                  className={selected ? "origin-card selected" : "origin-card"}
+                  style={{ "--origin-color": classMeta.color }}
+                  aria-pressed={selected}
+                  onClick={() => setIntroClass(className)}
+                >
+                  <span>{classMeta.icon}</span>
+                  <strong>{classMeta.label}</strong>
+                  <small>{opening.title.replace("Enter ", "")}</small>
+                  <em>{opening.perk}</em>
+                </button>
+              );
+            })}
+          </section>
+
+          <div className="intro-footer-strip">
+            <span>Real actions become XP</span>
+            <span>Daily quests unlock rewards</span>
+            <span>World bosses track your momentum</span>
           </div>
         </div>
       </div>
@@ -273,12 +451,6 @@ export default function App() {
       {floatingXp && <div className="floating-xp">{floatingXp}</div>}
 
       <div className="premium-dashboard-layout">
-        <Sidebar
-          state={state}
-          classMeta={CLASS_META}
-          onClassSelect={handleClassChoice}
-        />
-
         <div className="premium-dashboard-main">
           <DashboardHUD
             state={{ ...state, onReset: hardReset, onRest: handleRest }}
@@ -348,7 +520,7 @@ export default function App() {
                   bossesDefeated={state.bossesDefeated}
                 />
 
-                <QuestPanel quests={state.dailyQuests || []} />
+                <QuestPanel quests={state.dailyQuests || []} onClaimQuest={handleClaimQuest} />
               </>
             )}
 
@@ -385,6 +557,7 @@ export default function App() {
                   classes={CLASSES}
                   classMeta={CLASS_META}
                   primaryClass={state.primaryClass}
+                  level={state.level}
                   onClassSelect={handleClassChoice}
                 />
 
@@ -394,7 +567,7 @@ export default function App() {
 
             {activeView === "quests" && (
               <>
-                <QuestPanel quests={state.dailyQuests || []} />
+                <QuestPanel quests={state.dailyQuests || []} onClaimQuest={handleClaimQuest} />
 
                 <SkillTreePanel
                   skills={state.skills || []}

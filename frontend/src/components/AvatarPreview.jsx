@@ -94,6 +94,8 @@ export default function AvatarPreview({
           <span>Current Evolution</span>
           <strong>{currentEvolution?.title}</strong>
           <small>{currentEvolution?.outfit}</small>
+          <p>{currentEvolution?.perk}</p>
+          <em>{currentEvolution?.mastery}</em>
         </div>
 
         {nextEvolution && (
@@ -101,6 +103,8 @@ export default function AvatarPreview({
             <span>Next Evolution</span>
             <strong>{nextEvolution.title}</strong>
             <small>Unlocks at Level {nextEvolution.level}</small>
+            <p>{nextEvolution.perk}</p>
+            <em>{nextEvolution.mastery}</em>
           </div>
         )}
       </div>
