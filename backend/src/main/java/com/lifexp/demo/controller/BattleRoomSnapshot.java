@@ -34,7 +34,7 @@ public class BattleRoomSnapshot {
     public String status;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     public String payload;
 
     @Column(name = "created_at", nullable = false)
