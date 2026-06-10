@@ -1,8 +1,14 @@
 package com.lifexp.demo.controller;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +19,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class FriendlyBattleService {
     private static final String[] MOVES = {"POWER", "FOCUS", "GUARD", "BURST"};
+    private static final Duration WAITING_ROOM_TTL = Duration.ofMinutes(20);
+    private static final Duration ACTIVE_ROOM_TTL = Duration.ofMinutes(45);
+    private static final Duration COMPLETED_ROOM_TTL = Duration.ofMinutes(30);
+    private static final Duration MATCHMAKING_TTL = Duration.ofMinutes(5);
     private final SaveService saveService;
     private final UserAccountRepository userRepository;
     private final FriendshipRepository friendshipRepository;
     private final BattleHistoryRepository battleHistoryRepository;
+    private final BattleRoomSnapshotRepository battleRoomSnapshotRepository;
+    private final ObjectMapper objectMapper;
     private final Map<String, FriendlyBattleRoom> rooms = new ConcurrentHashMap<>();
     private final Map<String, MatchmakingEntry> matchmakingQueue = new ConcurrentHashMap<>();
     private final SecureRandom random = new SecureRandom();
@@ -25,12 +37,39 @@ public class FriendlyBattleService {
             SaveService saveService,
             UserAccountRepository userRepository,
             FriendshipRepository friendshipRepository,
-            BattleHistoryRepository battleHistoryRepository
+            BattleHistoryRepository battleHistoryRepository,
+            BattleRoomSnapshotRepository battleRoomSnapshotRepository
     ) {
         this.saveService = saveService;
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
         this.battleHistoryRepository = battleHistoryRepository;
+        this.battleRoomSnapshotRepository = battleRoomSnapshotRepository;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    }
+
+    @PostConstruct
+    public void loadActiveRooms() {
+        for (BattleRoomSnapshot snapshot : battleRoomSnapshotRepository.findByStatusNot("COMPLETE")) {
+            try {
+                FriendlyBattleRoom room = objectMapper.readValue(snapshot.payload, FriendlyBattleRoom.class);
+                if (room.code != null && !room.code.isBlank()) {
+                    rooms.put(room.code, room);
+                }
+            } catch (Exception exception) {
+                battleRoomSnapshotRepository.delete(snapshot);
+            }
+        }
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    public synchronized void cleanupStaleBattleState() {
+        Instant now = Instant.now();
+        matchmakingQueue.entrySet().removeIf(entry -> isOlderThan(entry.getValue().joinedAt, now, MATCHMAKING_TTL));
+        rooms.entrySet().removeIf(entry -> shouldExpireRoom(entry.getValue(), now));
+        battleRoomSnapshotRepository.deleteByStatusAndUpdatedAtBefore("COMPLETE", now.minus(COMPLETED_ROOM_TTL));
+        battleRoomSnapshotRepository.deleteByStatusNotAndUpdatedAtBefore("COMPLETE", now.minus(ACTIVE_ROOM_TTL));
     }
 
     public synchronized FriendlyBattleResponse createRoom(UserAccount account) {
@@ -49,6 +88,7 @@ public class FriendlyBattleService {
         room.code = code;
         room.host = createPlayer(account, state);
         room.createdAt = Instant.now().toString();
+        room.lastActivityAt = room.createdAt;
         room.status = "WAITING";
         String normalizedInvite = normalizeOptionalUsername(invitedUsername);
         if (!normalizedInvite.isBlank()) {
@@ -60,6 +100,7 @@ public class FriendlyBattleService {
             room.log.add(room.host.displayName + " opened a friendly battle room.");
         }
         rooms.put(code, room);
+        persistRoom(room);
         return toResponse(room, account.username);
     }
 
@@ -92,7 +133,9 @@ public class FriendlyBattleService {
         room.inviteStatus = "ACCEPTED";
         room.hostMove = "";
         room.guestMove = "";
+        touchRoom(room);
         room.log.add(room.guest.displayName + " joined the room.");
+        persistRoom(room);
         return toResponse(room, account.username);
     }
 
@@ -191,12 +234,14 @@ public class FriendlyBattleService {
             throw new IllegalArgumentException("You are not in this battle room.");
         }
 
+        touchRoom(room);
         room.log.add(playerFor(room, account.username).displayName + " locked in " + moveLabel(normalizedMove) + ".");
 
         if (room.guest != null && !room.hostMove.isBlank() && !room.guestMove.isBlank()) {
             resolveRound(room);
         }
 
+        persistRoom(room);
         return toResponse(room, account.username);
     }
 
@@ -223,6 +268,7 @@ public class FriendlyBattleService {
         room.hostMove = "";
         room.guestMove = "";
         room.status = room.hostWins >= 3 || room.guestWins >= 3 ? "COMPLETE" : "READY";
+        touchRoom(room);
         if ("COMPLETE".equals(room.status)) {
             saveBattleHistory(room);
         }
@@ -241,8 +287,10 @@ public class FriendlyBattleService {
         room.status = "READY";
         room.inviteStatus = "MATCHED";
         room.createdAt = Instant.now().toString();
+        room.lastActivityAt = room.createdAt;
         room.log.add(room.host.displayName + " and " + room.guest.displayName + " matched through queue.");
         rooms.put(code, room);
+        persistRoom(room);
         return room;
     }
 
@@ -267,6 +315,47 @@ public class FriendlyBattleService {
         }
         if (!existingMove.isBlank()) {
             throw new IllegalArgumentException("Move already locked for this round.");
+        }
+    }
+
+    private void touchRoom(FriendlyBattleRoom room) {
+        room.lastActivityAt = Instant.now().toString();
+    }
+
+    private boolean shouldExpireRoom(FriendlyBattleRoom room, Instant now) {
+        if ("COMPLETE".equals(room.status)) {
+            return isOlderThan(room.lastActivityAt, now, COMPLETED_ROOM_TTL);
+        }
+
+        Duration ttl = "WAITING".equals(room.status) ? WAITING_ROOM_TTL : ACTIVE_ROOM_TTL;
+        boolean expired = isOlderThan(room.lastActivityAt, now, ttl);
+        if (expired) {
+            battleRoomSnapshotRepository.deleteById(room.code);
+        }
+        return expired;
+    }
+
+    private boolean isOlderThan(String instantText, Instant now, Duration duration) {
+        try {
+            return Instant.parse(instantText).isBefore(now.minus(duration));
+        } catch (Exception exception) {
+            return true;
+        }
+    }
+
+    private void persistRoom(FriendlyBattleRoom room) {
+        try {
+            BattleRoomSnapshot snapshot = battleRoomSnapshotRepository.findById(room.code).orElseGet(BattleRoomSnapshot::new);
+            snapshot.roomCode = room.code;
+            snapshot.hostUsername = room.host.username;
+            snapshot.guestUsername = room.guest == null ? "" : room.guest.username;
+            snapshot.status = room.status;
+            snapshot.payload = objectMapper.writeValueAsString(room);
+            snapshot.createdAt = snapshot.createdAt == null ? Instant.now() : snapshot.createdAt;
+            snapshot.updatedAt = Instant.now();
+            battleRoomSnapshotRepository.save(snapshot);
+        } catch (Exception exception) {
+            // In-memory battle play should continue even if snapshot persistence fails.
         }
     }
 
@@ -445,6 +534,7 @@ public class FriendlyBattleService {
         String guestMove = "";
         String lastResult = "";
         String createdAt = "";
+        String lastActivityAt = "";
         String invitedUsername = "";
         String inviteStatus = "";
         boolean historySaved = false;

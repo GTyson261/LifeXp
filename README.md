@@ -60,3 +60,109 @@ This project focuses on a single core feature:
 «Tracking focus sessions and converting them into game-based progression.»
 
 Future ideas like full social systems, avatars, or large-scale features are intentionally out of scope for this version.
+
+---
+
+## Local Demo Setup
+
+LifeXP now runs as a local full-stack demo with a React frontend, Spring Boot backend, and MySQL persistence.
+
+### Requirements
+
+- Java 17+
+- Node.js 20+
+- MySQL running locally
+- MySQL database/user reachable by the backend
+
+### Start MySQL
+
+Use MySQL Workbench or your local MySQL service. The backend defaults to:
+
+- Host: `localhost`
+- Port: `3306`
+- Database: `lifexp`
+- User: `root`
+- Password: set with `MYSQL_PASSWORD`
+
+### Start Backend
+
+```bash
+cd backend
+MYSQL_PASSWORD='your_mysql_password' mvn spring-boot:run
+```
+
+The backend runs at:
+
+```text
+http://127.0.0.1:8080
+```
+
+### Start Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend usually runs at:
+
+```text
+http://127.0.0.1:5174
+```
+
+If Vite chooses another port, use the URL shown in the terminal.
+
+### Mobile LAN Demo
+
+To test on a phone on the same Wi-Fi:
+
+1. Keep backend and frontend running on your computer.
+2. Find your computer's local IP address.
+3. Open the Vite URL on your phone using that IP, for example:
+
+```text
+http://192.168.1.20:5174
+```
+
+The frontend will call the backend on the same host at port `8080`.
+
+### Demo Flow
+
+1. Register or log in.
+2. Pick a class and customize the avatar.
+3. Complete quests and fight bosses.
+4. Add another account as a friend.
+5. Accept the friend request from the second account.
+6. Invite that friend to a friendly battle or use matchmaking.
+7. Complete a battle and view battle history.
+
+### Verification Commands
+
+```bash
+cd backend
+mvn test
+```
+
+```bash
+cd frontend
+npm run build
+```
+
+### Local Battle Load Test
+
+With the backend running:
+
+```bash
+PLAYER_COUNT=12 scripts/friendly-battle-load-test.sh
+```
+
+This creates temporary users, joins matchmaking, creates matched rooms, submits sample moves, and prints battle stats.
+
+### Stability Notes
+
+- Friendships and battle history persist in MySQL.
+- Active friendly battle rooms are snapshotted to MySQL and restored on backend startup.
+- Matchmaking queue is intentionally short-lived and expires stale entries.
+- Waiting rooms, stale rooms, and old completed room snapshots are cleaned on a timer.
+- Friendly battle moves are server-validated for duplicate moves, stale rounds, full rooms, and completed rooms.

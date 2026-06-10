@@ -5,12 +5,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "friendships")
+@Table(
+        name = "friendships",
+        uniqueConstraints = @UniqueConstraint(name = "uk_friendship_pair", columnNames = {"requester_id", "receiver_id"}),
+        indexes = {
+                @Index(name = "idx_friendship_requester", columnList = "requester_id"),
+                @Index(name = "idx_friendship_receiver", columnList = "receiver_id"),
+                @Index(name = "idx_friendship_status", columnList = "status")
+        }
+)
 public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

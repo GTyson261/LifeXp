@@ -27,14 +27,20 @@ function storeSession(session) {
 
 async function request(path, options = {}) {
   const token = localStorage.getItem(TOKEN_KEY);
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {})
-    },
-    ...options
-  });
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {})
+      },
+      ...options
+    });
+  } catch {
+    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -50,14 +56,20 @@ async function request(path, options = {}) {
 
 async function battleRequest(path, options = {}) {
   const token = localStorage.getItem(TOKEN_KEY);
-  const response = await fetch(`${BATTLE_BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {})
-    },
-    ...options
-  });
+  let response;
+
+  try {
+    response = await fetch(`${BATTLE_BASE}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {})
+      },
+      ...options
+    });
+  } catch {
+    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -80,14 +92,20 @@ async function battleRequest(path, options = {}) {
 
 async function friendsRequest(path = "", options = {}) {
   const token = localStorage.getItem(TOKEN_KEY);
-  const response = await fetch(`${FRIENDS_BASE}${path}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {})
-    },
-    ...options
-  });
+  let response;
+
+  try {
+    response = await fetch(`${FRIENDS_BASE}${path}`, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers || {})
+      },
+      ...options
+    });
+  } catch {
+    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
