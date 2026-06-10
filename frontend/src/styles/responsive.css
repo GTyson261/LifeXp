@@ -70,6 +70,7 @@
   .weekly-quest-panel,
   .settings-panel,
   .battle-recap-card,
+  .friendly-battle-panel,
   .quests-panel,
   .skill-panel,
   .achievements-panel,
@@ -200,6 +201,7 @@
   .battle-recap-card,
   .focus-mode-panel,
   .companion-panel,
+  .friendly-battle-panel,
   .quests-panel,
   .skill-panel,
   .achievements-panel,
@@ -234,8 +236,68 @@
 
   .focus-mode-panel,
   .companion-panel,
+  .friendly-battle-panel,
   .battle-recap-card {
     grid-column: 1 / -1;
+  }
+
+  .battle-connect-grid,
+  .friends-grid,
+  .friend-request-grid,
+  .friend-social-grid,
+  .battle-invite-strip,
+  .social-toast-card,
+  .friendly-battle-arena,
+  .battle-move-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .battle-invite-list {
+    justify-content: stretch;
+  }
+
+  .battle-invite-list button {
+    flex: 1 1 100%;
+  }
+
+  .friend-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .friend-card-actions {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .friend-card-actions button {
+    flex: 1 1 110px;
+  }
+
+  .friend-profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .friend-leaderboard-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .friend-leaderboard-row small {
+    grid-column: 2;
+  }
+
+  .battle-versus-core {
+    width: 100%;
+    min-height: 78px;
+  }
+
+  .battle-room-tools {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .battle-room-tools button,
+  .battle-move-grid button {
+    width: 100%;
   }
 
   .companion-sprite {
@@ -258,7 +320,7 @@
     bottom: 0.75rem;
     z-index: 60;
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 0.25rem;
     padding: 0.4rem;
     border-radius: 8px;

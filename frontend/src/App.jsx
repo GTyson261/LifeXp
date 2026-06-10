@@ -30,6 +30,7 @@ import VictoryScreen from "./components/VictoryScreen";
 import DailyLoginReward from "./components/DailyLoginReward";
 import FocusModePanel from "./components/FocusModePanel";
 import CompanionPanel from "./components/CompanionPanel";
+import FriendlyBattlePanel from "./components/FriendlyBattlePanel";
 import {
   getGameState,
   completeActivity,
@@ -47,7 +48,16 @@ import {
   registerUser,
   loginUser,
   getStoredSession,
-  clearStoredSession
+  clearStoredSession,
+  createFriendlyBattleRoom,
+  joinFriendlyBattleRoom,
+  getFriendlyBattleRoom,
+  chooseFriendlyBattleMove,
+  getFriendlyBattleInvites,
+  getFriends,
+  sendFriendRequest,
+  acceptFriendRequest,
+  declineFriendRequest
 } from "./services/api";
 import "./styles.css";
 import "./styles/dashboard.css";
@@ -69,6 +79,7 @@ const DASHBOARD_TABS = [
   { key: "avatar", label: "Avatar", icon: "♙" },
   { key: "quests", label: "Quests", icon: "◇" },
   { key: "shop", label: "Shop", icon: "◈" },
+  { key: "friends", label: "Battle", icon: "⚔" },
   { key: "world", label: "World", icon: "⌖" },
   { key: "log", label: "Log", icon: "☰" }
 ];
@@ -356,6 +367,15 @@ export default function App() {
   const [bossEntrance, setBossEntrance] = useState(null);
   const [victoryReward, setVictoryReward] = useState(null);
   const [dailyRewardVisible, setDailyRewardVisible] = useState(false);
+  const [battleRoom, setBattleRoom] = useState(null);
+  const [battleCode, setBattleCode] = useState("");
+  const [battleError, setBattleError] = useState("");
+  const [friends, setFriends] = useState({ friends: [], incomingRequests: [], outgoingRequests: [] });
+  const [friendUsername, setFriendUsername] = useState("");
+  const [friendError, setFriendError] = useState("");
+  const [battleInvites, setBattleInvites] = useState([]);
+  const [selectedFriendUsername, setSelectedFriendUsername] = useState("");
+  const [socialToast, setSocialToast] = useState(null);
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem("lifexp_reduce_motion") === "true");
   const [compactMobile, setCompactMobile] = useState(() => localStorage.getItem("lifexp_compact_mobile") === "true");
   const [audioFeedback, setAudioFeedback] = useState(() => localStorage.getItem("lifexp_audio_feedback") === "true");
@@ -436,6 +456,43 @@ export default function App() {
       setDailyRewardVisible(true);
     }
   }, [state?.introCompleted, state?.lastLoginRewardDate]);
+
+  useEffect(() => {
+    if (activeView !== "friends" || !battleRoom?.code) return;
+
+    const interval = setInterval(async () => {
+      try {
+        setBattleRoom(await getFriendlyBattleRoom(battleRoom.code));
+      } catch {
+        // Manual refresh will show actionable errors; silent polling should stay quiet.
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [activeView, battleRoom?.code]);
+
+  useEffect(() => {
+    if (activeView !== "friends") return;
+    handleRefreshFriends();
+    handleRefreshBattleInvites();
+  }, [activeView]);
+
+  useEffect(() => {
+    if (activeView !== "friends") return;
+
+    const interval = setInterval(() => {
+      handleRefreshFriends({ quiet: true });
+      handleRefreshBattleInvites({ quiet: true });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [activeView]);
+
+  useEffect(() => {
+    if (!socialToast) return;
+    const timeout = setTimeout(() => setSocialToast(null), 3600);
+    return () => clearTimeout(timeout);
+  }, [socialToast]);
 
   const hasUnsavedAvatarChanges = Boolean(
     state?.avatar &&
@@ -792,6 +849,131 @@ export default function App() {
     applyGameStateUpdate(updated, { recapLabel: "Focus mode action" });
   }
 
+  async function handleCreateBattleRoom(invitedUsername = "") {
+    try {
+      setBattleError("");
+      const room = await createFriendlyBattleRoom(invitedUsername);
+      setBattleRoom(room);
+      setBattleCode(room.code || "");
+      if (invitedUsername) {
+        setSocialToast({ title: "Battle invite sent", message: `@${invitedUsername} can join from their Battle tab.` });
+      }
+      playFeedbackTone("boss", audioFeedback);
+    } catch (error) {
+      setBattleError(error.message || "Could not create battle room.");
+    }
+  }
+
+  async function handleJoinBattleRoom(event) {
+    event.preventDefault();
+
+    try {
+      setBattleError("");
+      const room = await joinFriendlyBattleRoom(battleCode);
+      setBattleRoom(room);
+      setBattleInvites((current) => current.filter((invite) => invite.code !== room.code));
+      playFeedbackTone("boss", audioFeedback);
+    } catch (error) {
+      setBattleError(error.message || "Could not join battle room.");
+    }
+  }
+
+  async function handleRefreshBattleRoom() {
+    if (!battleRoom?.code) return;
+
+    try {
+      setBattleError("");
+      setBattleRoom(await getFriendlyBattleRoom(battleRoom.code));
+    } catch (error) {
+      setBattleError(error.message || "Could not refresh battle room.");
+    }
+  }
+
+  async function handleChooseBattleMove(move) {
+    if (!battleRoom?.code) return;
+
+    try {
+      setBattleError("");
+      const updatedRoom = await chooseFriendlyBattleMove(battleRoom.code, move);
+      setBattleRoom(updatedRoom);
+      playFeedbackTone(updatedRoom.lastResult ? "victory" : "claim", audioFeedback);
+    } catch (error) {
+      setBattleError(error.message || "Could not lock in battle move.");
+    }
+  }
+
+  async function handleRefreshFriends(options = {}) {
+    try {
+      if (!options.quiet) setFriendError("");
+      setFriends(await getFriends());
+    } catch (error) {
+      if (!options.quiet) setFriendError(error.message || "Could not load friends.");
+    }
+  }
+
+  async function handleRefreshBattleInvites(options = {}) {
+    try {
+      if (!options.quiet) setBattleError("");
+      setBattleInvites(await getFriendlyBattleInvites());
+    } catch (error) {
+      if (!options.quiet) setBattleError(error.message || "Could not load battle invites.");
+    }
+  }
+
+  async function handleInviteFriend(friend) {
+    await handleCreateBattleRoom(friend.username);
+    await handleRefreshBattleInvites({ quiet: true });
+  }
+
+  async function handleAcceptBattleInvite(invite) {
+    try {
+      setBattleCode(invite.code);
+      setBattleError("");
+      const room = await joinFriendlyBattleRoom(invite.code);
+      setBattleRoom(room);
+      setBattleInvites((current) => current.filter((item) => item.code !== invite.code));
+      setSocialToast({ title: "Battle joined", message: `You joined ${invite.host?.displayName || "your friend"}'s room.` });
+      playFeedbackTone("boss", audioFeedback);
+    } catch (error) {
+      setBattleError(error.message || "Could not join battle invite.");
+    }
+  }
+
+  async function handleSendFriendRequest(event) {
+    event.preventDefault();
+
+    try {
+      setFriendError("");
+      const updatedFriends = await sendFriendRequest(friendUsername.trim());
+      setFriends(updatedFriends);
+      setFriendUsername("");
+      setSocialToast({ title: "Friend request sent", message: "They will appear here once they accept." });
+      playFeedbackTone("claim", audioFeedback);
+    } catch (error) {
+      setFriendError(error.message || "Could not send friend request.");
+    }
+  }
+
+  async function handleAcceptFriend(friendshipId) {
+    try {
+      setFriendError("");
+      setFriends(await acceptFriendRequest(friendshipId));
+      setSocialToast({ title: "Friend added", message: "They are now in your party list." });
+      playFeedbackTone("claim", audioFeedback);
+    } catch (error) {
+      setFriendError(error.message || "Could not accept friend request.");
+    }
+  }
+
+  async function handleDeclineFriend(friendshipId) {
+    try {
+      setFriendError("");
+      setFriends(await declineFriendRequest(friendshipId));
+    } catch (error) {
+      setFriendError(error.message || "Could not update friend request.");
+    }
+  }
+
   async function hardReset() {
     const updated = await resetGame();
     setState(updated);
@@ -802,6 +984,15 @@ export default function App() {
     setBossEntrance(null);
     setVictoryReward(null);
     setDailyRewardVisible(false);
+    setBattleRoom(null);
+    setBattleCode("");
+    setBattleError("");
+    setFriends({ friends: [], incomingRequests: [], outgoingRequests: [] });
+    setFriendUsername("");
+    setFriendError("");
+    setBattleInvites([]);
+    setSelectedFriendUsername("");
+    setSocialToast(null);
     setIntroClass("CODER");
     setIntroName("");
     setIntroPronouns("they/them");
@@ -1075,6 +1266,18 @@ export default function App() {
   const avatarPreviewDraft = lockedOutfitPreview
     ? { ...(avatarDraft || state.avatar || {}), outfit: lockedOutfitPreview }
     : avatarDraft;
+  const localJoinUrl = `${window.location.protocol}//${window.location.hostname}:5174`;
+  const selectedFriend =
+    (friends.friends || []).find((friend) => friend.username === selectedFriendUsername)
+    || (friends.friends || [])[0]
+    || null;
+  const friendLeaderboard = [...(friends.friends || [])].sort((left, right) => {
+    if (right.level !== left.level) return right.level - left.level;
+    if ((right.bossesDefeated || 0) !== (left.bossesDefeated || 0)) {
+      return (right.bossesDefeated || 0) - (left.bossesDefeated || 0);
+    }
+    return (right.xp || 0) - (left.xp || 0);
+  });
 
   return (
     <main
@@ -1367,6 +1570,46 @@ export default function App() {
               </>
             )}
 
+            {activeView === "friends" && (
+              <>
+                <FriendlyBattlePanel
+                  battleRoom={battleRoom}
+                  battleCode={battleCode}
+                  setBattleCode={setBattleCode}
+                  battleError={battleError}
+                  onCreateRoom={handleCreateBattleRoom}
+                  onJoinRoom={handleJoinBattleRoom}
+                  onRefreshRoom={handleRefreshBattleRoom}
+                  onChooseMove={handleChooseBattleMove}
+                  localJoinUrl={localJoinUrl}
+                  friends={friends}
+                  friendUsername={friendUsername}
+                  setFriendUsername={setFriendUsername}
+                  friendError={friendError}
+                  onSendFriendRequest={handleSendFriendRequest}
+                  onAcceptFriend={handleAcceptFriend}
+                  onDeclineFriend={handleDeclineFriend}
+                  onRefreshFriends={handleRefreshFriends}
+                  battleInvites={battleInvites}
+                  onRefreshBattleInvites={handleRefreshBattleInvites}
+                  onInviteFriend={handleInviteFriend}
+                  onAcceptBattleInvite={handleAcceptBattleInvite}
+                  selectedFriendUsername={selectedFriend?.username || ""}
+                  selectedFriend={selectedFriend}
+                  onSelectFriend={setSelectedFriendUsername}
+                  friendLeaderboard={friendLeaderboard}
+                  socialToast={socialToast}
+                  classMeta={CLASS_META}
+                />
+
+                <CompanionPanel
+                  state={state}
+                  classMeta={CLASS_META}
+                  rankTitle={rankTitle}
+                />
+              </>
+            )}
+
             {activeView === "world" && (
               <>
                 <WorldMapPanel
@@ -1455,12 +1698,13 @@ function AuthScreen({
           <input
             type="text"
             value={username}
-            placeholder="glenn"
+            placeholder="username"
             autoComplete="username"
             minLength="3"
             maxLength="32"
             onChange={(event) => setUsername(event.target.value)}
           />
+          <small className="auth-helper">Use 3-32 lowercase letters, numbers, or underscores.</small>
         </label>
 
         <label>

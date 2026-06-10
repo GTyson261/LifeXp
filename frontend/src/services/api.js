@@ -3,6 +3,8 @@ const apiOrigin =
   `${window.location.protocol}//${window.location.hostname}:8080`;
 const API_BASE = `${apiOrigin}/api/game`;
 const AUTH_BASE = `${apiOrigin}/api/auth`;
+const BATTLE_BASE = `${apiOrigin}/api/friendly-battle`;
+const FRIENDS_BASE = `${apiOrigin}/api/friends`;
 const TOKEN_KEY = "lifexp_auth_token";
 const USER_KEY = "lifexp_auth_user";
 
@@ -41,6 +43,66 @@ async function request(path, options = {}) {
     }
 
     throw new Error(`API error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+async function battleRequest(path, options = {}) {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const response = await fetch(`${BATTLE_BASE}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {})
+    },
+    ...options
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      clearStoredSession();
+      throw new Error("Please log in to view your LifeXP data.");
+    }
+
+    let message = `Battle error: ${response.status}`;
+    try {
+      const data = await response.json();
+      message = data.message || message;
+    } catch {
+      // Keep status message when the backend does not return JSON.
+    }
+    throw new Error(message);
+  }
+
+  return response.json();
+}
+
+async function friendsRequest(path = "", options = {}) {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const response = await fetch(`${FRIENDS_BASE}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {})
+    },
+    ...options
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      clearStoredSession();
+      throw new Error("Please log in to view your LifeXP friends.");
+    }
+
+    let message = `Friends error: ${response.status}`;
+    try {
+      const data = await response.json();
+      message = data.message || message;
+    } catch {
+      // Keep status message when the backend does not return JSON.
+    }
+    throw new Error(message);
   }
 
   return response.json();
@@ -163,6 +225,58 @@ export function restEnergy() {
 
 export function claimDailyLoginReward() {
   return request("/daily-login/claim", {
+    method: "POST"
+  });
+}
+
+export function createFriendlyBattleRoom(invitedUsername = "") {
+  return battleRequest("/rooms", {
+    method: "POST",
+    body: JSON.stringify({ invitedUsername })
+  });
+}
+
+export function joinFriendlyBattleRoom(code) {
+  return battleRequest("/rooms/join", {
+    method: "POST",
+    body: JSON.stringify({ code })
+  });
+}
+
+export function getFriendlyBattleRoom(code) {
+  return battleRequest(`/rooms/${code}`);
+}
+
+export function chooseFriendlyBattleMove(code, move) {
+  return battleRequest(`/rooms/${code}/move`, {
+    method: "POST",
+    body: JSON.stringify({ move })
+  });
+}
+
+export function getFriendlyBattleInvites() {
+  return battleRequest("/invites");
+}
+
+export function getFriends() {
+  return friendsRequest();
+}
+
+export function sendFriendRequest(username) {
+  return friendsRequest("/request", {
+    method: "POST",
+    body: JSON.stringify({ username })
+  });
+}
+
+export function acceptFriendRequest(friendshipId) {
+  return friendsRequest(`/${friendshipId}/accept`, {
+    method: "POST"
+  });
+}
+
+export function declineFriendRequest(friendshipId) {
+  return friendsRequest(`/${friendshipId}/decline`, {
     method: "POST"
   });
 }

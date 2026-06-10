@@ -141,8 +141,466 @@
 .settings-panel,
 .battle-recap-card,
 .focus-mode-panel,
-.companion-panel {
+.companion-panel,
+.friendly-battle-panel {
   grid-column: span 6;
+}
+
+.friendly-battle-panel {
+  grid-column: span 8;
+  display: grid;
+  gap: 1rem;
+  align-self: start;
+}
+
+.battle-code-chip {
+  min-width: 118px;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  text-align: center;
+  background: color-mix(in srgb, var(--class-color), transparent 84%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 52%);
+}
+
+.battle-code-chip span,
+.battle-player-card span,
+.battle-room-tools span,
+.battle-wait-card small {
+  color: var(--lifexp-muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.battle-code-chip strong {
+  color: white;
+  font-size: 1.45rem;
+  letter-spacing: 0.12em;
+}
+
+.friends-grid,
+.friend-request-grid,
+.friend-social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.friend-request-card,
+.friend-list-card,
+.friend-profile-card,
+.friend-leaderboard-card,
+.battle-invite-strip,
+.social-toast-card {
+  min-width: 0;
+  display: grid;
+  gap: 0.65rem;
+  align-content: start;
+  padding: 0.85rem;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--class-color), transparent 86%), transparent 48%),
+    rgba(2, 6, 23, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.social-toast-card {
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  color: white;
+  border-color: color-mix(in srgb, var(--class-color), transparent 52%);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--class-color), transparent 82%), rgba(2, 6, 23, 0.72));
+}
+
+.social-toast-card span,
+.battle-invite-strip span {
+  color: var(--lifexp-muted);
+}
+
+.battle-invite-strip {
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+}
+
+.battle-invite-strip > div:first-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.battle-invite-list {
+  display: flex;
+  gap: 0.45rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.battle-invite-list button {
+  min-height: 38px;
+  padding: 0.45rem 0.7rem;
+}
+
+.friend-request-card label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.friend-request-card input {
+  margin-bottom: 0;
+  text-align: left;
+  letter-spacing: 0;
+}
+
+.friend-request-card button,
+.friend-list-card button {
+  min-height: 40px;
+}
+
+.friend-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.friend-list-header > div {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.friend-list-header button {
+  padding: 0.45rem 0.7rem;
+}
+
+.friend-card-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.friend-card {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.65rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.friend-card.selected {
+  border-color: color-mix(in srgb, var(--class-color), transparent 42%);
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--class-color), transparent 88%);
+}
+
+.friend-card > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--class-color);
+  font-weight: 1000;
+  background: color-mix(in srgb, var(--class-color), transparent 86%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 62%);
+}
+
+.friend-card-main {
+  min-width: 0;
+  display: grid;
+  gap: 0.08rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  text-align: left;
+  background: transparent;
+  box-shadow: none;
+}
+
+.friend-card-main:hover {
+  color: white;
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
+.friend-card strong,
+.friend-card small,
+.friend-card em {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.friend-card small,
+.friend-card em {
+  color: var(--lifexp-muted);
+}
+
+.friend-card em {
+  font-size: 0.74rem;
+  font-style: normal;
+}
+
+.friend-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.friend-card-actions button {
+  padding: 0.45rem 0.65rem;
+}
+
+.friend-error {
+  color: #fecaca;
+  font-weight: 850;
+}
+
+.friend-profile-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.friend-profile-header > span {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--class-color);
+  font-size: 1.4rem;
+  font-weight: 1000;
+  background: color-mix(in srgb, var(--class-color), transparent 82%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 56%);
+}
+
+.friend-profile-header small,
+.friend-profile-stats span,
+.friend-leaderboard-row small {
+  color: var(--lifexp-muted);
+}
+
+.friend-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.friend-profile-stats div,
+.friend-leaderboard-row {
+  min-width: 0;
+  padding: 0.55rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.friend-profile-stats span,
+.friend-profile-stats strong {
+  display: block;
+}
+
+.friend-leaderboard-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.friend-leaderboard-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.friend-leaderboard-row > span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #020617;
+  font-weight: 1000;
+  background: linear-gradient(135deg, var(--class-color), white);
+}
+
+.battle-connect-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.battle-connect-card,
+.battle-empty-card,
+.battle-wait-card,
+.battle-result-card {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.battle-empty-card {
+  border-color: color-mix(in srgb, var(--class-color), transparent 72%);
+}
+
+.battle-connect-card label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.battle-connect-card input {
+  margin-bottom: 0;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 950;
+  letter-spacing: 0.16em;
+}
+
+.friendly-battle-error {
+  display: block;
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.42);
+  border: 1px solid rgba(248, 113, 113, 0.34);
+}
+
+.friendly-battle-arena {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: stretch;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at center, color-mix(in srgb, var(--class-color), transparent 80%), transparent 58%),
+    rgba(15, 23, 42, 0.68);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 68%);
+}
+
+.battle-player-card {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  padding: 0.85rem;
+  border-radius: 8px;
+  text-align: center;
+  background: rgba(2, 6, 23, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.battle-player-card.empty {
+  opacity: 0.66;
+}
+
+.battle-player-card strong,
+.battle-player-card small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.battle-player-card em {
+  color: var(--class-color);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.battle-player-sigil {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--class-color);
+  font-size: 1.55rem;
+  background: color-mix(in srgb, var(--class-color), transparent 84%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 58%);
+}
+
+.battle-versus-core {
+  width: 96px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.2rem;
+  color: white;
+  text-align: center;
+}
+
+.battle-versus-core span {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #020617;
+  font-weight: 1000;
+  background: linear-gradient(135deg, var(--class-color), white);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--class-color), transparent 45%);
+}
+
+.battle-versus-core small {
+  color: var(--lifexp-muted);
+}
+
+.battle-room-tools,
+.battle-log-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.battle-room-tools button {
+  flex: 0 0 auto;
+}
+
+.battle-move-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.battle-move-grid button {
+  min-height: 92px;
+  display: grid;
+  gap: 0.25rem;
+  align-content: center;
+  border-color: color-mix(in srgb, var(--class-color), transparent 64%);
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--class-color), transparent 82%), transparent 56%),
+    rgba(15, 23, 42, 0.88);
+}
+
+.battle-move-grid button span {
+  color: var(--lifexp-muted);
+  font-size: 0.75rem;
+}
+
+.battle-result-card {
+  border-color: color-mix(in srgb, var(--class-color), transparent 48%);
+  box-shadow: inset 0 0 20px color-mix(in srgb, var(--class-color), transparent 90%);
+}
+
+.battle-log-list span {
+  flex: 1 1 180px;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .profile-panel {
@@ -947,6 +1405,7 @@
   .dashboard-grid > .panel,
   .focus-mode-panel,
   .companion-panel,
+  .friendly-battle-panel,
   .battle-recap-card {
     grid-column: 1 / -1 !important;
     width: 100%;
