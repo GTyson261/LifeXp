@@ -1,4 +1,4 @@
-export default function DashboardHUD({ state, classMeta = {} }) {
+export default function DashboardHUD({ state, classMeta = {}, rankTitle = "" }) {
   const activeClass = state?.activeClass || "NOVICE";
   const displayClass = activeClass.replaceAll("_", " ");
   const meta = classMeta?.[activeClass] || {
@@ -22,7 +22,8 @@ export default function DashboardHUD({ state, classMeta = {} }) {
             <span>{meta.icon}</span>
             <div>
               <strong>{playerName}</strong>
-              <small>{pronouns}</small>
+              <small>{rankTitle || pronouns}</small>
+              {rankTitle && <em>{pronouns}</em>}
             </div>
           </div>
           <HudStat icon={meta.icon} label="Class" value={meta.label} />

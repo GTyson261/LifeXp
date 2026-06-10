@@ -90,6 +90,14 @@
   color: var(--lifexp-muted);
 }
 
+.hud-player-card em {
+  display: block;
+  color: var(--class-color);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 850;
+}
+
 .hud-stat span {
   display: block;
   font-size: 1.3rem;
@@ -131,7 +139,9 @@
 .mastery-panel,
 .weekly-quest-panel,
 .settings-panel,
-.battle-recap-card {
+.battle-recap-card,
+.focus-mode-panel,
+.companion-panel {
   grid-column: span 6;
 }
 
@@ -248,6 +258,10 @@
 .battle-recap-card {
   display: grid;
   gap: 0.85rem;
+  align-self: start;
+  height: fit-content;
+  min-height: 0;
+  overflow: hidden;
   border-radius: 20px;
   padding: 1rem;
   background:
@@ -256,18 +270,179 @@
   border: 1px solid color-mix(in srgb, var(--class-color), transparent 58%);
 }
 
+.battle-recap-card h3,
+.battle-recap-card p {
+  overflow-wrap: anywhere;
+}
+
 .battle-recap-stats {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
 }
 
 .battle-recap-stats span {
+  flex: 0 1 auto;
   padding: 0.45rem 0.65rem;
   border-radius: 999px;
   color: white;
   font-weight: 900;
   background: rgba(15, 23, 42, 0.82);
+}
+
+.battle-recap-card button {
+  justify-self: start;
+  width: auto;
+  max-width: 100%;
+  min-height: 42px;
+  padding: 0.6rem 0.9rem;
+  white-space: nowrap;
+}
+
+.focus-mode-panel {
+  display: grid;
+  gap: 0.85rem;
+  align-self: start;
+  background:
+    radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--class-color), transparent 72%), transparent 42%),
+    rgba(2, 6, 23, 0.86);
+}
+
+.focus-mode-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.focus-mode-header > span {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--class-color);
+  background: color-mix(in srgb, var(--class-color), transparent 84%);
+}
+
+.focus-mode-target {
+  padding: 0.85rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+}
+
+.focus-mode-target small {
+  color: var(--class-color);
+  font-weight: 900;
+}
+
+.focus-mode-target strong {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 1.1rem;
+}
+
+.focus-boss-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.4fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.focus-boss-strip span,
+.focus-boss-strip small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-boss-strip div {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.focus-boss-strip i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--class-color), #f8fafc);
+}
+
+.focus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.focus-actions button {
+  flex: 1 1 170px;
+  min-height: 46px;
+}
+
+.companion-panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  align-self: start;
+}
+
+.companion-sprite {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--class-color);
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.34), transparent 24%),
+    color-mix(in srgb, var(--class-color), transparent 78%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 48%);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--class-color), transparent 70%);
+  animation: companionHover 2.8s ease-in-out infinite alternate;
+}
+
+.companion-sprite::before,
+.companion-sprite::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--class-color), white 18%);
+}
+
+.companion-sprite::before {
+  width: 18px;
+  height: 18px;
+  left: 11px;
+  top: 16px;
+}
+
+.companion-sprite::after {
+  width: 12px;
+  height: 12px;
+  right: 14px;
+  bottom: 18px;
+  opacity: 0.7;
+}
+
+.companion-sprite span {
+  z-index: 1;
+  font-size: 1.8rem;
+}
+
+@keyframes companionHover {
+  from {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  to {
+    transform: translateY(-7px) rotate(2deg);
+  }
 }
 
 .achievement-toast {
@@ -762,6 +937,20 @@
 .avatar-customizer {
   min-width: 0;
   overflow: hidden;
+}
+
+@media (max-width: 700px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .dashboard-grid > .panel,
+  .focus-mode-panel,
+  .companion-panel,
+  .battle-recap-card {
+    grid-column: 1 / -1 !important;
+    width: 100%;
+  }
 }
 
 @media (max-width: 1500px) and (min-width: 1251px) {

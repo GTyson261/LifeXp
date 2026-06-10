@@ -52,7 +52,8 @@ export default function AvatarCustomizer({
   onSave,
   saveStatus = "saved",
   hasUnsavedChanges = true,
-  cosmeticUnlocks = null
+  cosmeticUnlocks = null,
+  onPreviewLockedOutfit = null
 }) {
   function updateAvatarField(field, value) {
     setAvatarDraft({
@@ -351,7 +352,21 @@ export default function AvatarCustomizer({
               onClick={() =>
                 isOutfitUnlocked(outfit) && updateAvatarField("outfit", outfit)
               }
-              disabled={!isOutfitUnlocked(outfit)}
+              onMouseEnter={() => {
+                if (!isOutfitUnlocked(outfit)) onPreviewLockedOutfit?.(outfit);
+              }}
+              onMouseLeave={() => {
+                if (!isOutfitUnlocked(outfit)) onPreviewLockedOutfit?.("");
+              }}
+              onFocus={() => {
+                if (!isOutfitUnlocked(outfit)) onPreviewLockedOutfit?.(outfit);
+              }}
+              onBlur={() => {
+                if (!isOutfitUnlocked(outfit)) onPreviewLockedOutfit?.("");
+              }}
+              onTouchStart={() => {
+                if (!isOutfitUnlocked(outfit)) onPreviewLockedOutfit?.(outfit);
+              }}
               type="button"
             >
               <span className="outfit-preview-tile" />

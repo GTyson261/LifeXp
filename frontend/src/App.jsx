@@ -24,6 +24,12 @@ import WeeklyQuestPanel from "./components/WeeklyQuestPanel";
 import BattleRecap from "./components/BattleRecap";
 import AchievementToast from "./components/AchievementToast";
 import SettingsPanel from "./components/SettingsPanel";
+import RewardBurst from "./components/RewardBurst";
+import BossEntrance from "./components/BossEntrance";
+import VictoryScreen from "./components/VictoryScreen";
+import DailyLoginReward from "./components/DailyLoginReward";
+import FocusModePanel from "./components/FocusModePanel";
+import CompanionPanel from "./components/CompanionPanel";
 import {
   getGameState,
   completeActivity,
@@ -36,6 +42,7 @@ import {
   equipInventoryItem,
   travelToWorld,
   restEnergy,
+  claimDailyLoginReward,
   resetGame,
   registerUser,
   loginUser,
@@ -274,6 +281,62 @@ function createBattleRecap(previousState, nextState, label) {
   };
 }
 
+function classRankTitle(className = "NOVICE", mastery = 0, level = 1) {
+  const tier = level >= 25 || mastery >= 300
+    ? 3
+    : level >= 10 || mastery >= 120
+      ? 2
+      : mastery >= 35
+        ? 1
+        : 0;
+
+  const ranks = {
+    CODER: ["Script Runner", "Debug Adept", "System Weaver", "Cyber Architect"],
+    BOOKWORM: ["Page Scout", "Margin Mage", "Rune Scholar", "Lore Keeper"],
+    SPORT_MASTER: ["Warmup Spark", "Arena Strider", "Titan Breaker", "Champion Form"],
+    GAMER: ["Combo Rookie", "Quest Tactician", "Arcade Captain", "Nexus Legend"],
+    EXPLORER: ["Trail Finder", "Route Maker", "Frontier Seeker", "Worldwalker"],
+    ZEN: ["Quiet Breath", "Still Water", "Spirit Guide", "Life Sage"],
+    MUSICIAN: ["Beat Finder", "Rhythm Caster", "Stage Current", "Sound Sage"],
+    CHEF: ["Prep Flame", "Kitchen Tempo", "Flame Artisan", "Culinary Legend"],
+    NOVICE: ["Gatebound Novice", "Momentum Finder", "Path Shaper", "LifeXP Hero"]
+  };
+
+  return (ranks[className] || ranks.NOVICE)[tier];
+}
+
+function isDailyRewardAvailable(state) {
+  if (!state) return false;
+  return state.lastLoginRewardDate !== new Date().toISOString().slice(0, 10);
+}
+
+function playFeedbackTone(kind, enabled) {
+  if (!enabled || typeof window === "undefined") return;
+
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const frequency = kind === "victory" ? 740 : kind === "boss" ? 180 : kind === "claim" ? 520 : 360;
+
+    oscillator.type = kind === "boss" ? "sawtooth" : "sine";
+    oscillator.frequency.setValueAtTime(frequency, context.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.35, context.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.18);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.2);
+  } catch {
+    // Audio feedback is optional and should never interrupt gameplay.
+  }
+}
+
 export default function App() {
   const [session, setSession] = useState(() => getStoredSession());
   const [state, setState] = useState(null);
@@ -286,10 +349,16 @@ export default function App() {
   const [introName, setIntroName] = useState("");
   const [introPronouns, setIntroPronouns] = useState("they/them");
   const [avatarSaveStatus, setAvatarSaveStatus] = useState("saved");
+  const [lockedOutfitPreview, setLockedOutfitPreview] = useState("");
   const [battleRecap, setBattleRecap] = useState(null);
   const [achievementToast, setAchievementToast] = useState(null);
+  const [rewardBurst, setRewardBurst] = useState(null);
+  const [bossEntrance, setBossEntrance] = useState(null);
+  const [victoryReward, setVictoryReward] = useState(null);
+  const [dailyRewardVisible, setDailyRewardVisible] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem("lifexp_reduce_motion") === "true");
   const [compactMobile, setCompactMobile] = useState(() => localStorage.getItem("lifexp_compact_mobile") === "true");
+  const [audioFeedback, setAudioFeedback] = useState(() => localStorage.getItem("lifexp_audio_feedback") === "true");
 
   const [activityType, setActivityType] = useState("coding");
   const [amount, setAmount] = useState("");
@@ -357,6 +426,16 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("lifexp_compact_mobile", String(compactMobile));
   }, [compactMobile]);
+
+  useEffect(() => {
+    localStorage.setItem("lifexp_audio_feedback", String(audioFeedback));
+  }, [audioFeedback]);
+
+  useEffect(() => {
+    if (state?.introCompleted && isDailyRewardAvailable(state)) {
+      setDailyRewardVisible(true);
+    }
+  }, [state?.introCompleted, state?.lastLoginRewardDate]);
 
   const hasUnsavedAvatarChanges = Boolean(
     state?.avatar &&
@@ -468,9 +547,16 @@ export default function App() {
     setTimeout(() => setFloatingXp(null), 1200);
   }
 
+  function showRewardBurst(reward) {
+    setRewardBurst({ id: Date.now(), ...reward });
+    setTimeout(() => setRewardBurst(null), 1600);
+  }
+
   function applyGameStateUpdate(updated, options = {}) {
     const previousState = state;
     const newAchievement = findNewAchievement(previousState, updated);
+    const bossChanged = previousState?.currentBoss?.name !== updated?.currentBoss?.name;
+    const bossDefeated = (updated?.bossesDefeated || 0) > (previousState?.bossesDefeated || 0);
 
     setState(updated);
     setAvatarDraft(updated.avatar);
@@ -482,6 +568,21 @@ export default function App() {
 
     if (options.recapLabel) {
       setBattleRecap(createBattleRecap(previousState, updated, options.recapLabel));
+    }
+
+    if ((options.bossEntrance || bossChanged) && updated?.currentBoss) {
+      setBossEntrance({ id: Date.now(), boss: updated.currentBoss, activeClass: updated.activeClass });
+      setTimeout(() => setBossEntrance(null), 1700);
+      playFeedbackTone("boss", audioFeedback);
+    }
+
+    if (bossDefeated) {
+      setVictoryReward({
+        id: Date.now(),
+        bossName: previousState?.currentBoss?.name || "World Boss",
+        loot: updated.lastLootDrops || []
+      });
+      playFeedbackTone("victory", audioFeedback);
     }
   }
 
@@ -544,9 +645,13 @@ export default function App() {
 
     const preservedAvatar = {
       ...(updated.avatar || {}),
-      ...currentAvatar,
       displayName: currentAvatar.displayName || updated.playerName || "PlayerOne",
-      pronouns: currentAvatar.pronouns || updated.pronouns || "they/them"
+      pronouns: currentAvatar.pronouns || updated.pronouns || "they/them",
+      gender: currentAvatar.gender || updated.avatar?.gender,
+      bodyType: currentAvatar.bodyType || updated.avatar?.bodyType,
+      skinTone: currentAvatar.skinTone || updated.avatar?.skinTone,
+      hairStyle: currentAvatar.hairStyle || updated.avatar?.hairStyle,
+      hairColor: currentAvatar.hairColor || updated.avatar?.hairColor
     };
 
     setState({
@@ -570,6 +675,7 @@ export default function App() {
     });
 
     showXp(updated.lastXpGain);
+    playFeedbackTone("claim", audioFeedback);
     applyGameStateUpdate(updated, { recapLabel: `${ACTIVITIES.find((activity) => activity.key === activityType)?.label || "Action"} complete` });
     setAmount("");
     setSummary("");
@@ -587,6 +693,7 @@ export default function App() {
     });
 
     showXp(updated.lastXpGain);
+    playFeedbackTone("claim", audioFeedback);
     applyGameStateUpdate(updated, { recapLabel: `Timer ${timerActivity} complete` });
     setTimerRunning(false);
     setTimerSeconds(0);
@@ -605,6 +712,10 @@ export default function App() {
       setAvatarSaveStatus("unsaved");
     }
 
+    if (nextView !== "avatar") {
+      setLockedOutfitPreview("");
+    }
+
     setActiveView(nextView);
   }
 
@@ -620,7 +731,7 @@ export default function App() {
 
   async function handleTravel(worldId) {
     const updated = await travelToWorld(worldId);
-    applyGameStateUpdate(updated, { recapLabel: "World travel" });
+    applyGameStateUpdate(updated, { recapLabel: "World travel", bossEntrance: true });
   }
 
   async function handleRest() {
@@ -634,11 +745,51 @@ export default function App() {
   }
 
   async function handleClaimQuest(questId) {
+    const quest = (state.dailyQuests || []).find((item) => item.id === questId);
     const updated = await claimQuest(questId);
     if (updated.lastXpGain > 0) {
       showXp(updated.lastXpGain);
     }
+    showRewardBurst({
+      xp: quest?.rewardXp || 0,
+      gold: quest?.rewardGold || 0,
+      essence: quest?.rewardEssence || 0
+    });
+    playFeedbackTone("claim", audioFeedback);
     applyGameStateUpdate(updated, { recapLabel: "Quest reward claimed" });
+  }
+
+  async function handleClaimDailyReward() {
+    const previousGold = state.gold;
+    const previousCrystals = state.crystals;
+    const previousEssence = state.essence;
+    const updated = await claimDailyLoginReward();
+
+    showRewardBurst({
+      xp: 0,
+      gold: Math.max(0, updated.gold - previousGold),
+      crystals: Math.max(0, updated.crystals - previousCrystals),
+      essence: Math.max(0, updated.essence - previousEssence)
+    });
+    setDailyRewardVisible(false);
+    playFeedbackTone("claim", audioFeedback);
+    applyGameStateUpdate(updated);
+  }
+
+  async function handleQuickFocusAction(actionType = "focus") {
+    const sanitizedType = actionType === "any" || actionType === "boss_damage" || actionType === "travel"
+      ? "focus"
+      : actionType;
+    const updated = await completeActivity({
+      type: sanitizedType,
+      amount: 10,
+      summary: "Quick focus mode action",
+      verified: true
+    });
+
+    showXp(updated.lastXpGain);
+    playFeedbackTone("claim", audioFeedback);
+    applyGameStateUpdate(updated, { recapLabel: "Focus mode action" });
   }
 
   async function hardReset() {
@@ -647,6 +798,10 @@ export default function App() {
     setAvatarDraft(updated.avatar);
     setBattleRecap(null);
     setAchievementToast(null);
+    setRewardBurst(null);
+    setBossEntrance(null);
+    setVictoryReward(null);
+    setDailyRewardVisible(false);
     setIntroClass("CODER");
     setIntroName("");
     setIntroPronouns("they/them");
@@ -916,6 +1071,10 @@ export default function App() {
   }
 
   const cosmeticUnlocks = cosmeticUnlocksFromState(state);
+  const rankTitle = classRankTitle(state.primaryClass || activeClass, state.classMastery, state.level);
+  const avatarPreviewDraft = lockedOutfitPreview
+    ? { ...(avatarDraft || state.avatar || {}), outfit: lockedOutfitPreview }
+    : avatarDraft;
 
   return (
     <main
@@ -929,6 +1088,23 @@ export default function App() {
       style={{ "--class-color": meta.color }}
     >
       {floatingXp && <div className="floating-xp">{floatingXp}</div>}
+      <RewardBurst reward={rewardBurst} />
+      <BossEntrance
+        boss={bossEntrance?.boss}
+        activeClass={bossEntrance?.activeClass || activeClass}
+        classMeta={CLASS_META}
+      />
+      <VictoryScreen
+        reward={victoryReward}
+        onDismiss={() => setVictoryReward(null)}
+      />
+      {dailyRewardVisible && isDailyRewardAvailable(state) && (
+        <DailyLoginReward
+          state={state}
+          onClaim={handleClaimDailyReward}
+          onDismiss={() => setDailyRewardVisible(false)}
+        />
+      )}
       <AchievementToast
         achievement={achievementToast}
         onDismiss={() => setAchievementToast(null)}
@@ -939,6 +1115,7 @@ export default function App() {
           <DashboardHUD
             state={{ ...state, onReset: hardReset, onRest: handleRest }}
             classMeta={CLASS_META}
+            rankTitle={rankTitle}
           />
 
           <nav className="dashboard-tabs" aria-label="Dashboard views">
@@ -987,11 +1164,18 @@ export default function App() {
                   xpPercent={xpPercent}
                 />
 
+                <FocusModePanel
+                  state={state}
+                  classMeta={CLASS_META}
+                  onQuickAction={handleQuickFocusAction}
+                  onOpenQuests={() => setActiveView("quests")}
+                />
+
                 <AvatarPreview
                   className="overview-detail-panel"
                   state={state}
                   classMeta={CLASS_META}
-                  avatarDraft={avatarDraft}
+                  avatarDraft={avatarPreviewDraft}
                   timerRunning={timerRunning}
                 />
 
@@ -1004,6 +1188,12 @@ export default function App() {
                   onStart={() => setTimerRunning(true)}
                   onStopAndClaim={stopTimerAndClaim}
                   formatTime={formatTime}
+                />
+
+                <CompanionPanel
+                  state={state}
+                  classMeta={CLASS_META}
+                  rankTitle={rankTitle}
                 />
 
                 <ActivityPanel
@@ -1055,6 +1245,12 @@ export default function App() {
                   classMeta={CLASS_META}
                 />
 
+                <CompanionPanel
+                  state={state}
+                  classMeta={CLASS_META}
+                  rankTitle={rankTitle}
+                />
+
                 <WeeklyQuestPanel
                   state={state}
                   classMeta={CLASS_META}
@@ -1074,7 +1270,7 @@ export default function App() {
                 <AvatarPreview
                   state={state}
                   classMeta={CLASS_META}
-                  avatarDraft={avatarDraft}
+                  avatarDraft={avatarPreviewDraft}
                   timerRunning={timerRunning}
                 />
 
@@ -1085,6 +1281,7 @@ export default function App() {
                   saveStatus={avatarSaveStatus}
                   hasUnsavedChanges={hasUnsavedAvatarChanges}
                   cosmeticUnlocks={cosmeticUnlocks}
+                  onPreviewLockedOutfit={setLockedOutfitPreview}
                 />
 
                 <EquipmentPanel
@@ -1217,6 +1414,8 @@ export default function App() {
                   setReduceMotion={setReduceMotion}
                   compactMobile={compactMobile}
                   setCompactMobile={setCompactMobile}
+                  audioFeedback={audioFeedback}
+                  setAudioFeedback={setAudioFeedback}
                   onReset={hardReset}
                   onLogout={logout}
                 />

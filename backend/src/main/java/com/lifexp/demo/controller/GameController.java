@@ -76,6 +76,11 @@ public class GameController {
         return runAsUser(authorization, () -> gameService.rest());
     }
 
+    @PostMapping("/daily-login/claim")
+    public PlayerState claimDailyLoginReward(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        return runAsUser(authorization, () -> gameService.claimDailyLoginReward());
+    }
+
     @PostMapping("/load")
     public PlayerState load(@RequestHeader(value = "Authorization", required = false) String authorization) {
         return runAsUser(authorization, () -> gameService.reloadSave());

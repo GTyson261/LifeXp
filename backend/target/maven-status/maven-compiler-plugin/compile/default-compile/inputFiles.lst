@@ -1,6 +1,10 @@
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/LifeXpDemoApplication.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/ActionRequest.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/ActivityRequest.java
+/Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/AuthController.java
+/Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/AuthRequest.java
+/Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/AuthResponse.java
+/Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/AuthService.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/AvatarController.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/CharacterController.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/ClassRequest.java
@@ -20,4 +24,6 @@
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/Skill.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/SkillController.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/SkillRequest.java
+/Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/UserAccount.java
+/Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/UserAccountRepository.java
 /Users/glenntyson/Downloads/LifeXp/backend/src/main/java/com/lifexp/demo/controller/WorldTravelRequest.java

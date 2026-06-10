@@ -38,6 +38,146 @@
   animation-delay: 0.08s;
 }
 
+.reward-burst {
+  position: fixed;
+  top: 18%;
+  right: 1rem;
+  z-index: 105;
+  display: grid;
+  gap: 0.45rem;
+  pointer-events: none;
+}
+
+.reward-burst span {
+  min-width: 128px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 999px;
+  color: white;
+  font-weight: 950;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.28), transparent 24%),
+    rgba(2, 6, 23, 0.92);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 44%);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.36);
+  animation: rewardFly 1.45s cubic-bezier(0.2, 0.84, 0.28, 1) both;
+  animation-delay: calc(var(--reward-index, 0) * 0.09s);
+}
+
+.boss-entrance,
+.victory-screen,
+.daily-reward-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.boss-entrance {
+  background: radial-gradient(circle, color-mix(in srgb, var(--class-color), transparent 78%), transparent 58%);
+  animation: overlayFade 1.55s ease both;
+}
+
+.boss-entrance-card,
+.victory-card,
+.daily-reward-card {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.2rem;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.95);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 42%);
+  box-shadow:
+    0 24px 90px rgba(0, 0, 0, 0.55),
+    inset 0 0 28px color-mix(in srgb, var(--class-color), transparent 88%);
+  pointer-events: auto;
+}
+
+.boss-entrance-card {
+  text-align: center;
+  animation: bossCardSlam 1.2s cubic-bezier(0.18, 0.9, 0.24, 1) both;
+}
+
+.boss-entrance-card > span {
+  font-size: 2.4rem;
+}
+
+.boss-entrance-card strong,
+.victory-card h2,
+.daily-reward-card h2 {
+  margin: 0;
+  color: white;
+  font-size: clamp(1.8rem, 6vw, 3.2rem);
+}
+
+.boss-entrance-card small,
+.boss-entrance-card em {
+  color: var(--class-color);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.victory-screen,
+.daily-reward-screen {
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(18px);
+}
+
+.victory-card,
+.daily-reward-card {
+  animation: rewardCardIn 0.36s ease both;
+}
+
+.victory-loot-grid,
+.daily-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.65rem;
+}
+
+.victory-loot-grid span,
+.daily-reward-grid span {
+  min-height: 96px;
+  display: grid;
+  place-items: center;
+  gap: 0.2rem;
+  padding: 0.85rem;
+  border-radius: 8px;
+  color: white;
+  font-weight: 950;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, color-mix(in srgb, var(--class-color), transparent 64%), transparent 56%),
+    rgba(15, 23, 42, 0.82);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 58%);
+  animation: lootFlip 0.5s ease both;
+  animation-delay: calc(var(--loot-index, 0) * 0.08s);
+}
+
+.daily-reward-grid strong {
+  font-size: 1.65rem;
+}
+
+.daily-reward-grid small {
+  color: var(--lifexp-muted);
+  font-weight: 850;
+}
+
+.daily-reward-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.daily-reward-actions button,
+.victory-card button {
+  flex: 1 1 160px;
+  min-height: 46px;
+}
+
 @keyframes avatarWork {
   from {
     transform: translateY(0);
@@ -84,6 +224,74 @@
   }
 }
 
+@keyframes rewardFly {
+  0% {
+    opacity: 0;
+    transform: translate(24px, 28px) scale(0.88);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.04);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-32px, -86px) scale(0.92);
+  }
+}
+
+@keyframes overlayFade {
+  0%, 100% {
+    opacity: 0;
+  }
+
+  14%, 82% {
+    opacity: 1;
+  }
+}
+
+@keyframes bossCardSlam {
+  0% {
+    opacity: 0;
+    transform: translateY(-44px) scale(1.12);
+  }
+
+  22% {
+    opacity: 1;
+    transform: translateY(0) scale(0.98);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(18px) scale(1);
+  }
+}
+
+@keyframes rewardCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lootFlip {
+  from {
+    opacity: 0;
+    transform: rotateY(-72deg) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotateY(0deg) translateY(0);
+  }
+}
+
 @keyframes lootPop {
   from {
     transform: translateY(12px) scale(0.96);
@@ -99,7 +307,14 @@
 @media (prefers-reduced-motion: reduce) {
   .floating-xp,
   .floating-xp::before,
-  .floating-xp::after {
+  .floating-xp::after,
+  .reward-burst span,
+  .boss-entrance,
+  .boss-entrance-card,
+  .victory-card,
+  .daily-reward-card,
+  .victory-loot-grid span,
+  .daily-reward-grid span {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }

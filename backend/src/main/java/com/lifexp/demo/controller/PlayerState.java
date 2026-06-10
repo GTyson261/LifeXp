@@ -25,6 +25,8 @@ public class PlayerState {
 
     public long lastDailyReset = System.currentTimeMillis();
     public int loginStreak = 1;
+    public String lastLoginRewardDate = "";
+    public int loginRewardStreak = 0;
     public long lastActivityTimestamp = System.currentTimeMillis();
     public long lastRestTimestamp = 0L;
 

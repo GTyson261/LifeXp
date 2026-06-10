@@ -4,6 +4,8 @@ export default function SettingsPanel({
   setReduceMotion,
   compactMobile,
   setCompactMobile,
+  audioFeedback,
+  setAudioFeedback,
   onReset,
   onLogout
 }) {
@@ -34,6 +36,15 @@ export default function SettingsPanel({
             onChange={(event) => setCompactMobile(event.target.checked)}
           />
           <span>Compact mobile cards</span>
+        </label>
+
+        <label className="settings-toggle">
+          <input
+            type="checkbox"
+            checked={audioFeedback}
+            onChange={(event) => setAudioFeedback(event.target.checked)}
+          />
+          <span>UI sound feedback</span>
         </label>
       </div>
 

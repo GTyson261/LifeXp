@@ -160,3 +160,9 @@ export function restEnergy() {
     method: "POST"
   });
 }
+
+export function claimDailyLoginReward() {
+  return request("/daily-login/claim", {
+    method: "POST"
+  });
+}

@@ -2,6 +2,7 @@ package com.lifexp.demo.controller;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.function.Supplier;
 
 @Service
@@ -296,6 +297,42 @@ public class GameService {
         state.energy = Math.min(100, state.energy + 25);
         state.lastRestTimestamp = now;
         state.activityLog.add(0, "Rested and recovered " + (state.energy - before) + " energy.");
+        trimLog();
+        saveState();
+        return state;
+    }
+
+    public PlayerState claimDailyLoginReward() {
+        String today = LocalDate.now().toString();
+
+        if (today.equals(state.lastLoginRewardDate)) {
+            state.activityLog.add(0, "Daily reward already claimed today.");
+            trimLog();
+            saveState();
+            return state;
+        }
+
+        state.loginRewardStreak = Math.max(0, state.loginRewardStreak) + 1;
+        state.lastLoginRewardDate = today;
+
+        int day = ((state.loginRewardStreak - 1) % 7) + 1;
+        int goldReward = 20 + day * 8;
+        int crystalReward = day >= 3 ? 2 : 1;
+        int essenceReward = day >= 5 ? 2 : day >= 2 ? 1 : 0;
+
+        state.gold += goldReward;
+        state.crystals += crystalReward;
+        state.essence += essenceReward;
+
+        state.lastLootDrops.clear();
+        addLootDrop("Daily Streak Day " + day);
+        addLootDrop(goldReward + " Gold");
+        addLootDrop(crystalReward + " Crystals");
+        if (essenceReward > 0) {
+            addLootDrop(essenceReward + " Essence");
+        }
+
+        state.activityLog.add(0, "Daily login reward claimed: day " + day + " streak.");
         trimLog();
         saveState();
         return state;
@@ -873,6 +910,8 @@ public class GameService {
             state.avatar.displayName = state.playerName;
             state.avatar.pronouns = state.pronouns;
         }
+
+        ensureClassDefaultOutfitOwned();
     }
 
     private void unlockAvailableWorlds() {
@@ -1108,8 +1147,48 @@ public class GameService {
         state.primaryClass = className;
         state.activeClass = className;
         state.title = titleForClass(className);
-        state.avatar.outfit = outfitForClass(className);
+        String outfit = outfitForClass(className);
+        state.avatar.outfit = outfit;
         state.avatar.aura = auraForClass(className);
+        equipClassDefaultOutfit(className, outfit);
+    }
+
+    private void ensureClassDefaultOutfitOwned() {
+        String className = state.primaryClass == null || state.primaryClass.isBlank()
+                ? "NOVICE"
+                : state.primaryClass;
+        ensureInventoryItem(classDefaultOutfitId(className), outfitForClass(className), "outfit", false);
+    }
+
+    private void equipClassDefaultOutfit(String className, String outfit) {
+        PlayerState.InventoryItem selected = ensureInventoryItem(classDefaultOutfitId(className), outfit, "outfit", false);
+
+        for (PlayerState.InventoryItem item : state.inventory) {
+            if (item.type.equals("outfit")) {
+                item.equipped = false;
+            }
+        }
+
+        selected.equipped = true;
+    }
+
+    private PlayerState.InventoryItem ensureInventoryItem(String id, String name, String type, boolean equipped) {
+        for (PlayerState.InventoryItem item : state.inventory) {
+            if (item.name.equals(name) && item.type.equals(type)) {
+                return item;
+            }
+        }
+
+        PlayerState.InventoryItem created = new PlayerState.InventoryItem(id, name, type, equipped);
+        state.inventory.add(created);
+        return created;
+    }
+
+    private String classDefaultOutfitId(String className) {
+        String normalizedClass = className == null || className.isBlank()
+                ? "novice"
+                : className.toLowerCase();
+        return "class_" + normalizedClass + "_outfit";
     }
 
     private void trimLog() {

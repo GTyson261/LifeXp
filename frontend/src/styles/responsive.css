@@ -197,12 +197,50 @@
   .boss-panel,
   .loot-panel,
   .currency-panel,
+  .battle-recap-card,
+  .focus-mode-panel,
+  .companion-panel,
   .quests-panel,
   .skill-panel,
   .achievements-panel,
   .activity-log,
   .world-map-panel {
     grid-column: span 1;
+  }
+
+  .battle-recap-card {
+    align-self: start;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.85rem;
+  }
+
+  .battle-recap-card button {
+    justify-self: start;
+    width: auto;
+  }
+
+  .focus-boss-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .focus-actions button {
+    flex-basis: 100%;
+  }
+
+  .companion-panel {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .focus-mode-panel,
+  .companion-panel,
+  .battle-recap-card {
+    grid-column: 1 / -1;
+  }
+
+  .companion-sprite {
+    width: 62px;
+    height: 62px;
   }
 
   .app-shell {
