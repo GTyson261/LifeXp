@@ -43,6 +43,39 @@ public class FriendlyBattleController {
         return battleService.getInvites(authService.requireAccount(authorization));
     }
 
+    @GetMapping("/active")
+    public FriendlyBattleService.FriendlyBattleResponse getActiveRoom(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return battleService.getActiveRoom(authService.requireAccount(authorization));
+    }
+
+    @PostMapping("/matchmaking/join")
+    public FriendlyBattleService.MatchmakingResponse joinMatchmaking(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return battleService.joinMatchmaking(authService.requireAccount(authorization));
+    }
+
+    @PostMapping("/matchmaking/leave")
+    public FriendlyBattleService.MatchmakingResponse leaveMatchmaking(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return battleService.leaveMatchmaking(authService.requireAccount(authorization));
+    }
+
+    @GetMapping("/history")
+    public List<FriendlyBattleService.BattleHistoryResponse> getHistory(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return battleService.getHistory(authService.requireAccount(authorization));
+    }
+
+    @GetMapping("/stats")
+    public FriendlyBattleService.BattleStatsResponse getStats() {
+        return battleService.getStats();
+    }
+
     @PostMapping("/rooms/join")
     public FriendlyBattleService.FriendlyBattleResponse joinRoom(
             @RequestHeader(value = "Authorization", required = false) String authorization,
@@ -65,7 +98,7 @@ public class FriendlyBattleController {
             @PathVariable String code,
             @RequestBody BattleMoveRequest request
     ) {
-        return battleService.chooseMove(authService.requireAccount(authorization), code, request.move);
+        return battleService.chooseMove(authService.requireAccount(authorization), code, request.move, request.round);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -84,5 +117,6 @@ public class FriendlyBattleController {
 
     public static class BattleMoveRequest {
         public String move;
+        public Integer round;
     }
 }

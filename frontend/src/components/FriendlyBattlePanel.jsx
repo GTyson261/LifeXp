@@ -43,6 +43,13 @@ export default function FriendlyBattlePanel({
   onRefreshBattleInvites,
   onInviteFriend,
   onAcceptBattleInvite,
+  matchmakingStatus,
+  onJoinMatchmaking,
+  onLeaveMatchmaking,
+  onReconnectBattle,
+  battleHistory = [],
+  onRefreshBattleHistory,
+  battleStats,
   selectedFriendUsername,
   selectedFriend,
   onSelectFriend,
@@ -94,6 +101,31 @@ export default function FriendlyBattlePanel({
           </div>
         </div>
       )}
+
+      <div className="matchmaking-card">
+        <div>
+          <strong>Matchmaking</strong>
+          <span>{matchmakingStatus === "QUEUED" ? "Searching for a friendly opponent." : "Queue for a fast local match or reconnect to an active room."}</span>
+        </div>
+        <div className="matchmaking-actions">
+          <button type="button" onClick={onJoinMatchmaking}>
+            Find Match
+          </button>
+          <button type="button" disabled={matchmakingStatus !== "QUEUED"} onClick={onLeaveMatchmaking}>
+            Leave Queue
+          </button>
+          <button type="button" onClick={onReconnectBattle}>
+            Reconnect
+          </button>
+        </div>
+        {battleStats && (
+          <div className="battle-stats-strip">
+            <span>{battleStats.activeRooms || 0} active</span>
+            <span>{battleStats.queuedPlayers || 0} queued</span>
+            <span>{battleStats.persistedBattleHistory || 0} saved</span>
+          </div>
+        )}
+      </div>
 
       <div className="friends-grid">
         <form className="friend-request-card" onSubmit={onSendFriendRequest}>
@@ -217,6 +249,23 @@ export default function FriendlyBattlePanel({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {battleHistory.length > 0 && (
+        <div className="battle-history-card">
+          <div className="friend-list-header">
+            <strong>Battle History</strong>
+            <button type="button" onClick={onRefreshBattleHistory}>Refresh</button>
+          </div>
+          <div className="battle-history-list">
+            {battleHistory.slice(0, 4).map((battle) => (
+              <div key={battle.id} className="battle-history-row">
+                <strong>{battle.hostUsername} vs {battle.guestUsername}</strong>
+                <small>Winner: {battle.winnerUsername} · {battle.hostWins}-{battle.guestWins} · {battle.rounds} rounds</small>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

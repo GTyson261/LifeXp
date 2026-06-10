@@ -247,15 +247,39 @@ export function getFriendlyBattleRoom(code) {
   return battleRequest(`/rooms/${code}`);
 }
 
-export function chooseFriendlyBattleMove(code, move) {
+export function chooseFriendlyBattleMove(code, move, round = 0) {
   return battleRequest(`/rooms/${code}/move`, {
     method: "POST",
-    body: JSON.stringify({ move })
+    body: JSON.stringify({ move, round })
   });
 }
 
 export function getFriendlyBattleInvites() {
   return battleRequest("/invites");
+}
+
+export function getActiveFriendlyBattleRoom() {
+  return battleRequest("/active");
+}
+
+export function joinFriendlyBattleMatchmaking() {
+  return battleRequest("/matchmaking/join", {
+    method: "POST"
+  });
+}
+
+export function leaveFriendlyBattleMatchmaking() {
+  return battleRequest("/matchmaking/leave", {
+    method: "POST"
+  });
+}
+
+export function getFriendlyBattleHistory() {
+  return battleRequest("/history");
+}
+
+export function getFriendlyBattleStats() {
+  return battleRequest("/stats");
 }
 
 export function getFriends() {

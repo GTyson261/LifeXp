@@ -54,6 +54,11 @@ import {
   getFriendlyBattleRoom,
   chooseFriendlyBattleMove,
   getFriendlyBattleInvites,
+  getActiveFriendlyBattleRoom,
+  joinFriendlyBattleMatchmaking,
+  leaveFriendlyBattleMatchmaking,
+  getFriendlyBattleHistory,
+  getFriendlyBattleStats,
   getFriends,
   sendFriendRequest,
   acceptFriendRequest,
@@ -374,6 +379,9 @@ export default function App() {
   const [friendUsername, setFriendUsername] = useState("");
   const [friendError, setFriendError] = useState("");
   const [battleInvites, setBattleInvites] = useState([]);
+  const [matchmakingStatus, setMatchmakingStatus] = useState("");
+  const [battleHistory, setBattleHistory] = useState([]);
+  const [battleStats, setBattleStats] = useState(null);
   const [selectedFriendUsername, setSelectedFriendUsername] = useState("");
   const [socialToast, setSocialToast] = useState(null);
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem("lifexp_reduce_motion") === "true");
@@ -475,6 +483,8 @@ export default function App() {
     if (activeView !== "friends") return;
     handleRefreshFriends();
     handleRefreshBattleInvites();
+    handleRefreshBattleHistory({ quiet: true });
+    handleRefreshBattleStats({ quiet: true });
   }, [activeView]);
 
   useEffect(() => {
@@ -483,10 +493,14 @@ export default function App() {
     const interval = setInterval(() => {
       handleRefreshFriends({ quiet: true });
       handleRefreshBattleInvites({ quiet: true });
+      handleRefreshBattleStats({ quiet: true });
+      if (battleRoom?.code) {
+        handleRefreshBattleRoom({ quiet: true });
+      }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [activeView]);
+  }, [activeView, battleRoom?.code]);
 
   useEffect(() => {
     if (!socialToast) return;
@@ -878,14 +892,14 @@ export default function App() {
     }
   }
 
-  async function handleRefreshBattleRoom() {
+  async function handleRefreshBattleRoom(options = {}) {
     if (!battleRoom?.code) return;
 
     try {
-      setBattleError("");
+      if (!options.quiet) setBattleError("");
       setBattleRoom(await getFriendlyBattleRoom(battleRoom.code));
     } catch (error) {
-      setBattleError(error.message || "Could not refresh battle room.");
+      if (!options.quiet) setBattleError(error.message || "Could not refresh battle room.");
     }
   }
 
@@ -894,11 +908,79 @@ export default function App() {
 
     try {
       setBattleError("");
-      const updatedRoom = await chooseFriendlyBattleMove(battleRoom.code, move);
+      const updatedRoom = await chooseFriendlyBattleMove(battleRoom.code, move, battleRoom.round || 0);
       setBattleRoom(updatedRoom);
+      if (updatedRoom.status === "COMPLETE") {
+        handleRefreshBattleHistory({ quiet: true });
+      }
       playFeedbackTone(updatedRoom.lastResult ? "victory" : "claim", audioFeedback);
     } catch (error) {
       setBattleError(error.message || "Could not lock in battle move.");
+    }
+  }
+
+  async function handleReconnectBattle() {
+    try {
+      setBattleError("");
+      const room = await getActiveFriendlyBattleRoom();
+      if (room) {
+        setBattleRoom(room);
+        setBattleCode(room.code || "");
+        setSocialToast({ title: "Battle restored", message: "You reconnected to your active room." });
+      } else {
+        setSocialToast({ title: "No active battle", message: "Create a room or join matchmaking to start one." });
+      }
+    } catch (error) {
+      setBattleError(error.message || "Could not reconnect to battle.");
+    }
+  }
+
+  async function handleJoinMatchmaking() {
+    try {
+      setBattleError("");
+      const result = await joinFriendlyBattleMatchmaking();
+      setMatchmakingStatus(result.status);
+      if (result.room) {
+        setBattleRoom(result.room);
+        setBattleCode(result.room.code || "");
+        setSocialToast({ title: "Match found", message: "A friendly opponent is ready." });
+        playFeedbackTone("boss", audioFeedback);
+      } else {
+        setSocialToast({ title: "Searching for match", message: "Keep this tab open while another player joins." });
+      }
+      handleRefreshBattleStats({ quiet: true });
+    } catch (error) {
+      setBattleError(error.message || "Could not join matchmaking.");
+    }
+  }
+
+  async function handleLeaveMatchmaking() {
+    try {
+      setBattleError("");
+      const result = await leaveFriendlyBattleMatchmaking();
+      setMatchmakingStatus(result.status);
+      setSocialToast({ title: "Queue left", message: "You left matchmaking." });
+      handleRefreshBattleStats({ quiet: true });
+    } catch (error) {
+      setBattleError(error.message || "Could not leave matchmaking.");
+    }
+  }
+
+  async function handleRefreshBattleHistory(options = {}) {
+    try {
+      if (!options.quiet) setBattleError("");
+      setBattleHistory(await getFriendlyBattleHistory());
+    } catch (error) {
+      if (!options.quiet) setBattleError(error.message || "Could not load battle history.");
+    }
+  }
+
+  async function handleRefreshBattleStats(options = {}) {
+    try {
+      if (!options.quiet) setBattleError("");
+      setBattleStats(await getFriendlyBattleStats());
+    } catch (error) {
+      if (!options.quiet) setBattleError(error.message || "Could not load battle stats.");
     }
   }
 
@@ -991,6 +1073,9 @@ export default function App() {
     setFriendUsername("");
     setFriendError("");
     setBattleInvites([]);
+    setMatchmakingStatus("");
+    setBattleHistory([]);
+    setBattleStats(null);
     setSelectedFriendUsername("");
     setSocialToast(null);
     setIntroClass("CODER");
@@ -1594,6 +1679,13 @@ export default function App() {
                   onRefreshBattleInvites={handleRefreshBattleInvites}
                   onInviteFriend={handleInviteFriend}
                   onAcceptBattleInvite={handleAcceptBattleInvite}
+                  matchmakingStatus={matchmakingStatus}
+                  onJoinMatchmaking={handleJoinMatchmaking}
+                  onLeaveMatchmaking={handleLeaveMatchmaking}
+                  onReconnectBattle={handleReconnectBattle}
+                  battleHistory={battleHistory}
+                  onRefreshBattleHistory={handleRefreshBattleHistory}
+                  battleStats={battleStats}
                   selectedFriendUsername={selectedFriend?.username || ""}
                   selectedFriend={selectedFriend}
                   onSelectFriend={setSelectedFriendUsername}

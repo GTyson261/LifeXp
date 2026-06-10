@@ -246,6 +246,7 @@
   .friend-request-grid,
   .friend-social-grid,
   .battle-invite-strip,
+  .matchmaking-card,
   .social-toast-card,
   .friendly-battle-arena,
   .battle-move-grid {
@@ -256,6 +257,12 @@
     justify-content: stretch;
   }
 
+  .matchmaking-actions,
+  .battle-invite-list {
+    justify-content: stretch;
+  }
+
+  .matchmaking-actions button,
   .battle-invite-list button {
     flex: 1 1 100%;
   }

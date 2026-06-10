@@ -191,7 +191,9 @@
 .friend-list-card,
 .friend-profile-card,
 .friend-leaderboard-card,
+.battle-history-card,
 .battle-invite-strip,
+.matchmaking-card,
 .social-toast-card {
   min-width: 0;
   display: grid;
@@ -227,6 +229,47 @@
 .battle-invite-strip > div:first-child {
   display: grid;
   gap: 0.15rem;
+}
+
+.matchmaking-card {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.matchmaking-card > div:first-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.matchmaking-card span,
+.battle-stats-strip span,
+.battle-history-row small {
+  color: var(--lifexp-muted);
+}
+
+.matchmaking-actions,
+.battle-stats-strip {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.matchmaking-actions button {
+  min-height: 38px;
+  padding: 0.45rem 0.7rem;
+}
+
+.battle-stats-strip {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+}
+
+.battle-stats-strip span {
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .battle-invite-list {
@@ -396,7 +439,8 @@
 }
 
 .friend-profile-stats div,
-.friend-leaderboard-row {
+.friend-leaderboard-row,
+.battle-history-row {
   min-width: 0;
   padding: 0.55rem;
   border-radius: 8px;
@@ -414,7 +458,8 @@
   gap: 0.45rem;
 }
 
-.friend-leaderboard-row {
+.friend-leaderboard-row,
+.battle-history-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 0.5rem;
@@ -430,6 +475,19 @@
   color: #020617;
   font-weight: 1000;
   background: linear-gradient(135deg, var(--class-color), white);
+}
+
+.battle-history-card {
+  grid-column: 1 / -1;
+}
+
+.battle-history-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.battle-history-row {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .battle-connect-grid {

@@ -16,24 +16,33 @@ public class FriendlyBattleService {
     private final SaveService saveService;
     private final UserAccountRepository userRepository;
     private final FriendshipRepository friendshipRepository;
+    private final BattleHistoryRepository battleHistoryRepository;
     private final Map<String, FriendlyBattleRoom> rooms = new ConcurrentHashMap<>();
+    private final Map<String, MatchmakingEntry> matchmakingQueue = new ConcurrentHashMap<>();
     private final SecureRandom random = new SecureRandom();
 
     public FriendlyBattleService(
             SaveService saveService,
             UserAccountRepository userRepository,
-            FriendshipRepository friendshipRepository
+            FriendshipRepository friendshipRepository,
+            BattleHistoryRepository battleHistoryRepository
     ) {
         this.saveService = saveService;
         this.userRepository = userRepository;
         this.friendshipRepository = friendshipRepository;
+        this.battleHistoryRepository = battleHistoryRepository;
     }
 
-    public FriendlyBattleResponse createRoom(UserAccount account) {
+    public synchronized FriendlyBattleResponse createRoom(UserAccount account) {
         return createRoom(account, "");
     }
 
-    public FriendlyBattleResponse createRoom(UserAccount account, String invitedUsername) {
+    public synchronized FriendlyBattleResponse createRoom(UserAccount account, String invitedUsername) {
+        FriendlyBattleRoom activeRoom = findActiveRoomFor(account.username);
+        if (activeRoom != null) {
+            return toResponse(activeRoom, account.username);
+        }
+
         String code = createCode();
         PlayerState state = saveService.loadOrCreateNew(account);
         FriendlyBattleRoom room = new FriendlyBattleRoom();
@@ -54,11 +63,19 @@ public class FriendlyBattleService {
         return toResponse(room, account.username);
     }
 
-    public FriendlyBattleResponse joinRoom(UserAccount account, String roomCode) {
+    public synchronized FriendlyBattleResponse joinRoom(UserAccount account, String roomCode) {
         FriendlyBattleRoom room = requireRoom(roomCode);
 
         if (room.host.username.equals(account.username)) {
             return toResponse(room, account.username);
+        }
+
+        if (room.guest != null && room.guest.username.equals(account.username)) {
+            return toResponse(room, account.username);
+        }
+
+        if (room.guest != null) {
+            throw new IllegalArgumentException("This battle room is already full.");
         }
 
         if (!room.invitedUsername.isBlank() && !room.invitedUsername.equals(account.username)) {
@@ -83,6 +100,11 @@ public class FriendlyBattleService {
         return toResponse(requireRoom(roomCode), account.username);
     }
 
+    public FriendlyBattleResponse getActiveRoom(UserAccount account) {
+        FriendlyBattleRoom room = findActiveRoomFor(account.username);
+        return room == null ? null : toResponse(room, account.username);
+    }
+
     public List<FriendlyBattleResponse> getInvites(UserAccount account) {
         List<FriendlyBattleResponse> invites = new ArrayList<>();
         for (FriendlyBattleRoom room : rooms.values()) {
@@ -97,13 +119,73 @@ public class FriendlyBattleService {
         return invites;
     }
 
-    public FriendlyBattleResponse chooseMove(UserAccount account, String roomCode, String move) {
+    public synchronized MatchmakingResponse joinMatchmaking(UserAccount account) {
+        FriendlyBattleRoom activeRoom = findActiveRoomFor(account.username);
+        if (activeRoom != null) {
+            MatchmakingResponse response = new MatchmakingResponse();
+            response.status = "MATCHED";
+            response.room = toResponse(activeRoom, account.username);
+            return response;
+        }
+
+        for (MatchmakingEntry entry : matchmakingQueue.values()) {
+            if (entry.username.equals(account.username)) continue;
+            matchmakingQueue.remove(entry.username);
+            matchmakingQueue.remove(account.username);
+
+            FriendlyBattleRoom room = createMatchedRoom(entry.account, account);
+            MatchmakingResponse response = new MatchmakingResponse();
+            response.status = "MATCHED";
+            response.room = toResponse(room, account.username);
+            return response;
+        }
+
+        MatchmakingEntry entry = new MatchmakingEntry();
+        entry.username = account.username;
+        entry.account = account;
+        entry.joinedAt = Instant.now().toString();
+        matchmakingQueue.put(account.username, entry);
+
+        MatchmakingResponse response = new MatchmakingResponse();
+        response.status = "QUEUED";
+        response.queueSize = matchmakingQueue.size();
+        return response;
+    }
+
+    public synchronized MatchmakingResponse leaveMatchmaking(UserAccount account) {
+        matchmakingQueue.remove(account.username);
+        MatchmakingResponse response = new MatchmakingResponse();
+        response.status = "LEFT_QUEUE";
+        response.queueSize = matchmakingQueue.size();
+        return response;
+    }
+
+    public List<BattleHistoryResponse> getHistory(UserAccount account) {
+        return battleHistoryRepository
+                .findTop20ByHostUsernameOrGuestUsernameOrderByCompletedAtDesc(account.username, account.username)
+                .stream()
+                .map(BattleHistoryResponse::from)
+                .toList();
+    }
+
+    public BattleStatsResponse getStats() {
+        BattleStatsResponse response = new BattleStatsResponse();
+        response.activeRooms = (int) rooms.values().stream().filter(room -> !"COMPLETE".equals(room.status)).count();
+        response.queuedPlayers = matchmakingQueue.size();
+        response.completedRoomsInMemory = (int) rooms.values().stream().filter(room -> "COMPLETE".equals(room.status)).count();
+        response.persistedBattleHistory = battleHistoryRepository.count();
+        return response;
+    }
+
+    public synchronized FriendlyBattleResponse chooseMove(UserAccount account, String roomCode, String move, Integer expectedRound) {
         FriendlyBattleRoom room = requireRoom(roomCode);
         String normalizedMove = normalizeMove(move);
 
         if (room.host.username.equals(account.username)) {
+            validateMoveLock(room, room.hostMove, expectedRound);
             room.hostMove = normalizedMove;
         } else if (room.guest != null && room.guest.username.equals(account.username)) {
+            validateMoveLock(room, room.guestMove, expectedRound);
             room.guestMove = normalizedMove;
         } else {
             throw new IllegalArgumentException("You are not in this battle room.");
@@ -141,6 +223,67 @@ public class FriendlyBattleService {
         room.hostMove = "";
         room.guestMove = "";
         room.status = room.hostWins >= 3 || room.guestWins >= 3 ? "COMPLETE" : "READY";
+        if ("COMPLETE".equals(room.status)) {
+            saveBattleHistory(room);
+        }
+    }
+
+    private FriendlyBattleRoom createMatchedRoom(UserAccount queuedAccount, UserAccount challengerAccount) {
+        String code = createCode();
+        FriendlyBattleRoom room = new FriendlyBattleRoom();
+        room.code = code;
+        room.host = createPlayer(queuedAccount, saveService.loadOrCreateNew(queuedAccount));
+        room.guest = createPlayer(challengerAccount, saveService.loadOrCreateNew(challengerAccount));
+        if (room.host.displayName.equals(room.guest.displayName)) {
+            room.host.displayName = room.host.username;
+            room.guest.displayName = room.guest.username;
+        }
+        room.status = "READY";
+        room.inviteStatus = "MATCHED";
+        room.createdAt = Instant.now().toString();
+        room.log.add(room.host.displayName + " and " + room.guest.displayName + " matched through queue.");
+        rooms.put(code, room);
+        return room;
+    }
+
+    private FriendlyBattleRoom findActiveRoomFor(String username) {
+        return rooms.values().stream()
+                .filter(room -> !"COMPLETE".equals(room.status))
+                .filter(room -> room.host.username.equals(username)
+                        || (room.guest != null && room.guest.username.equals(username)))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void validateMoveLock(FriendlyBattleRoom room, String existingMove, Integer expectedRound) {
+        if ("WAITING".equals(room.status)) {
+            throw new IllegalArgumentException("Wait for an opponent before choosing a move.");
+        }
+        if ("COMPLETE".equals(room.status)) {
+            throw new IllegalArgumentException("This battle is already complete.");
+        }
+        if (expectedRound != null && expectedRound != room.round) {
+            throw new IllegalArgumentException("Battle round changed. Refresh before choosing a move.");
+        }
+        if (!existingMove.isBlank()) {
+            throw new IllegalArgumentException("Move already locked for this round.");
+        }
+    }
+
+    private void saveBattleHistory(FriendlyBattleRoom room) {
+        if (room.historySaved) return;
+
+        BattleHistory history = new BattleHistory();
+        history.roomCode = room.code;
+        history.hostUsername = room.host.username;
+        history.guestUsername = room.guest == null ? "" : room.guest.username;
+        history.winnerUsername = room.hostWins > room.guestWins ? room.host.username : room.guest.username;
+        history.rounds = room.round;
+        history.hostWins = room.hostWins;
+        history.guestWins = room.guestWins;
+        history.summary = String.join("\n", room.log);
+        battleHistoryRepository.save(history);
+        room.historySaved = true;
     }
 
     private int moveScore(FriendlyBattlePlayer player, String move) {
@@ -304,7 +447,14 @@ public class FriendlyBattleService {
         String createdAt = "";
         String invitedUsername = "";
         String inviteStatus = "";
+        boolean historySaved = false;
         List<String> log = new ArrayList<>();
+    }
+
+    private static class MatchmakingEntry {
+        String username;
+        UserAccount account;
+        String joinedAt;
     }
 
     public static class FriendlyBattleResponse {
@@ -321,6 +471,47 @@ public class FriendlyBattleService {
         public boolean viewerMoveLocked;
         public boolean opponentMoveLocked;
         public List<String> log;
+    }
+
+    public static class MatchmakingResponse {
+        public String status;
+        public int queueSize;
+        public FriendlyBattleResponse room;
+    }
+
+    public static class BattleHistoryResponse {
+        public Long id;
+        public String roomCode;
+        public String hostUsername;
+        public String guestUsername;
+        public String winnerUsername;
+        public int rounds;
+        public int hostWins;
+        public int guestWins;
+        public String summary;
+        public String completedAt;
+
+        static BattleHistoryResponse from(BattleHistory history) {
+            BattleHistoryResponse response = new BattleHistoryResponse();
+            response.id = history.id;
+            response.roomCode = history.roomCode;
+            response.hostUsername = history.hostUsername;
+            response.guestUsername = history.guestUsername;
+            response.winnerUsername = history.winnerUsername;
+            response.rounds = history.rounds;
+            response.hostWins = history.hostWins;
+            response.guestWins = history.guestWins;
+            response.summary = history.summary;
+            response.completedAt = history.completedAt == null ? "" : history.completedAt.toString();
+            return response;
+        }
+    }
+
+    public static class BattleStatsResponse {
+        public int activeRooms;
+        public int queuedPlayers;
+        public int completedRoomsInMemory;
+        public long persistedBattleHistory;
     }
 
     public static class FriendlyBattlePlayer {
