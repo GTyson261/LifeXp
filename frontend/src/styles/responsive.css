@@ -28,6 +28,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .hud-mission-deck {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .hud-mission-card {
     grid-column: 1 / -1;
   }
@@ -192,6 +196,22 @@
   .hud-status-rail {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.55rem;
+  }
+
+  .hud-mission-deck {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .hud-mission-tile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.45rem;
+    padding: 0.68rem;
+  }
+
+  .hud-mission-tile > span {
+    width: 32px;
+    height: 32px;
   }
 
   .hud-mission-card {

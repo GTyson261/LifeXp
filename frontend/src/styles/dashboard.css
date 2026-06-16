@@ -236,6 +236,69 @@
   justify-content: center;
 }
 
+.hud-mission-deck {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.hud-mission-tile {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.72rem 0.78rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 88%), transparent 62%),
+    rgba(2, 6, 23, 0.68);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 76%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.hud-mission-tile > span {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--class-color);
+  background: color-mix(in srgb, var(--class-color), transparent 84%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 56%);
+}
+
+.hud-mission-tile small,
+.hud-mission-tile strong,
+.hud-mission-tile em {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.hud-mission-tile small {
+  color: var(--lifexp-muted);
+  font-size: 0.67rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.hud-mission-tile strong {
+  color: white;
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.hud-mission-tile em {
+  color: #cbd5e1;
+  font-size: 0.74rem;
+  font-style: normal;
+  line-height: 1.25;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));

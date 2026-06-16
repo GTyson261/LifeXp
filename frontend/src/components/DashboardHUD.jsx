@@ -10,6 +10,36 @@ export default function DashboardHUD({ state, classMeta = {}, rankTitle = "" }) 
   const boss = state?.currentBoss;
   const bossPercent = boss?.maxHp ? Math.max(0, Math.round((boss.hp / boss.maxHp) * 100)) : 0;
   const energy = state?.energy ?? 100;
+  const quests = state?.dailyQuests || [];
+  const completedQuests = quests.filter((quest) => quest.completed).length;
+  const claimReady = quests.filter((quest) => quest.completed && !quest.claimed).length;
+  const equippedItems = (state?.inventory || []).filter((item) => item.equipped).length;
+  const missionDeck = [
+    {
+      icon: "◇",
+      label: "Daily Ops",
+      value: quests.length ? `${completedQuests}/${quests.length}` : "Ready",
+      detail: claimReady > 0 ? `${claimReady} claim ready` : "Quest board synced"
+    },
+    {
+      icon: "⚔",
+      label: "Threat",
+      value: boss?.maxHp ? `${bossPercent}%` : "Scan",
+      detail: boss?.name || "Awaiting boss signal"
+    },
+    {
+      icon: "♙",
+      label: "Loadout",
+      value: `${equippedItems} gear`,
+      detail: state?.equippedAura || state?.avatar?.aura || "Starter Glow"
+    },
+    {
+      icon: "🔥",
+      label: "Streak",
+      value: `${state?.loginStreak || 1} day`,
+      detail: `${state?.bossesDefeated || 0} boss clears`
+    }
+  ];
 
   return (
     <section className="premium-top-hud">
@@ -64,6 +94,19 @@ export default function DashboardHUD({ state, classMeta = {}, rankTitle = "" }) 
           <span>Campaign Record</span>
           <strong>{state?.bossesDefeated || 0} boss clears</strong>
         </div>
+      </div>
+
+      <div className="hud-mission-deck" aria-label="Mission control deck">
+        {missionDeck.map((mission) => (
+          <div className="hud-mission-tile" key={mission.label}>
+            <span>{mission.icon}</span>
+            <div>
+              <small>{mission.label}</small>
+              <strong>{mission.value}</strong>
+              <em>{mission.detail}</em>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
