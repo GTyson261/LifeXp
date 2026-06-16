@@ -639,6 +639,7 @@ export default function App() {
   const xpNeeded = state.level * 100;
   const xpPercent = Math.min(100, Math.round((state.xp / xpNeeded) * 100));
   const navSignals = getDashboardNavSignals(state, activeClass);
+  const navReadiness = getDashboardNavReadiness(state, activeClass);
 
   function showXp(xp) {
     setFloatingXp(`+${xp} XP`);
@@ -1488,6 +1489,12 @@ export default function App() {
                 <span>{tab.icon}</span>
                 <strong>{tab.label}</strong>
                 <small>{navSignals[tab.key] || "Ready"}</small>
+                <i
+                  className="nav-readiness-meter"
+                  aria-label={`${tab.label} readiness ${navReadiness[tab.key] || 0}%`}
+                >
+                  <b style={{ width: `${navReadiness[tab.key] || 0}%` }} />
+                </i>
               </button>
             ))}
           </nav>
@@ -1505,6 +1512,12 @@ export default function App() {
                 <span>{tab.icon}</span>
                 <strong>{tab.label}</strong>
                 <small>{navSignals[tab.key] || "Ready"}</small>
+                <i
+                  className="nav-readiness-meter"
+                  aria-label={`${tab.label} readiness ${navReadiness[tab.key] || 0}%`}
+                >
+                  <b style={{ width: `${navReadiness[tab.key] || 0}%` }} />
+                </i>
               </button>
             ))}
           </nav>
@@ -1997,6 +2010,33 @@ function getDashboardNavSignals(state = {}, activeClass = "NOVICE") {
     battle: `${state.bossesDefeated || 0} wins`,
     world: activeWorld?.name || "Map",
     log: `${activityCount} logs`
+  };
+}
+
+function getDashboardNavReadiness(state = {}, activeClass = "NOVICE") {
+  const quests = state.dailyQuests || [];
+  const completedQuests = quests.filter((quest) => quest.completed).length;
+  const claimReady = quests.filter((quest) => quest.completed && !quest.claimed).length;
+  const inventory = state.inventory || [];
+  const equippedItems = inventory.filter((item) => item.equipped).length;
+  const worlds = state.worlds || [];
+  const unlockedWorlds = worlds.filter((world) => world.unlocked).length;
+  const activityCount = (state.activityLog || []).length;
+  const energy = Math.max(0, Math.min(100, state.energy ?? 100));
+  const boss = state.currentBoss;
+  const bossPressure = boss?.maxHp ? Math.max(0, Math.round(100 - (boss.hp / boss.maxHp) * 100)) : 0;
+  const mastery = Math.max(0, Math.min(100, state.classMastery || 0));
+  const questPercent = quests.length === 0 ? 0 : Math.round((completedQuests / quests.length) * 100);
+
+  return {
+    overview: Math.max(energy, Math.min(100, state.level ? state.level * 12 : 12)),
+    profile: Math.max(mastery, activeClass !== "NOVICE" ? 45 : 20),
+    avatar: Math.min(100, equippedItems * 24 + ((state.avatar?.aura || state.equippedAura) ? 18 : 0)),
+    quests: Math.max(questPercent, claimReady > 0 ? 100 : 0),
+    shop: Math.min(100, Math.round(((state.gold || 0) / 600) * 100) + Math.min(25, state.crystals || 0)),
+    battle: Math.max(bossPressure, Math.min(100, (state.bossesDefeated || 0) * 25)),
+    world: worlds.length === 0 ? 0 : Math.round((unlockedWorlds / worlds.length) * 100),
+    log: Math.min(100, activityCount * 8)
   };
 }
 

@@ -527,6 +527,22 @@
     white-space: nowrap;
   }
 
+  .mobile-nav-button .nav-readiness-meter {
+    width: 100%;
+    max-width: 34px;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.92);
+  }
+
+  .mobile-nav-button .nav-readiness-meter b {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--class-color), #f8fafc);
+  }
+
   .mobile-nav-button.active {
     color: white;
     border-color: color-mix(in srgb, var(--class-color), transparent 56%);
