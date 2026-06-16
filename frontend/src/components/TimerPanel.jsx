@@ -9,6 +9,10 @@ export default function TimerPanel({
   formatTime
 }) {
   const selectedActivity = activities.find((activity) => activity.key === timerActivity);
+  const minutes = Math.floor(timerSeconds / 60);
+  const chargePercent = Math.min(100, Math.round((timerSeconds / 1500) * 100));
+  const estimatedXp = Math.max(0, Math.floor(minutes * 10));
+  const sessionTier = timerSeconds >= 1500 ? "Deep Run" : timerSeconds >= 600 ? "Focused" : timerRunning ? "Warming" : "Queued";
 
   return (
     <div className="panel timer-panel premium-timer-panel">
@@ -39,10 +43,31 @@ export default function TimerPanel({
         </select>
       </label>
 
+      <div className="timer-cockpit-card" aria-label="Timer session cockpit">
+        <div>
+          <small>Session Tier</small>
+          <strong>{sessionTier}</strong>
+        </div>
+        <div>
+          <small>Charge</small>
+          <strong>{chargePercent}%</strong>
+        </div>
+        <div>
+          <small>XP Estimate</small>
+          <strong>+{estimatedXp}</strong>
+        </div>
+      </div>
+
       <div className="timer-display premium-timer-display">
         <span>{selectedActivity?.icon || "⏱️"}</span>
         <strong>{formatTime(timerSeconds)}</strong>
         <small>{timerRunning ? "Verified session recording" : "Ready for verified XP"}</small>
+      </div>
+
+      <div className="timer-charge-meter" aria-label={`Timer charge ${chargePercent}%`}>
+        <i>
+          <b style={{ width: `${chargePercent}%` }} />
+        </i>
       </div>
 
       <div className="timer-signal-row" aria-hidden="true">
