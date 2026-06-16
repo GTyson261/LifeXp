@@ -48,10 +48,10 @@
   pointer-events: none;
 }
 
-.reward-burst span {
+.reward-burst > span {
   min-width: 132px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0.45rem;
   align-items: center;
   padding: 0.62rem 0.78rem;
@@ -65,6 +65,26 @@
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.36);
   animation: rewardFly 1.45s cubic-bezier(0.2, 0.84, 0.28, 1) both;
   animation-delay: calc(var(--reward-index, 0) * 0.09s);
+}
+
+.reward-burst > span > em {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-style: normal;
+  background: color-mix(in srgb, var(--class-color), transparent 84%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 56%);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--class-color), transparent 70%);
+}
+
+.reward-burst > span > span {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: center;
 }
 
 .reward-burst small {
@@ -543,7 +563,7 @@
   .floating-xp,
   .floating-xp::before,
   .floating-xp::after,
-  .reward-burst span,
+  .reward-burst > span,
   .boss-entrance,
   .boss-entrance-card,
   .victory-card,
