@@ -140,6 +140,37 @@
 }
 
 @media (max-width: 700px) {
+  .loading-screen {
+    place-items: start center;
+    min-height: 100dvh;
+    padding: 0.75rem;
+  }
+
+  .boot-card,
+  .loading-error-card {
+    gap: 0.7rem;
+    padding: 1rem;
+  }
+
+  .boot-card h1,
+  .loading-error-card h1 {
+    font-size: clamp(2rem, 13vw, 3rem);
+    line-height: 1;
+  }
+
+  .boot-card-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .boot-core {
+    width: min(170px, 54vw);
+  }
+
+  .boot-status-grid,
+  .boot-diagnostic-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .app-shell {
     padding: 0.75rem;
   }

@@ -598,6 +598,10 @@ export default function App() {
               </p>
             </div>
           </div>
+          <div className="boot-diagnostic-strip">
+            <span><small>Client</small><strong>Ready</strong></span>
+            <span><small>Save Link</small><strong>Paused</strong></span>
+          </div>
           <div className="boot-status-grid">
             <span><small>Frontend</small><strong>Online</strong></span>
             <span><small>Backend</small><strong>Offline</strong></span>
@@ -619,10 +623,24 @@ export default function App() {
     return (
       <div className="loading-screen">
         <div className="boot-card">
-          <p className="eyebrow">Live Season Build</p>
-          <h1>Booting LifeXP</h1>
+          <div className="boot-card-header">
+            <span>XP</span>
+            <div>
+              <p className="eyebrow">Live Season Build</p>
+              <h1>Booting LifeXP</h1>
+              <p>Syncing hero data, world state, and daily quest systems.</p>
+            </div>
+          </div>
+          <div className="boot-core" aria-hidden="true">
+            <span />
+            <strong>SYNC</strong>
+          </div>
           <div className="boot-progress-track">
             <span />
+          </div>
+          <div className="boot-diagnostic-strip">
+            <span><small>Client</small><strong>Online</strong></span>
+            <span><small>Protocol</small><strong>Live</strong></span>
           </div>
           <div className="boot-status-grid">
             <span><small>Auth</small><strong>Linked</strong></span>

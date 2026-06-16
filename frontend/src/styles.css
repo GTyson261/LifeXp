@@ -190,6 +190,91 @@ textarea {
   box-shadow: 0 0 22px rgba(250, 204, 21, 0.22);
 }
 
+.boot-card-header p {
+  margin: 0.25rem 0 0;
+  color: var(--lifexp-muted);
+  line-height: 1.45;
+}
+
+.boot-core {
+  width: min(220px, 58vw);
+  aspect-ratio: 1;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  position: relative;
+  margin: 0.15rem 0;
+}
+
+.boot-core::before,
+.boot-core::after,
+.boot-core span {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+}
+
+.boot-core::before {
+  inset: 0;
+  background: conic-gradient(from 0deg, var(--lifexp-cyan), transparent 28%, var(--lifexp-gold), transparent 64%, var(--lifexp-purple), var(--lifexp-cyan));
+  filter: blur(2px);
+  opacity: 0.72;
+  animation: bootCoreSpin 8s linear infinite;
+}
+
+.boot-core::after {
+  inset: 18%;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.92), rgba(34, 211, 238, 0.26) 34%, rgba(2, 6, 23, 0.9) 74%);
+  box-shadow:
+    inset 0 0 32px rgba(34, 211, 238, 0.18),
+    0 0 38px rgba(34, 211, 238, 0.2);
+}
+
+.boot-core span {
+  inset: 8%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.boot-core strong {
+  position: relative;
+  z-index: 1;
+  color: #020617;
+  font-size: clamp(1.15rem, 5vw, 2rem);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.9);
+}
+
+.boot-diagnostic-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.boot-diagnostic-strip span {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.68rem 0.72rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.12), transparent),
+    rgba(2, 6, 23, 0.72);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+}
+
+.boot-diagnostic-strip small {
+  color: var(--lifexp-muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.boot-diagnostic-strip strong {
+  color: white;
+  overflow-wrap: anywhere;
+}
+
 @keyframes bootPulse {
   from {
     width: 42%;
@@ -199,6 +284,12 @@ textarea {
   to {
     width: 92%;
     filter: brightness(1.16);
+  }
+}
+
+@keyframes bootCoreSpin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
