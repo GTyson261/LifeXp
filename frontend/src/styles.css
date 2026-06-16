@@ -1,11 +1,15 @@
 :root {
   --lifexp-bg: #03040c;
-  --lifexp-panel: rgba(10, 15, 34, 0.88);
+  --lifexp-panel: rgba(8, 13, 28, 0.9);
   --lifexp-cyan: #22d3ee;
   --lifexp-purple: #a855f7;
   --lifexp-gold: #facc15;
+  --lifexp-danger: #fb7185;
+  --lifexp-green: #34d399;
   --lifexp-text: #f8fafc;
   --lifexp-muted: #94a3b8;
+  --lifexp-ink: #020617;
+  --lifexp-border: rgba(148, 163, 184, 0.18);
 }
 
 * {
@@ -22,9 +26,10 @@ body {
   color: var(--lifexp-text);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at 18% 8%, rgba(168, 85, 247, 0.2), transparent 28%),
-    radial-gradient(circle at 90% 20%, rgba(34, 211, 238, 0.13), transparent 28%),
-    linear-gradient(135deg, #03040c, #07111f 45%, #02030a);
+    linear-gradient(180deg, rgba(8, 13, 30, 0.35), rgba(2, 6, 23, 0.92)),
+    radial-gradient(ellipse at 18% 8%, rgba(34, 211, 238, 0.16), transparent 32%),
+    radial-gradient(ellipse at 80% 14%, rgba(250, 204, 21, 0.12), transparent 28%),
+    linear-gradient(135deg, #020617, #07111f 48%, #030712);
 }
 
 button,
@@ -36,12 +41,17 @@ textarea {
 
 button {
   cursor: pointer;
-  border-radius: 12px;
-  border: 1px solid rgba(168, 85, 247, 0.5);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--class-color, var(--lifexp-cyan)), transparent 48%);
   padding: 0.75rem 1rem;
-  background: rgba(15, 23, 42, 0.9);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 48%),
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color, var(--lifexp-cyan)), transparent 72%), rgba(15, 23, 42, 0.94));
   color: white;
-  transition: 0.2s;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 button:disabled {
@@ -50,8 +60,15 @@ button:disabled {
 }
 
 button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  border-color: var(--lifexp-cyan);
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--class-color, var(--lifexp-cyan)), white 16%);
+  box-shadow:
+    0 12px 30px color-mix(in srgb, var(--class-color, var(--lifexp-cyan)), transparent 78%),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 input,
@@ -60,9 +77,9 @@ textarea {
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 0.75rem;
-  border-radius: 12px;
-  background: rgba(2, 6, 23, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.82);
+  border: 1px solid var(--lifexp-border);
   color: white;
 }
 
@@ -70,28 +87,140 @@ textarea {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  font-size: 2rem;
+  padding: 1rem;
+  font-size: 1rem;
   font-weight: 900;
-  background: radial-gradient(circle, #13213f, #050510);
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.12), rgba(2, 6, 23, 0.88)),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.07) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(135deg, #020617, #08111f 48%, #030712);
+  background-size: auto, 76px 76px, 76px 76px, auto;
+}
+
+.boot-card,
+.loading-error-card {
+  width: min(560px, 100%);
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.25rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 28%),
+    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.16), transparent 44%),
+    rgba(2, 6, 23, 0.9);
+  border: 1px solid rgba(34, 211, 238, 0.28);
+  box-shadow:
+    0 22px 70px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.boot-card h1,
+.loading-error-card h1 {
+  margin: 0;
+  color: white;
+  font-size: clamp(2rem, 8vw, 3.8rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.boot-progress-track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.boot-progress-track span {
+  display: block;
+  width: 72%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--lifexp-cyan), white, var(--lifexp-purple));
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.36);
+  animation: bootPulse 1.4s ease-in-out infinite alternate;
+}
+
+.boot-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.boot-status-grid span {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.68rem 0.72rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.68);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.boot-status-grid small {
+  color: var(--lifexp-muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.boot-status-grid strong {
+  color: white;
+  overflow-wrap: anywhere;
+}
+
+.boot-card-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.boot-card-header > span {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #020617;
+  font-size: 1.5rem;
+  font-weight: 1000;
+  background: linear-gradient(135deg, var(--lifexp-gold), white);
+  box-shadow: 0 0 22px rgba(250, 204, 21, 0.22);
+}
+
+@keyframes bootPulse {
+  from {
+    width: 42%;
+    filter: brightness(0.95);
+  }
+
+  to {
+    width: 92%;
+    filter: brightness(1.16);
+  }
 }
 
 .loading-error-screen {
-  padding: 1rem;
-  font-size: 1rem;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
 }
 
-.loading-error-card {
-  width: min(520px, 100%);
-  display: grid;
-  gap: 0.85rem;
-  padding: 1.25rem;
-  border-radius: 24px;
-  background: rgba(2, 6, 23, 0.88);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+.loading-error-screen::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 6px),
+    radial-gradient(ellipse at 50% 0%, rgba(34, 211, 238, 0.18), transparent 42%),
+    radial-gradient(ellipse at 100% 100%, rgba(250, 204, 21, 0.12), transparent 36%);
+  opacity: 0.85;
 }
 
-.loading-error-card h1,
 .loading-error-card p {
   margin: 0;
 }
@@ -108,9 +237,76 @@ textarea {
   isolation: isolate;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--class-color), transparent 58%), transparent 28%),
-    radial-gradient(circle at 78% 12%, rgba(168, 85, 247, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.08), rgba(2, 6, 23, 0.9)),
+    radial-gradient(ellipse at top left, color-mix(in srgb, var(--class-color), transparent 60%), transparent 30%),
     linear-gradient(135deg, #03040c, #08111f 48%, #02030a);
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, rgba(34, 211, 238, 0.06), transparent 28% 70%, rgba(250, 204, 21, 0.06)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: auto, 84px 84px, 84px 84px;
+  transform: perspective(900px) rotateX(64deg) translateY(12vh) scale(1.6);
+  transform-origin: bottom center;
+  opacity: 0.55;
+}
+
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.72), transparent 22% 78%, rgba(2, 6, 23, 0.74)),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.18), transparent 34%, rgba(0, 0, 0, 0.58));
+}
+
+.game-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.game-backdrop-grid,
+.game-backdrop-scanline,
+.game-backdrop-vignette {
+  position: absolute;
+  inset: 0;
+}
+
+.game-backdrop-grid {
+  background:
+    linear-gradient(120deg, transparent 0 42%, color-mix(in srgb, var(--class-color), transparent 84%) 42.2% 42.8%, transparent 43%),
+    linear-gradient(240deg, transparent 0 58%, rgba(34, 211, 238, 0.08) 58.2% 58.8%, transparent 59%);
+  opacity: 0.8;
+}
+
+.game-backdrop-scanline {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.032) 0,
+    rgba(255, 255, 255, 0.032) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.28;
+}
+
+.game-backdrop-vignette {
+  background:
+    radial-gradient(ellipse at 50% 4%, transparent 0 36%, rgba(2, 6, 23, 0.44) 76%),
+    radial-gradient(ellipse at 50% 106%, color-mix(in srgb, var(--class-color), transparent 82%), transparent 42%);
 }
 
 .theme-default {

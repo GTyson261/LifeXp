@@ -2,22 +2,22 @@ const BATTLE_MOVES = [
   {
     key: "POWER",
     label: "Power Strike",
-    hint: "Strong into guard."
+    hint: "Beats Guard. Slight raw edge."
   },
   {
     key: "FOCUS",
     label: "Focus Counter",
-    hint: "Counters power."
+    hint: "Beats Power. Stable counter."
   },
   {
     key: "GUARD",
     label: "Guard Stance",
-    hint: "Stops burst."
+    hint: "Beats Burst. Defensive read."
   },
   {
     key: "BURST",
     label: "Limit Burst",
-    hint: "Breaks focus."
+    hint: "Beats Focus. Risky pressure."
   }
 ];
 
@@ -29,6 +29,7 @@ export default function FriendlyBattlePanel({
   onCreateRoom,
   onJoinRoom,
   onRefreshRoom,
+  onLeaveRoom,
   onChooseMove,
   localJoinUrl,
   friends,
@@ -61,6 +62,23 @@ export default function FriendlyBattlePanel({
   const guest = battleRoom?.guest;
   const status = battleRoom?.status || "IDLE";
   const invitedUsername = battleRoom?.inviteStatus === "INVITED" ? battleRoom.invitedUsername : "";
+  const roundsPlayed = battleRoom ? (battleRoom.hostWins || 0) + (battleRoom.guestWins || 0) : 0;
+  const queueActive = matchmakingStatus === "QUEUED";
+  const activeRooms = battleStats?.activeRooms || 0;
+  const queuedPlayers = battleStats?.queuedPlayers || 0;
+  const savedBattles = battleStats?.persistedBattleHistory || 0;
+  const lobbyHeat = Math.min(100, activeRooms * 18 + queuedPlayers * 14 + (battleInvites.length || 0) * 12);
+  const firstTo = battleRoom?.firstTo || 3;
+  const hostWins = battleRoom?.hostWins || 0;
+  const guestWins = battleRoom?.guestWins || 0;
+  const friendCount = friends?.friends?.length || 0;
+  const pendingRequests = (friends?.incomingRequests?.length || 0) + (friends?.outgoingRequests?.length || 0);
+  const partyReadiness = Math.min(100, 24 + friendCount * 12 + (selectedFriend ? 22 : 0) + queuedPlayers * 8 + activeRooms * 6);
+  const scoutTarget = selectedFriend || guest || host;
+  const scoutPower = scoutTarget ? playerPowerScore(scoutTarget, scoutTarget === host ? hostWins : guestWins) : 0;
+  const roomState = battleRoom
+    ? `${host ? "Host locked" : "Host open"} / ${guest ? "Guest locked" : "Guest open"}`
+    : "No room active";
 
   return (
     <div className="panel friendly-battle-panel">
@@ -77,6 +95,66 @@ export default function FriendlyBattlePanel({
             <strong>{battleRoom.code}</strong>
           </div>
         )}
+      </div>
+
+      <div className="battle-command-strip">
+        <span>
+          <small>Status</small>
+          <strong>{formatStatus(status)}</strong>
+        </span>
+        <span>
+          <small>Rounds</small>
+          <strong>{roundsPlayed}</strong>
+        </span>
+        <span>
+          <small>Queue</small>
+          <strong>{matchmakingStatus === "QUEUED" ? "Searching" : "Ready"}</strong>
+        </span>
+      </div>
+
+      <div className="battle-lobby-status">
+        <div>
+          <small>Arena Heat</small>
+          <strong>{lobbyHeat}%</strong>
+          <i aria-label={`Arena heat ${lobbyHeat}%`}>
+            <b style={{ width: `${lobbyHeat}%` }} />
+          </i>
+        </div>
+        <div>
+          <small>Active Rooms</small>
+          <strong>{activeRooms}</strong>
+        </div>
+        <div>
+          <small>Queued</small>
+          <strong>{queuedPlayers}</strong>
+        </div>
+        <div>
+          <small>Saved</small>
+          <strong>{savedBattles}</strong>
+        </div>
+      </div>
+
+      <div className="battle-prep-grid" aria-label="Battle preparation summary">
+        <div className="battle-prep-card primary">
+          <div>
+            <small>Party Readiness</small>
+            <strong>{partyReadiness}%</strong>
+          </div>
+          <i aria-hidden="true">
+            <b style={{ width: `${partyReadiness}%` }} />
+          </i>
+          <span>{friendCount} friend{friendCount === 1 ? "" : "s"} available · {pendingRequests} pending</span>
+        </div>
+        <div className="battle-prep-card">
+          <small>Scout Intel</small>
+          <strong>{scoutTarget?.displayName || scoutTarget?.username || "No target"}</strong>
+          <span>{scoutPower ? `${scoutPower}% threat profile` : "Select a friend to preview"}</span>
+        </div>
+        <div className="battle-prep-card">
+          <small>Room State</small>
+          <strong>{roomState}</strong>
+          <span>{battleRoom?.code ? `Code ${battleRoom.code}` : "Create or join to start"}</span>
+        </div>
       </div>
 
       {socialToast && (
@@ -106,6 +184,9 @@ export default function FriendlyBattlePanel({
         <div>
           <strong>Matchmaking</strong>
           <span>{matchmakingStatus === "QUEUED" ? "Searching for a friendly opponent." : "Queue for a fast local match or reconnect to an active room."}</span>
+          <div className="matchmaking-search-meter" aria-label={queueActive ? "Matchmaking search active" : "Matchmaking ready"}>
+            <i className={queueActive ? "searching" : ""} />
+          </div>
         </div>
         <div className="matchmaking-actions">
           <button type="button" onClick={onJoinMatchmaking}>
@@ -116,6 +197,9 @@ export default function FriendlyBattlePanel({
           </button>
           <button type="button" onClick={onReconnectBattle}>
             Reconnect
+          </button>
+          <button type="button" onClick={() => onRefreshRoom()}>
+            Refresh
           </button>
         </div>
         {battleStats && (
@@ -273,7 +357,7 @@ export default function FriendlyBattlePanel({
         <div className="battle-connect-card">
           <strong>Create a Room</strong>
           <p>Start a local friendly match and share the 6-digit code.</p>
-          <button type="button" onClick={onCreateRoom}>
+          <button type="button" onClick={() => onCreateRoom()}>
             Create Battle Code
           </button>
         </div>
@@ -302,8 +386,15 @@ export default function FriendlyBattlePanel({
 
       {!battleRoom && (
         <div className="battle-empty-card">
-          <strong>Ready when your party is</strong>
-          <p>Create a room for a quick code match, or invite a friend from the list above for a cleaner head-to-head start.</p>
+          <div className="battle-empty-arena">
+            <span>Host</span>
+            <strong>VS</strong>
+            <span>Guest</span>
+          </div>
+          <div>
+            <strong>Ready when your party is</strong>
+            <p>Create a room for a quick code match, or invite a friend from the list above for a cleaner head-to-head start.</p>
+          </div>
         </div>
       )}
 
@@ -319,9 +410,34 @@ export default function FriendlyBattlePanel({
             <BattlePlayerCard player={guest} side="Guest" classMeta={classMeta} wins={battleRoom.guestWins || 0} />
           </div>
 
+          <div className="battle-round-track" aria-label={`Host ${hostWins}, guest ${guestWins}, first to ${firstTo}`}>
+            <span>
+              <small>Host</small>
+              <strong>{hostWins}</strong>
+            </span>
+            <div>
+              {Array.from({ length: firstTo }, (_, index) => (
+                <i key={`host-${index}`} className={index < hostWins ? "host-win" : ""} />
+              ))}
+            </div>
+            <strong>First to {firstTo}</strong>
+            <div>
+              {Array.from({ length: firstTo }, (_, index) => (
+                <i key={`guest-${index}`} className={index < guestWins ? "guest-win" : ""} />
+              ))}
+            </div>
+            <span>
+              <small>Guest</small>
+              <strong>{guestWins}</strong>
+            </span>
+          </div>
+
           <div className="battle-room-tools">
-            <button type="button" onClick={onRefreshRoom}>
+            <button type="button" onClick={() => onRefreshRoom()}>
               Refresh Battle
+            </button>
+            <button type="button" className="battle-leave-button" onClick={onLeaveRoom}>
+              Leave Room
             </button>
             <span>{battleRoom.viewerMoveLocked ? "Your move is locked." : "Choose your move."}</span>
             {battleRoom.opponentMoveLocked && <span>Friend is ready.</span>}
@@ -333,9 +449,11 @@ export default function FriendlyBattlePanel({
                 <button
                   key={move.key}
                   type="button"
+                  className={`battle-move-${move.key.toLowerCase()}`}
                   disabled={battleRoom.viewerMoveLocked}
                   onClick={() => onChooseMove(move.key)}
                 >
+                  <small>{moveRole(move.key)}</small>
                   <strong>{move.label}</strong>
                   <span>{move.hint}</span>
                 </button>
@@ -414,6 +532,15 @@ function FriendProfileCard({ friend, classMeta, invitePending = false, onInviteF
           <strong>{friend.classMastery || 0}</strong>
         </div>
       </div>
+      <div className="friend-profile-readiness">
+        <div>
+          <small>Threat Profile</small>
+          <strong>{playerPowerScore(friend)}%</strong>
+        </div>
+        <i aria-hidden="true">
+          <b style={{ width: `${playerPowerScore(friend)}%` }} />
+        </i>
+      </div>
       <button type="button" disabled={invitePending} onClick={() => onInviteFriend(friend)}>
         {invitePending ? "Invite Pending" : "Invite to Battle"}
       </button>
@@ -433,16 +560,35 @@ function BattlePlayerCard({ player, side, classMeta, wins }) {
   }
 
   const meta = classMeta[player.primaryClass] || classMeta.NOVICE || { icon: "◇", label: player.primaryClass };
+  const powerScore = playerPowerScore(player, wins);
+  const rank = powerScore >= 85 ? "S" : powerScore >= 70 ? "A" : powerScore >= 50 ? "B" : "C";
 
   return (
     <div className="battle-player-card">
       <span>{side}</span>
+      <b className="battle-player-rank">{rank}</b>
       <div className="battle-player-sigil">{meta.icon}</div>
       <strong>{player.displayName}</strong>
       <small>{meta.label} · Level {player.level}</small>
+      <div className="battle-power-meter" aria-label={`${player.displayName} power ${powerScore}`}>
+        <i style={{ width: `${powerScore}%` }} />
+      </div>
       <em>{wins} round win{wins === 1 ? "" : "s"}</em>
     </div>
   );
+}
+
+function playerPowerScore(player = {}, wins = 0) {
+  return Math.max(1, Math.min(100, (player.level || 1) * 8 + (player.bossesDefeated || 0) * 3 + wins * 12));
+}
+
+function moveRole(key = "") {
+  if (key === "POWER") return "Pressure";
+  if (key === "FOCUS") return "Counter";
+  if (key === "GUARD") return "Defense";
+  if (key === "BURST") return "Finisher";
+
+  return "Move";
 }
 
 function formatStatus(status) {

@@ -101,6 +101,14 @@ public class FriendlyBattleController {
         return battleService.chooseMove(authService.requireAccount(authorization), code, request.move, request.round);
     }
 
+    @PostMapping("/rooms/{code}/leave")
+    public FriendlyBattleService.FriendlyBattleResponse leaveRoom(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @PathVariable String code
+    ) {
+        return battleService.leaveRoom(authService.requireAccount(authorization), code);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> battleError(IllegalArgumentException exception) {

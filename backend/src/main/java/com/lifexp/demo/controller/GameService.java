@@ -79,7 +79,6 @@ public class GameService {
 
                 state.energy -= travelCost;
                 state.currentWorldId = world.id;
-                state.activeClass = world.classTheme;
 
                 state.currentBoss = createBossForWorld(world);
                 advanceQuest("travel", 1);
@@ -181,7 +180,7 @@ public class GameService {
             return state;
         }
 
-        state.activeClass = activeClassForActivity(type);
+        String actionClass = activeClassForActivity(type);
 
         int xpGain = calculateXp(type, amount, summary, request.verified);
 
@@ -205,7 +204,7 @@ public class GameService {
         state.xp += xpGain;
         state.gold += Math.max(1, xpGain / 10);
 
-        if (state.activeClass.equals(state.primaryClass)) {
+        if (actionClass.equals(state.primaryClass)) {
             state.classMastery += Math.max(1, xpGain / 20);
         }
 

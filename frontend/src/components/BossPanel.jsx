@@ -22,6 +22,8 @@ export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) 
     `${3 + Math.max(1, Math.floor((boss.level || 1) / 2))}+ Crystals`,
     "Cosmetic Drop"
   ];
+  const phaseSteps = ["Active", "Wounded", "Enraged"];
+  const threatScore = phase === "Enraged" ? 100 : phase === "Wounded" ? 66 : 34;
 
   return (
     <div className={`panel boss-panel premium-boss-panel boss-phase-${phase.toLowerCase()} ${className}`.trim()}>
@@ -37,6 +39,14 @@ export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) 
       <div className="boss-phase-banner">
         <span>{phase} Phase</span>
         <strong>{phaseMessage}</strong>
+      </div>
+
+      <div className="boss-phase-track" aria-label={`Boss phase ${phase}`}>
+        {phaseSteps.map((step) => (
+          <span key={step} className={phaseSteps.indexOf(step) <= phaseSteps.indexOf(phase) ? "active" : ""}>
+            {step}
+          </span>
+        ))}
       </div>
 
       <div className="boss-showcase">
@@ -60,6 +70,31 @@ export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) 
 
       <div className="boss-health">
         <div style={{ width: `${hpPercent}%` }} />
+      </div>
+
+      <div className="boss-threat-meter">
+        <div>
+          <small>Threat Pressure</small>
+          <strong>{threatScore}%</strong>
+        </div>
+        <i aria-label={`Threat pressure ${threatScore}%`}>
+          <b style={{ width: `${threatScore}%` }} />
+        </i>
+      </div>
+
+      <div className="boss-telemetry-grid">
+        <span>
+          <small>Threat</small>
+          <strong>{phase}</strong>
+        </span>
+        <span>
+          <small>Element</small>
+          <strong>{boss.element || "Shadow"}</strong>
+        </span>
+        <span>
+          <small>Tier</small>
+          <strong>Lv {boss.level || 1}</strong>
+        </span>
       </div>
 
       <div className="boss-footer-grid">

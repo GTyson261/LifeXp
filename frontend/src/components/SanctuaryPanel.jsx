@@ -2,6 +2,10 @@ export default function SanctuaryPanel({ state, classMeta = {} }) {
   const primaryMeta = classMeta[state?.primaryClass] || { label: state?.primaryClass || "Unknown", icon: "✨" };
   const activeMeta = classMeta[state?.activeClass] || { label: state?.activeClass || "Unknown", icon: "✨" };
   const resetStatus = getResetStatus(state?.lastDailyReset);
+  const energy = Math.max(0, Math.min(100, state?.energy ?? 100));
+  const penalty = state?.xpPenaltyActionsLeft ?? 0;
+  const stability = Math.max(0, Math.min(100, energy - penalty * 8 + (state?.loginStreak ?? 1) * 4));
+  const dailyState = resetStatus === "Ready" ? "Reset Ready" : "Cycle Active";
 
   return (
     <div className="panel sanctuary-status premium-sanctuary-panel">
@@ -15,6 +19,33 @@ export default function SanctuaryPanel({ state, classMeta = {} }) {
         <div className="sanctuary-chip">
           {primaryMeta.icon} {primaryMeta.label}
         </div>
+      </div>
+
+      <div className="sanctuary-command-strip">
+        <span>
+          <small>Reset Window</small>
+          <strong>{resetStatus}</strong>
+        </span>
+        <span>
+          <small>Penalty</small>
+          <strong>{penalty > 0 ? `${penalty} actions` : "Clear"}</strong>
+        </span>
+        <span>
+          <small>Energy</small>
+          <strong>{energy}%</strong>
+          <i><b style={{ width: `${energy}%` }} /></i>
+        </span>
+      </div>
+
+      <div className="sanctuary-system-card" aria-label="Sanctuary system status">
+        <div>
+          <small>System Stability</small>
+          <strong>{stability}%</strong>
+        </div>
+        <i aria-hidden="true">
+          <b style={{ width: `${stability}%` }} />
+        </i>
+        <span>{dailyState} · {penalty > 0 ? "Penalty active" : "No penalties"}</span>
       </div>
 
       <div className="sanctuary-stat-grid">

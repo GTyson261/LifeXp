@@ -235,7 +235,7 @@ public class FriendlyBattleService {
         }
 
         touchRoom(room);
-        room.log.add(playerFor(room, account.username).displayName + " locked in " + moveLabel(normalizedMove) + ".");
+        room.log.add(playerFor(room, account.username).displayName + " locked in a move.");
 
         if (room.guest != null && !room.hostMove.isBlank() && !room.guestMove.isBlank()) {
             resolveRound(room);
@@ -245,11 +245,48 @@ public class FriendlyBattleService {
         return toResponse(room, account.username);
     }
 
+    public synchronized FriendlyBattleResponse leaveRoom(UserAccount account, String roomCode) {
+        FriendlyBattleRoom room = requireRoom(roomCode);
+        FriendlyBattlePlayer leavingPlayer = playerFor(room, account.username);
+
+        if ("WAITING".equals(room.status) || room.guest == null) {
+            rooms.remove(room.code);
+            battleRoomSnapshotRepository.deleteById(room.code);
+            return null;
+        }
+
+        if ("COMPLETE".equals(room.status)) {
+            return null;
+        }
+
+        boolean hostLeft = room.host.username.equals(account.username);
+        if (hostLeft) {
+            room.guestWins = 3;
+        } else {
+            room.hostWins = 3;
+        }
+
+        room.hostMove = "";
+        room.guestMove = "";
+        room.status = "COMPLETE";
+        room.lastResult = leavingPlayer.displayName + " left the battle. The match ended by forfeit.";
+        room.log.add(0, room.lastResult);
+        trimLog(room);
+        touchRoom(room);
+        saveBattleHistory(room);
+        persistRoom(room);
+        return null;
+    }
+
     private void resolveRound(FriendlyBattleRoom room) {
         room.round += 1;
 
-        int hostScore = moveScore(room.host, room.hostMove) + counterBonus(room.hostMove, room.guestMove) + random.nextInt(7);
-        int guestScore = moveScore(room.guest, room.guestMove) + counterBonus(room.guestMove, room.hostMove) + random.nextInt(7);
+        int hostScore = moveScore(room.host, room.hostMove, room.hostPreviousMove)
+                + counterBonus(room.hostMove, room.guestMove)
+                + random.nextInt(4);
+        int guestScore = moveScore(room.guest, room.guestMove, room.guestPreviousMove)
+                + counterBonus(room.guestMove, room.hostMove)
+                + random.nextInt(4);
 
         String result;
         if (hostScore == guestScore) {
@@ -262,9 +299,13 @@ public class FriendlyBattleService {
             result = "Round " + room.round + ": " + room.guest.displayName + " edged out " + room.host.displayName + ".";
         }
 
-        room.lastResult = result + " " + room.host.displayName + " " + hostScore + " vs " + room.guest.displayName + " " + guestScore + ".";
+        room.lastResult = result
+                + " " + moveLabel(room.hostMove) + " " + hostScore
+                + " vs " + moveLabel(room.guestMove) + " " + guestScore + ".";
         room.log.add(0, room.lastResult);
         trimLog(room);
+        room.hostPreviousMove = room.hostMove;
+        room.guestPreviousMove = room.guestMove;
         room.hostMove = "";
         room.guestMove = "";
         room.status = room.hostWins >= 3 || room.guestWins >= 3 ? "COMPLETE" : "READY";
@@ -375,27 +416,40 @@ public class FriendlyBattleService {
         room.historySaved = true;
     }
 
-    private int moveScore(FriendlyBattlePlayer player, String move) {
-        int base = player.level * 8 + player.classMastery / 8 + player.energy / 5 + player.bossesDefeated * 4;
+    private int moveScore(FriendlyBattlePlayer player, String move, String previousMove) {
+        int base = 50 + playerBattleModifier(player);
         switch (move) {
             case "POWER":
-                return base + 18 + player.level;
+                return base + 4 + repeatMovePenalty(move, previousMove);
             case "FOCUS":
-                return base + 14 + player.skillPoints * 3;
+                return base + repeatMovePenalty(move, previousMove);
             case "GUARD":
-                return base + 12 + player.energy / 4;
+                return base + 1 + repeatMovePenalty(move, previousMove);
             case "BURST":
-                return base + 10 + player.bossesDefeated * 5 + random.nextInt(12);
+                return base + 3 + repeatMovePenalty(move, previousMove);
             default:
                 return base;
         }
     }
 
+    private int playerBattleModifier(FriendlyBattlePlayer player) {
+        int levelBonus = Math.min(5, Math.max(0, player.level - 1) / 2);
+        int masteryBonus = Math.min(4, player.classMastery / 25);
+        int skillBonus = Math.min(3, player.skillPoints);
+        int bossBonus = Math.min(3, player.bossesDefeated);
+        int energyBonus = player.energy >= 75 ? 2 : player.energy >= 40 ? 1 : 0;
+        return levelBonus + masteryBonus + skillBonus + bossBonus + energyBonus;
+    }
+
+    private int repeatMovePenalty(String move, String previousMove) {
+        return move.equals(previousMove) ? -5 : 0;
+    }
+
     private int counterBonus(String move, String opponentMove) {
-        if (move.equals("FOCUS") && opponentMove.equals("POWER")) return 10;
-        if (move.equals("POWER") && opponentMove.equals("GUARD")) return 8;
-        if (move.equals("GUARD") && opponentMove.equals("BURST")) return 10;
-        if (move.equals("BURST") && opponentMove.equals("FOCUS")) return 8;
+        if (move.equals("FOCUS") && opponentMove.equals("POWER")) return 12;
+        if (move.equals("POWER") && opponentMove.equals("GUARD")) return 12;
+        if (move.equals("GUARD") && opponentMove.equals("BURST")) return 12;
+        if (move.equals("BURST") && opponentMove.equals("FOCUS")) return 12;
         return 0;
     }
 
@@ -532,6 +586,8 @@ public class FriendlyBattleService {
         int guestWins = 0;
         String hostMove = "";
         String guestMove = "";
+        String hostPreviousMove = "";
+        String guestPreviousMove = "";
         String lastResult = "";
         String createdAt = "";
         String lastActivityAt = "";

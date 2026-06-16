@@ -14,6 +14,9 @@ export default function ActivityPanel({
 }) {
   const energyAfter = Math.max(0, energy - energyCost);
   const canAffordEnergy = energy >= energyCost;
+  const selectedActivity = activities.find((activity) => activity.key === activityType) || activities[0];
+  const numericAmount = Math.max(0, Number(amount) || 0);
+  const estimatedXp = numericAmount > 0 ? Math.max(5, Math.round(numericAmount * (verified ? 1.35 : 1))) : 0;
 
   return (
     <form className="panel activity-panel premium-activity-panel" onSubmit={onSubmit}>
@@ -28,6 +31,22 @@ export default function ActivityPanel({
             <span>Energy After: {energyAfter}%</span>
           </div>
         </div>
+      </div>
+
+      <div className="activity-command-card">
+        <span>{selectedActivity?.icon || "🎯"}</span>
+        <div>
+          <small>Selected Action</small>
+          <strong>{selectedActivity?.label || "Action"}</strong>
+        </div>
+        <div>
+          <small>XP Forecast</small>
+          <strong>{estimatedXp ? `+${estimatedXp}` : "Awaiting input"}</strong>
+        </div>
+      </div>
+
+      <div className="activity-energy-meter" aria-label={`Energy after action ${energyAfter}%`}>
+        <i style={{ width: `${energyAfter}%` }} />
       </div>
 
       <label>

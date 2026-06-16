@@ -6,6 +6,12 @@ export default function ProfilePanel({ state, classMeta = {}, xpNeeded = 100, xp
   const completedClassQuests = (state?.dailyQuests || []).filter(
     (quest) => (quest.id || "").startsWith("class_") && quest.completed
   ).length;
+  const completionTitle = state?.bossesDefeated > 0 ? "Bossbreaker" : primaryMeta.archetype || "Gatebound Hero";
+  const level = state?.level || 1;
+  const profilePower = level * 120 + (state?.bossesDefeated || 0) * 75 + completedClassQuests * 45 + ownedCosmetics * 12;
+  const collectionTarget = Math.max(8, ownedCosmetics + 4);
+  const collectionPercent = Math.min(100, Math.round((ownedCosmetics / collectionTarget) * 100));
+  const nextLevelPercent = Math.max(0, Math.min(100, xpPercent || 0));
 
   function copyProfile() {
     const profileText = `${avatar.displayName || state?.playerName || "PlayerOne"} | Level ${state?.level || 1} ${primaryMeta.label || state?.primaryClass || "Novice"} | ${state?.xp || 0}/${xpNeeded} XP`;
@@ -32,6 +38,30 @@ export default function ProfilePanel({ state, classMeta = {}, xpNeeded = 100, xp
 
       <div className="profile-xp-track">
         <div style={{ width: `${xpPercent}%` }} />
+      </div>
+
+      <div className="profile-command-grid" aria-label="Profile command summary">
+        <div className="profile-command-card primary">
+          <small>Profile Power</small>
+          <strong>{profilePower}</strong>
+          <span>{completionTitle}</span>
+        </div>
+        <div className="profile-command-card">
+          <small>Next Level</small>
+          <strong>{nextLevelPercent}%</strong>
+          <span>{state?.xp || 0}/{xpNeeded} XP</span>
+        </div>
+        <div className="profile-command-card">
+          <small>Collection</small>
+          <strong>{collectionPercent}%</strong>
+          <span>{ownedCosmetics}/{collectionTarget} cosmetics</span>
+        </div>
+      </div>
+
+      <div className="profile-title-strip">
+        <span>{primaryMeta.world || "Awakening Gate"}</span>
+        <strong>{completionTitle}</strong>
+        <small>{state?.xp || 0}/{xpNeeded} XP</small>
       </div>
 
       <div className="profile-stat-grid">

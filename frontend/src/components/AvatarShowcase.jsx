@@ -92,6 +92,17 @@ export default function AvatarShowcase({
         <strong>Choose your path. Become legendary.</strong>
         <small>Your journey. Your story. Your world.</small>
 
+        <div className="showcase-season-strip">
+          <span>
+            <small>Classes</small>
+            <strong>{showcaseClasses.length}</strong>
+          </span>
+          <span>
+            <small>Active</small>
+            <strong>{classMeta[activeClass]?.label || "None"}</strong>
+          </span>
+        </div>
+
         <ul>
           {FEATURE_LABELS.map((label) => (
             <li key={label}>
@@ -116,9 +127,13 @@ export default function AvatarShowcase({
               style={{ "--showcase-color": meta.color || "#22d3ee" }}
               onClick={() => onClassSelect(className)}
             >
+              <span className="showcase-class-status">{isActive ? "Selected" : "Path"}</span>
               <span className="showcase-class-icon">{meta.icon || "+"}</span>
               <strong>{meta.label || className}</strong>
               <small>{meta.archetype || meta.world || "Hero"}</small>
+              <div className="showcase-class-footer">
+                <span>{meta.world || "Unknown World"}</span>
+              </div>
               <div className="showcase-avatar-window">
                 <AvatarPortrait avatar={avatar} color={meta.color || "#22d3ee"} />
               </div>

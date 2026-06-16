@@ -1,6 +1,11 @@
 
 
 export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], lootHistory = [] }) {
+  const rareDrops = lootHistory.filter((loot) => rarityClass(loot) !== "loot-common").length;
+  const vaultScore = lootHistory.reduce((sum, loot) => sum + rarityValue(loot), 0);
+  const dropStreak = Math.min(6, lastLootDrops.length || Math.min(lootHistory.length, bossesDefeated));
+  const rarePercent = lootHistory.length === 0 ? 0 : Math.round((rareDrops / lootHistory.length) * 100);
+
   return (
     <div className="panel loot-panel premium-loot-panel">
       <div className="section-heading-row">
@@ -15,12 +20,39 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
         </div>
       </div>
 
+      <div className="loot-command-strip">
+        <span>
+          <small>Boss Clears</small>
+          <strong>{bossesDefeated}</strong>
+        </span>
+        <span>
+          <small>Rare Finds</small>
+          <strong>{rareDrops}</strong>
+        </span>
+        <span>
+          <small>Vault Size</small>
+          <strong>{lootHistory.length}</strong>
+        </span>
+      </div>
+
+      <div className="loot-vault-card" aria-label="Loot vault status">
+        <div>
+          <small>Vault Score</small>
+          <strong>{vaultScore}</strong>
+        </div>
+        <i aria-hidden="true">
+          <b style={{ width: `${rarePercent}%` }} />
+        </i>
+        <span>{rarePercent}% rare+ history · {dropStreak} drop streak</span>
+      </div>
+
       {lastLootDrops.length > 0 ? (
         <div className="loot-burst premium-loot-burst">
           {lastLootDrops.map((loot, index) => (
             <div className={`loot-chip ${rarityClass(loot)}`} key={`${loot}-${index}`}>
               <span>{rarityIcon(loot)}</span>
               <strong>{loot}</strong>
+              <small>{rarityLabel(loot)}</small>
             </div>
           ))}
         </div>
@@ -41,7 +73,10 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
           lootHistory.slice(0, 6).map((loot, index) => (
             <div className="log-item loot-history-item" key={`${loot}-${index}`}>
               <span>{rarityIcon(loot)}</span>
-              {loot}
+              <div>
+                <strong>{loot}</strong>
+                <small>{rarityLabel(loot)}</small>
+              </div>
             </div>
           ))
         ) : (
@@ -50,6 +85,26 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
       </div>
     </div>
   );
+}
+
+function rarityValue(loot = "") {
+  const label = rarityLabel(loot);
+
+  if (label === "Legendary") return 120;
+  if (label === "Epic") return 75;
+  if (label === "Magic") return 45;
+
+  return 20;
+}
+
+function rarityLabel(loot = "") {
+  const value = loot.toLowerCase();
+
+  if (value.includes("legendary") || value.includes("mythic")) return "Legendary";
+  if (value.includes("epic") || value.includes("rare")) return "Epic";
+  if (value.includes("crystal") || value.includes("essence")) return "Magic";
+
+  return "Common";
 }
 
 function rarityClass(loot = "") {

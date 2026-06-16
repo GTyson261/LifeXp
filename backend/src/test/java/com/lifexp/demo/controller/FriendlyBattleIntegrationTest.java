@@ -52,7 +52,9 @@ class FriendlyBattleIntegrationTest {
         assertThat(active.path("code").asText()).isEqualTo(code);
         assertThat(snapshotRepository.findById(code)).isPresent();
 
-        postJson("/api/friendly-battle/rooms/" + code + "/move", hostToken, "{\"move\":\"POWER\",\"round\":0}");
+        JsonNode lockedMoveRoom = postJson("/api/friendly-battle/rooms/" + code + "/move", hostToken, "{\"move\":\"POWER\",\"round\":0}");
+        assertThat(lockedMoveRoom.path("log").toString()).contains("locked in a move");
+        assertThat(lockedMoveRoom.path("log").toString()).doesNotContain("Power Strike");
         postJsonExpectingBadRequest("/api/friendly-battle/rooms/" + code + "/move", hostToken, "{\"move\":\"GUARD\",\"round\":0}", "Move already locked");
         JsonNode roundOne = postJson("/api/friendly-battle/rooms/" + code + "/move", guestToken, "{\"move\":\"FOCUS\",\"round\":0}");
         postJsonExpectingBadRequest("/api/friendly-battle/rooms/" + code + "/move", hostToken, "{\"move\":\"BURST\",\"round\":0}", "Battle round changed");
@@ -68,6 +70,47 @@ class FriendlyBattleIntegrationTest {
         JsonNode history = getJson("/api/friendly-battle/history", hostToken);
         assertThat(history.size()).isGreaterThanOrEqualTo(1);
         assertThat(history.get(0).path("roomCode").asText()).isEqualTo(code);
+    }
+
+    @Test
+    void playerCanLeaveActiveRoomAndOpponentSeesForfeit() throws Exception {
+        String suffix = Long.toString(System.nanoTime(), 36);
+        String host = "leave_host_" + suffix;
+        String guest = "leave_guest_" + suffix;
+        String hostToken = register(host);
+        String guestToken = register(guest);
+
+        JsonNode created = postJson("/api/friendly-battle/rooms", hostToken, "{}");
+        String code = created.path("code").asText();
+        JsonNode joined = postJson("/api/friendly-battle/rooms/join", guestToken, "{\"code\":\"" + code + "\"}");
+
+        assertThat(joined.path("status").asText()).isEqualTo("READY");
+
+        postOk("/api/friendly-battle/rooms/" + code + "/leave", guestToken, "{}");
+        JsonNode roomAfterLeave = getJson("/api/friendly-battle/rooms/" + code, hostToken);
+
+        assertThat(roomAfterLeave.path("status").asText()).isEqualTo("COMPLETE");
+        assertThat(roomAfterLeave.path("lastResult").asText()).contains("left the battle");
+        assertThat(roomAfterLeave.path("hostWins").asInt()).isEqualTo(3);
+    }
+
+    @Test
+    void loggingActionDoesNotOverrideChosenClassTheme() throws Exception {
+        String suffix = Long.toString(System.nanoTime(), 36);
+        String token = register("explorer_" + suffix);
+
+        JsonNode explorer = postJson("/api/game/intro/class", token, "{\"className\":\"EXPLORER\"}");
+        assertThat(explorer.path("primaryClass").asText()).isEqualTo("EXPLORER");
+        assertThat(explorer.path("activeClass").asText()).isEqualTo("EXPLORER");
+
+        JsonNode updated = postJson(
+                "/api/game/activity",
+                token,
+                "{\"type\":\"coding\",\"amount\":10,\"summary\":\"Logged a quick build action\",\"verified\":true}"
+        );
+
+        assertThat(updated.path("primaryClass").asText()).isEqualTo("EXPLORER");
+        assertThat(updated.path("activeClass").asText()).isEqualTo("EXPLORER");
     }
 
     private String register(String username) throws Exception {
@@ -86,6 +129,14 @@ class FriendlyBattleIntegrationTest {
                 .getResponse()
                 .getContentAsString();
         return objectMapper.readTree(response);
+    }
+
+    private void postOk(String path, String token, String body) throws Exception {
+        mockMvc.perform(post(path)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token == null ? "" : "Bearer " + token)
+                        .content(body))
+                .andExpect(status().isOk());
     }
 
     private void postJsonExpectingBadRequest(String path, String token, String body, String messagePart) throws Exception {

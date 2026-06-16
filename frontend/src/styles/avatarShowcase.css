@@ -49,6 +49,41 @@
   line-height: 1.6;
 }
 
+.showcase-season-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.showcase-season-strip span {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.65rem 0.7rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.14), transparent 58%),
+    rgba(2, 6, 23, 0.58);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+}
+
+.showcase-season-strip small {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.64rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.showcase-season-strip strong {
+  margin: 0;
+  color: white;
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
 .avatar-showcase-rail ul {
   display: grid;
   gap: 1rem;
@@ -133,6 +168,28 @@
   box-shadow: 0 0 18px color-mix(in srgb, var(--showcase-color), transparent 62%);
 }
 
+.showcase-class-status,
+.showcase-class-footer {
+  position: relative;
+  z-index: 2;
+}
+
+.showcase-class-status {
+  justify-self: start;
+  padding: 0.3rem 0.52rem;
+  border-radius: 999px;
+  color: #e2e8f0;
+  font-size: 0.62rem;
+  font-weight: 950;
+  background: rgba(2, 6, 23, 0.62);
+  border: 1px solid color-mix(in srgb, var(--showcase-color), transparent 56%);
+}
+
+.showcase-class-card.active .showcase-class-status {
+  color: #bbf7d0;
+  border-color: rgba(34, 197, 94, 0.56);
+}
+
 .showcase-class-card strong,
 .showcase-class-card small,
 .showcase-class-icon {
@@ -152,6 +209,23 @@
   font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.showcase-class-footer {
+  margin-top: 0.45rem;
+}
+
+.showcase-class-footer span {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 0.28rem 0.48rem;
+  border-radius: 999px;
+  color: #cbd5e1;
+  font-size: 0.62rem;
+  font-weight: 900;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid color-mix(in srgb, var(--showcase-color), transparent 70%);
+  overflow-wrap: anywhere;
 }
 
 .showcase-avatar-window {

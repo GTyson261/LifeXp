@@ -49,9 +49,13 @@
 }
 
 .reward-burst span {
-  min-width: 128px;
-  padding: 0.65rem 0.85rem;
-  border-radius: 999px;
+  min-width: 132px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: center;
+  padding: 0.62rem 0.78rem;
+  border-radius: 8px;
   color: white;
   font-weight: 950;
   background:
@@ -61,6 +65,24 @@
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.36);
   animation: rewardFly 1.45s cubic-bezier(0.2, 0.84, 0.28, 1) both;
   animation-delay: calc(var(--reward-index, 0) * 0.09s);
+}
+
+.reward-burst small {
+  color: var(--lifexp-muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.reward-burst strong {
+  color: white;
+}
+
+.reward-burst .reward-crystals {
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+.reward-burst .reward-essence {
+  border-color: rgba(168, 85, 247, 0.55);
 }
 
 .boss-entrance,
@@ -101,8 +123,27 @@
   animation: bossCardSlam 1.2s cubic-bezier(0.18, 0.9, 0.24, 1) both;
 }
 
-.boss-entrance-card > span {
+.boss-entrance-sigil {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--class-color), transparent 58%), transparent 64%),
+    rgba(15, 23, 42, 0.82);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 42%);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--class-color), transparent 58%);
+}
+
+.boss-entrance-sigil span {
   font-size: 2.4rem;
+}
+
+.boss-entrance-copy {
+  display: grid;
+  gap: 0.28rem;
 }
 
 .boss-entrance-card strong,
@@ -120,6 +161,40 @@
   font-weight: 900;
 }
 
+.boss-threat-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.62rem 0.72rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+}
+
+.boss-threat-strip span,
+.boss-threat-strip strong {
+  color: #e2e8f0;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.boss-threat-strip div {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.92);
+}
+
+.boss-threat-strip i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22d3ee, #facc15, #fb7185);
+  box-shadow: 0 0 16px rgba(251, 113, 133, 0.38);
+}
+
 .victory-screen,
 .daily-reward-screen {
   background: rgba(2, 6, 23, 0.72);
@@ -128,7 +203,138 @@
 
 .victory-card,
 .daily-reward-card {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.07), transparent 26%),
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--class-color), transparent 72%), transparent 42%),
+    rgba(2, 6, 23, 0.95);
   animation: rewardCardIn 0.36s ease both;
+}
+
+.victory-title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.victory-grade {
+  width: 86px;
+  min-height: 86px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  border-radius: 8px;
+  color: #020617;
+  background: linear-gradient(135deg, var(--lifexp-gold), white);
+  border: 1px solid rgba(250, 204, 21, 0.72);
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.24);
+}
+
+.victory-grade small {
+  font-size: 0.62rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.victory-grade strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.victory-reward-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.victory-reward-strip span {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem 0.72rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.76);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 72%);
+}
+
+.victory-reward-strip small,
+.victory-loot-grid small {
+  color: var(--lifexp-muted);
+  font-size: 0.66rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.victory-reward-strip strong {
+  color: white;
+}
+
+.daily-streak-track {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin: 0.15rem 0 0.35rem;
+}
+
+.daily-reward-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 0.55rem;
+}
+
+.daily-reward-status span {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.74);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+}
+
+.daily-reward-status small {
+  color: var(--lifexp-muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.daily-reward-status strong {
+  color: white;
+}
+
+.daily-reward-status i {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.9);
+}
+
+.daily-reward-status b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--lifexp-gold), white);
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.28);
+}
+
+.daily-streak-track span {
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--lifexp-muted);
+  font-size: 0.78rem;
+  font-weight: 950;
+  background: rgba(15, 23, 42, 0.74);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.daily-streak-track span.active {
+  color: #020617;
+  background: linear-gradient(135deg, var(--lifexp-gold), white);
+  border-color: rgba(250, 204, 21, 0.7);
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.28);
 }
 
 .victory-loot-grid,
@@ -157,8 +363,37 @@
   animation-delay: calc(var(--loot-index, 0) * 0.08s);
 }
 
+.victory-loot-grid .victory-loot-card {
+  justify-items: start;
+}
+
+.victory-loot-grid .loot-tier-legendary {
+  border-color: rgba(250, 204, 21, 0.68);
+  box-shadow: 0 0 24px rgba(250, 204, 21, 0.18);
+}
+
+.victory-loot-grid .loot-tier-epic {
+  border-color: rgba(168, 85, 247, 0.62);
+}
+
+.victory-loot-grid .loot-tier-rare {
+  border-color: rgba(34, 211, 238, 0.58);
+}
+
 .daily-reward-grid strong {
   font-size: 1.65rem;
+}
+
+.daily-reward-grid .daily-reward-crystals {
+  border-color: rgba(34, 211, 238, 0.55);
+}
+
+.daily-reward-grid .daily-reward-essence {
+  border-color: rgba(168, 85, 247, 0.55);
+}
+
+.daily-reward-grid .daily-reward-gold {
+  border-color: rgba(250, 204, 21, 0.55);
 }
 
 .daily-reward-grid small {

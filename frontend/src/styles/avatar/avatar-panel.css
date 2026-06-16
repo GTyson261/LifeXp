@@ -138,6 +138,38 @@
   margin-top: 0.15rem;
 }
 
+.avatar-identity-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.75rem 0 0.65rem;
+}
+
+.avatar-identity-strip span {
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.68rem 0.7rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 88%), transparent 58%),
+    rgba(2, 6, 23, 0.68);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 72%);
+}
+
+.avatar-identity-strip small {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.avatar-identity-strip strong {
+  color: white;
+  overflow-wrap: anywhere;
+}
+
 .avatar-panel .avatar-loadout-stat {
   min-height: 72px;
   display: flex;
@@ -159,6 +191,45 @@
   margin-top: 0.2rem;
   font-size: clamp(0.92rem, 1.6vw, 1.12rem);
   line-height: 1.16;
+}
+
+.avatar-panel .avatar-loadout-stat small {
+  margin-top: 0.28rem;
+  color: color-mix(in srgb, var(--class-color), white 28%);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.avatar-loadout-score {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+}
+
+.avatar-loadout-score span {
+  color: var(--lifexp-muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.avatar-loadout-score i {
+  display: block;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.13);
+}
+
+.avatar-loadout-score b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, var(--class-color), white);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--class-color), transparent 48%);
 }
 
 .avatar-panel .avatar-evolution-panel {

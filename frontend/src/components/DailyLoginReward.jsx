@@ -6,6 +6,8 @@ export default function DailyLoginReward({ state, onClaim, onDismiss }) {
   const gold = 20 + day * 8;
   const crystals = day >= 3 ? 2 : 1;
   const essence = day >= 5 ? 2 : day >= 2 ? 1 : 0;
+  const nextDay = day === 7 ? 1 : day + 1;
+  const streakPower = Math.min(100, Math.round((day / 7) * 100));
 
   return (
     <div className="daily-reward-screen" role="dialog" aria-modal="true">
@@ -14,10 +16,33 @@ export default function DailyLoginReward({ state, onClaim, onDismiss }) {
         <h2>Day {day} Streak Reward</h2>
         <p>Claim today’s boost before jumping back into quests.</p>
 
+        <div className="daily-reward-status">
+          <span>
+            <small>Streak Power</small>
+            <strong>{streakPower}%</strong>
+            <i><b style={{ width: `${streakPower}%` }} /></i>
+          </span>
+          <span>
+            <small>Next Cache</small>
+            <strong>Day {nextDay}</strong>
+          </span>
+        </div>
+
+        <div className="daily-streak-track" aria-label={`Day ${day} of 7 reward track`}>
+          {Array.from({ length: 7 }, (_, index) => (
+            <span
+              key={index + 1}
+              className={index + 1 <= day ? "active" : ""}
+            >
+              {index + 1}
+            </span>
+          ))}
+        </div>
+
         <div className="daily-reward-grid">
-          <span><strong>{gold}</strong><small>Gold</small></span>
-          <span><strong>{crystals}</strong><small>Crystals</small></span>
-          <span><strong>{essence}</strong><small>Essence</small></span>
+          <span className="daily-reward-gold"><strong>{gold}</strong><small>Gold</small></span>
+          <span className="daily-reward-crystals"><strong>{crystals}</strong><small>Crystals</small></span>
+          <span className="daily-reward-essence"><strong>{essence}</strong><small>Essence</small></span>
         </div>
 
         <div className="daily-reward-actions">

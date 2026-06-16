@@ -97,6 +97,15 @@ export default function AvatarCustomizer({
     : hasUnsavedChanges
       ? "Save Avatar Changes"
       : "Avatar Saved";
+  const identityFields = [
+    avatarDraft?.displayName,
+    avatarDraft?.pronouns,
+    avatarDraft?.skinTone,
+    avatarDraft?.hairColor,
+    avatarDraft?.hairStyle,
+    avatarDraft?.outfit
+  ];
+  const forgeCompletion = Math.round((identityFields.filter(Boolean).length / identityFields.length) * 100);
 
   return (
     <div className="panel avatar-customizer premium-customizer">
@@ -107,6 +116,36 @@ export default function AvatarCustomizer({
           <h3>Avatar Forge</h3>
           <p>You are the hero of this story.</p>
         </div>
+      </div>
+
+      <div className="forge-status-strip">
+        <span>
+          <small>Model</small>
+          <strong>{selectedModelType}</strong>
+        </span>
+        <span>
+          <small>Build</small>
+          <strong>{selectedBodyType}</strong>
+        </span>
+        <span>
+          <small>Outfit</small>
+          <strong>{avatarDraft?.outfit || "Default"}</strong>
+        </span>
+        <span>
+          <small>Save State</small>
+          <strong>{saveStatus === "saving" ? "Syncing" : hasUnsavedChanges ? "Draft" : "Saved"}</strong>
+        </span>
+      </div>
+
+      <div className="forge-synthesis-card" aria-label="Avatar forge synthesis">
+        <div>
+          <small>Forge Sync</small>
+          <strong>{forgeCompletion}%</strong>
+        </div>
+        <i aria-hidden="true">
+          <b style={{ width: `${forgeCompletion}%` }} />
+        </i>
+        <span>{hasUnsavedChanges ? "Draft changes pending" : "Avatar identity saved"} · {selectedModelType} {selectedBodyType}</span>
       </div>
 
       <section className="customizer-section">

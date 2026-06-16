@@ -25,6 +25,11 @@ function storeSession(session) {
   return session;
 }
 
+async function parseJsonOrNull(response) {
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
 async function request(path, options = {}) {
   const token = localStorage.getItem(TOKEN_KEY);
   let response;
@@ -51,7 +56,7 @@ async function request(path, options = {}) {
     throw new Error(`API error: ${response.status}`);
   }
 
-  return response.json();
+  return parseJsonOrNull(response);
 }
 
 async function battleRequest(path, options = {}) {
@@ -87,7 +92,7 @@ async function battleRequest(path, options = {}) {
     throw new Error(message);
   }
 
-  return response.json();
+  return parseJsonOrNull(response);
 }
 
 async function friendsRequest(path = "", options = {}) {
@@ -123,7 +128,7 @@ async function friendsRequest(path = "", options = {}) {
     throw new Error(message);
   }
 
-  return response.json();
+  return parseJsonOrNull(response);
 }
 
 async function authRequest(path, payload) {
@@ -269,6 +274,12 @@ export function chooseFriendlyBattleMove(code, move, round = 0) {
   return battleRequest(`/rooms/${code}/move`, {
     method: "POST",
     body: JSON.stringify({ move, round })
+  });
+}
+
+export function leaveFriendlyBattleRoom(code) {
+  return battleRequest(`/rooms/${code}/leave`, {
+    method: "POST"
   });
 }
 

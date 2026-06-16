@@ -24,6 +24,14 @@
     justify-content: flex-start;
   }
 
+  .hud-status-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hud-mission-card {
+    grid-column: 1 / -1;
+  }
+
   .hero-panel,
   .avatar-showcase-panel,
   .avatar-panel,
@@ -104,6 +112,27 @@
   .view-avatar .avatar-panel .premium-avatar {
     margin-top: 0.15rem;
   }
+
+  .skill-command-strip,
+  .weekly-command-strip,
+  .sanctuary-command-strip,
+  .settings-status-strip,
+  .economy-command-strip,
+  .quest-command-strip,
+  .forge-status-strip,
+  .battle-prep-grid,
+  .quest-intel-grid,
+  .skill-planner-strip,
+  .profile-command-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .battle-prep-card.primary,
+  .quest-intel-card.primary,
+  .skill-planner-card.primary,
+  .profile-command-card.primary {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 700px) {
@@ -140,7 +169,7 @@
   .hud-stat {
     min-width: 0;
     padding: 0.7rem;
-    border-radius: 16px;
+    border-radius: 8px;
   }
 
   .hud-stat strong {
@@ -151,7 +180,22 @@
     min-width: 0;
     min-height: 44px;
     padding: 0.6rem 0.75rem;
-    border-radius: 16px;
+    border-radius: 8px;
+  }
+
+  .equipment-score-strip,
+  .inventory-summary-strip,
+  .avatar-identity-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hud-status-rail {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+
+  .hud-mission-card {
+    grid-column: auto;
   }
 
   .account-strip {
@@ -226,12 +270,45 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .focus-run-stats,
+  .campaign-telemetry-grid,
+  .boss-telemetry-grid,
+  .boss-phase-track,
+  .world-route-console,
+  .world-command-strip,
+  .battle-command-strip,
+  .mastery-command-strip,
+  .loot-command-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .profile-title-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .focus-actions button {
     flex-basis: 100%;
   }
 
   .companion-panel {
     grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .companion-status-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .victory-title-row,
+  .victory-reward-strip,
+  .daily-reward-status,
+  .battle-recap-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .victory-grade,
+  .battle-recap-grade {
+    justify-self: start;
   }
 
   .focus-mode-panel,
@@ -241,16 +318,46 @@
     grid-column: 1 / -1;
   }
 
+  .activity-summary-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .battle-connect-grid,
   .friends-grid,
   .friend-request-grid,
   .friend-social-grid,
   .battle-invite-strip,
+  .battle-lobby-status,
+  .battle-prep-grid,
+  .quest-intel-grid,
+  .skill-planner-strip,
+  .profile-command-grid,
   .matchmaking-card,
   .social-toast-card,
+  .battle-empty-card,
   .friendly-battle-arena,
-  .battle-move-grid {
+  .battle-move-grid,
+  .battle-round-track {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .activity-command-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .activity-command-card > div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .boss-showcase {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+
+  .quest-ring {
+    width: 64px;
+    height: 64px;
   }
 
   .battle-invite-list {
@@ -307,6 +414,34 @@
     width: 100%;
   }
 
+  .friendly-battle-panel .section-heading-row,
+  .world-map-panel .section-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .battle-code-chip {
+    width: 100%;
+  }
+
+  .battle-log-list span {
+    flex-basis: 100%;
+  }
+
+  .world-requirement-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .world-arena-art {
+    min-height: 82px;
+  }
+
+  .world-arena-art span {
+    width: 50px;
+    height: 50px;
+    font-size: 1.45rem;
+  }
+
   .companion-sprite {
     width: 62px;
     height: 62px;
@@ -338,7 +473,7 @@
 
   .mobile-nav-button {
     min-width: 0;
-    min-height: 48px;
+    min-height: 52px;
     display: grid;
     place-items: center;
     gap: 0.1rem;
@@ -361,10 +496,25 @@
     white-space: nowrap;
   }
 
+  .mobile-nav-button small {
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--lifexp-muted);
+    font-size: 0.48rem;
+    font-weight: 850;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .mobile-nav-button.active {
     color: white;
     border-color: color-mix(in srgb, var(--class-color), transparent 56%);
     background: color-mix(in srgb, var(--class-color), transparent 84%);
+  }
+
+  .mobile-nav-button.active small {
+    color: color-mix(in srgb, var(--class-color), white 48%);
   }
 
   .profile-hero-row {
@@ -381,6 +531,22 @@
   .compact-mobile .quest-card,
   .compact-mobile .weekly-quest {
     padding: 0.7rem;
+  }
+
+  .skill-command-strip,
+  .weekly-command-strip,
+  .sanctuary-command-strip,
+  .settings-status-strip,
+  .economy-command-strip,
+  .quest-command-strip,
+  .forge-status-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-intel-card.primary,
+  .skill-planner-card.primary,
+  .profile-command-card.primary {
+    grid-column: auto;
   }
 
   .dashboard-grid.view-avatar > .panel {
@@ -484,6 +650,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .inventory-summary-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .avatar-card-header {
     align-items: flex-start;
     flex-direction: column;
@@ -510,6 +680,11 @@
 
   .avatar-panel .avatar-loadout-stat strong {
     font-size: 0.9rem;
+  }
+
+  .equipment-score-strip,
+  .avatar-identity-strip {
+    grid-template-columns: 1fr;
   }
 
   .avatar-panel .avatar-evolution-current,

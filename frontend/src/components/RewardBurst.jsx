@@ -11,8 +11,13 @@ export default function RewardBurst({ reward }) {
   return (
     <div className="reward-burst" aria-live="polite">
       {particles.map((item, index) => (
-        <span key={item.label} style={{ "--reward-index": index }}>
-          +{item.value} {item.label}
+        <span
+          key={item.label}
+          className={`reward-particle reward-${item.label.toLowerCase()}`}
+          style={{ "--reward-index": index }}
+        >
+          <small>{item.label}</small>
+          <strong>+{item.value}</strong>
         </span>
       ))}
     </div>

@@ -32,8 +32,10 @@ export default function ShopPanel({ items = [], onBuyItem }) {
 }
 
 function ShopItemCard({ item, onBuyItem }) {
+  const rarity = itemRarity(item);
+
   return (
-    <div className="shop-card premium-shop-card">
+    <div className={`shop-card premium-shop-card rarity-${rarity.toLowerCase()}`}>
       <div className="shop-item-icon">
         {itemIcon(item.type)}
       </div>
@@ -42,6 +44,11 @@ function ShopItemCard({ item, onBuyItem }) {
         <div className="shop-item-title-row">
           <strong>{item.name}</strong>
           <span className="shop-item-type">{item.type}</span>
+        </div>
+
+        <div className="shop-rarity-row">
+          <span>{rarity}</span>
+          <small>{item.currency}</small>
         </div>
 
         <p>{item.description}</p>
@@ -59,6 +66,17 @@ function ShopItemCard({ item, onBuyItem }) {
       </button>
     </div>
   );
+}
+
+function itemRarity(item = {}) {
+  const cost = Number(item.cost) || 0;
+  const currency = String(item.currency || "").toLowerCase();
+
+  if (currency.includes("essence") || cost >= 250) return "Mythic";
+  if (currency.includes("crystal") || cost >= 150) return "Epic";
+  if (cost >= 75) return "Rare";
+
+  return "Common";
 }
 
 function itemIcon(type = "") {

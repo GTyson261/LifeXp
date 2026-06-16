@@ -1,5 +1,6 @@
 export default function AchievementPanel({ achievements = [] }) {
   const unlockedCount = achievements.filter((achievement) => achievement.unlocked).length;
+  const unlockPercent = achievements.length ? Math.round((unlockedCount / achievements.length) * 100) : 0;
 
   return (
     <div className="panel achievements-panel premium-achievements-panel">
@@ -14,6 +15,10 @@ export default function AchievementPanel({ achievements = [] }) {
         </div>
       </div>
 
+      <div className="achievement-progress-track">
+        <div style={{ width: `${unlockPercent}%` }} />
+      </div>
+
       <div className="achievement-list">
         {achievements.map((achievement) => (
           <div
@@ -22,6 +27,7 @@ export default function AchievementPanel({ achievements = [] }) {
           >
             <span>{achievement.unlocked ? "🏆" : "🔒"}</span>
             <div>
+              <small>{achievement.unlocked ? "Unlocked" : "Locked"}</small>
               <strong>{achievement.name}</strong>
               <p>{achievement.description}</p>
             </div>

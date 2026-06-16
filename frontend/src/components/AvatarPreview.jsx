@@ -28,6 +28,18 @@ export default function AvatarPreview({
 
   const currentEvolution = getEvolution(activeClass, state?.level || 1);
   const nextEvolution = getNextEvolution(activeClass, state?.level || 1);
+  const avatarLevel = Number(state?.level || 1);
+  const avatarPower = avatarLevel * 120 + Number(state?.skillPoints || 0) * 40 + Math.floor(Number(state?.xp || 0) / 10);
+  const loadoutSlots = [
+    avatar?.outfit,
+    avatar?.hairStyle,
+    avatar?.bodyType,
+    equippedAura,
+    equippedFrame,
+    avatar?.pronouns
+  ];
+  const filledLoadout = loadoutSlots.filter(Boolean).length;
+  const loadoutPercent = Math.round((filledLoadout / loadoutSlots.length) * 100);
 
   return (
     <div className={`panel avatar-panel ${frameClass(equippedFrame)} ${className}`.trim()}>
@@ -60,6 +72,25 @@ export default function AvatarPreview({
         </button>
       </div>
 
+      <div className="avatar-identity-strip" aria-label="Avatar identity summary">
+        <span>
+          <small>Level</small>
+          <strong>{avatarLevel}</strong>
+        </span>
+        <span>
+          <small>Power</small>
+          <strong>{avatarPower}</strong>
+        </span>
+        <span>
+          <small>Evolution</small>
+          <strong>{currentEvolution?.title || "Novice"}</strong>
+        </span>
+        <span>
+          <small>Loadout</small>
+          <strong>{loadoutPercent}%</strong>
+        </span>
+      </div>
+
       <div className={`avatar-stage avatar-stage-${avatarMode}`}>
         {avatarMode === "live" ? (
           <FakeAvatar
@@ -82,12 +113,18 @@ export default function AvatarPreview({
         )}
       </div>
       <div className="avatar-loadout-grid">
-        <LoadoutStat label="Outfit" value={avatar?.outfit || "Novice Jacket"} />
-        <LoadoutStat label="Hair" value={avatar?.hairStyle || "Fade"} />
-        <LoadoutStat label="Body" value={avatar?.bodyType || "Average"} />
-        <LoadoutStat label="Aura" value={equippedAura} />
-        <LoadoutStat label="Frame" value={equippedFrame} />
-        <LoadoutStat label="Pronouns" value={avatar?.pronouns || "they/them"} />
+        <LoadoutStat label="Outfit" value={avatar?.outfit || "Novice Jacket"} status="Hero model" />
+        <LoadoutStat label="Hair" value={avatar?.hairStyle || "Fade"} status="Silhouette" />
+        <LoadoutStat label="Body" value={avatar?.bodyType || "Average"} status="Rig profile" />
+        <LoadoutStat label="Aura" value={equippedAura} status="Battle FX" />
+        <LoadoutStat label="Frame" value={equippedFrame} status="Profile art" />
+        <LoadoutStat label="Pronouns" value={avatar?.pronouns || "they/them"} status="Identity" />
+      </div>
+      <div className="avatar-loadout-score" aria-hidden="true">
+        <span>Loadout Sync</span>
+        <i>
+          <b style={{ width: `${loadoutPercent}%` }} />
+        </i>
       </div>
       <div className="avatar-evolution-panel">
         <h4>Evolution Path</h4>
@@ -114,11 +151,12 @@ export default function AvatarPreview({
   );
 }
 
-export function LoadoutStat({ label, value }) {
+export function LoadoutStat({ label, value, status }) {
   return (
     <div className="avatar-loadout-stat">
       <span>{label}</span>
       <strong>{value}</strong>
+      {status && <small>{status}</small>}
     </div>
   );
 }

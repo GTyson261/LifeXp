@@ -42,6 +42,14 @@ export default function TimerPanel({
       <div className="timer-display premium-timer-display">
         <span>{selectedActivity?.icon || "⏱️"}</span>
         <strong>{formatTime(timerSeconds)}</strong>
+        <small>{timerRunning ? "Verified session recording" : "Ready for verified XP"}</small>
+      </div>
+
+      <div className="timer-signal-row" aria-hidden="true">
+        <span className={timerRunning ? "active" : ""} />
+        <span className={timerRunning ? "active" : ""} />
+        <span className={timerRunning ? "active" : ""} />
+        <span />
       </div>
 
       {!timerRunning ? (

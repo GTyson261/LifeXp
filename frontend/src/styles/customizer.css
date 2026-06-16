@@ -69,6 +69,91 @@
     rgba(2, 6, 23, 0.78);
 }
 
+.forge-status-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.8rem;
+}
+
+.forge-status-strip span {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.68rem 0.72rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 88%), transparent 58%),
+    rgba(2, 6, 23, 0.66);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 72%);
+}
+
+.forge-status-strip small {
+  color: var(--lifexp-muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.forge-status-strip strong {
+  color: white;
+  overflow-wrap: anywhere;
+}
+
+.forge-synthesis-card {
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+  margin-bottom: 0.85rem;
+  padding: 0.78rem 0.85rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 84%), transparent 56%),
+    rgba(2, 6, 23, 0.7);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 58%);
+}
+
+.forge-synthesis-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.forge-synthesis-card small {
+  color: var(--lifexp-muted);
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.forge-synthesis-card strong {
+  color: white;
+}
+
+.forge-synthesis-card span {
+  color: var(--lifexp-muted);
+  font-size: 0.78rem;
+}
+
+.forge-synthesis-card i {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.forge-synthesis-card b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, var(--class-color), white);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--class-color), transparent 48%);
+}
+
 .choice-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));

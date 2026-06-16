@@ -53,6 +53,7 @@ import {
   joinFriendlyBattleRoom,
   getFriendlyBattleRoom,
   chooseFriendlyBattleMove,
+  leaveFriendlyBattleRoom,
   getFriendlyBattleInvites,
   getActiveFriendlyBattleRoom,
   joinFriendlyBattleMatchmaking,
@@ -587,11 +588,21 @@ export default function App() {
     return (
       <div className="loading-screen loading-error-screen">
         <div className="loading-error-card">
-          <p className="eyebrow">Connection Needed</p>
-          <h1>LifeXP backend is offline</h1>
-          <p>
-            Start the Spring Boot backend on port 8080, then retry the dashboard.
-          </p>
+          <div className="boot-card-header">
+            <span>!</span>
+            <div>
+              <p className="eyebrow">Connection Needed</p>
+              <h1>LifeXP backend is offline</h1>
+              <p>
+                Start the Spring Boot backend on port 8080, then retry the dashboard.
+              </p>
+            </div>
+          </div>
+          <div className="boot-status-grid">
+            <span><small>Frontend</small><strong>Online</strong></span>
+            <span><small>Backend</small><strong>Offline</strong></span>
+            <span><small>Port</small><strong>8080</strong></span>
+          </div>
           <button type="button" onClick={loadGame}>
             Retry Connection
           </button>
@@ -605,13 +616,29 @@ export default function App() {
   }
 
   if (!state) {
-    return <div className="loading-screen">Booting LifeXP...</div>;
+    return (
+      <div className="loading-screen">
+        <div className="boot-card">
+          <p className="eyebrow">Live Season Build</p>
+          <h1>Booting LifeXP</h1>
+          <div className="boot-progress-track">
+            <span />
+          </div>
+          <div className="boot-status-grid">
+            <span><small>Auth</small><strong>Linked</strong></span>
+            <span><small>Save</small><strong>Loading</strong></span>
+            <span><small>World</small><strong>Syncing</strong></span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  const activeClass = state.activeClass || "NOVICE";
+  const activeClass = state.primaryClass || state.activeClass || "NOVICE";
   const meta = CLASS_META[activeClass] || CLASS_META.NOVICE;
   const xpNeeded = state.level * 100;
   const xpPercent = Math.min(100, Math.round((state.xp / xpNeeded) * 100));
+  const navSignals = getDashboardNavSignals(state, activeClass);
 
   function showXp(xp) {
     setFloatingXp(`+${xp} XP`);
@@ -893,13 +920,36 @@ export default function App() {
   }
 
   async function handleRefreshBattleRoom(options = {}) {
-    if (!battleRoom?.code) return;
+    if (!battleRoom?.code) {
+      await handleReconnectBattle();
+      return;
+    }
 
     try {
       if (!options.quiet) setBattleError("");
       setBattleRoom(await getFriendlyBattleRoom(battleRoom.code));
+      if (!options.quiet) {
+        setSocialToast({ title: "Battle refreshed", message: "Room state is up to date." });
+      }
     } catch (error) {
       if (!options.quiet) setBattleError(error.message || "Could not refresh battle room.");
+    }
+  }
+
+  async function handleLeaveBattleRoom() {
+    if (!battleRoom?.code) return;
+
+    try {
+      setBattleError("");
+      await leaveFriendlyBattleRoom(battleRoom.code);
+      setBattleRoom(null);
+      setBattleCode("");
+      setMatchmakingStatus("");
+      setSocialToast({ title: "Left battle", message: "You are out of the room and can start another match." });
+      handleRefreshBattleStats({ quiet: true });
+      handleRefreshBattleHistory({ quiet: true });
+    } catch (error) {
+      setBattleError(error.message || "Could not leave battle room.");
     }
   }
 
@@ -1092,6 +1142,11 @@ export default function App() {
     const introOpening = INTRO_OPENINGS[introClass] || INTRO_OPENINGS.CODER;
     const canOpenGate = introName.trim().length > 0;
     const introModelType = avatarDraft?.gender === "Female" ? "Female" : "Male";
+    const introDossier = [
+      { label: "World", value: introMeta.world },
+      { label: "Role", value: introMeta.archetype },
+      { label: "Starter Perk", value: introOpening.perk }
+    ];
     const introPreviewState = {
       ...state,
       primaryClass: introClass,
@@ -1297,6 +1352,15 @@ export default function App() {
                 <em>{introOpening.perk}</em>
               </div>
 
+              <div className="intro-dossier-grid" aria-label="Selected origin dossier">
+                {introDossier.map((item) => (
+                  <span key={item.label}>
+                    <small>{item.label}</small>
+                    <strong>{item.value}</strong>
+                  </span>
+                ))}
+              </div>
+
               <button className="gate-button" disabled={!canOpenGate} onClick={openGate}>
                 {canOpenGate ? `Open ${introMeta.world} Gate` : "Name Your Hero First"}
               </button>
@@ -1376,6 +1440,11 @@ export default function App() {
       style={{ "--class-color": meta.color }}
     >
       {floatingXp && <div className="floating-xp">{floatingXp}</div>}
+      <div className="game-backdrop" aria-hidden="true">
+        <span className="game-backdrop-grid" />
+        <span className="game-backdrop-scanline" />
+        <span className="game-backdrop-vignette" />
+      </div>
       <RewardBurst reward={rewardBurst} />
       <BossEntrance
         boss={bossEntrance?.boss}
@@ -1418,6 +1487,7 @@ export default function App() {
               >
                 <span>{tab.icon}</span>
                 <strong>{tab.label}</strong>
+                <small>{navSignals[tab.key] || "Ready"}</small>
               </button>
             ))}
           </nav>
@@ -1434,6 +1504,7 @@ export default function App() {
               >
                 <span>{tab.icon}</span>
                 <strong>{tab.label}</strong>
+                <small>{navSignals[tab.key] || "Ready"}</small>
               </button>
             ))}
           </nav>
@@ -1665,6 +1736,7 @@ export default function App() {
                   onCreateRoom={handleCreateBattleRoom}
                   onJoinRoom={handleJoinBattleRoom}
                   onRefreshRoom={handleRefreshBattleRoom}
+                  onLeaveRoom={handleLeaveBattleRoom}
                   onChooseMove={handleChooseBattleMove}
                   localJoinUrl={localJoinUrl}
                   friends={friends}
@@ -1775,72 +1847,105 @@ function AuthScreen({
   onSubmit
 }) {
   const isRegister = mode === "register";
+  const authSignals = [
+    { label: "Cloud Save", value: "Online" },
+    { label: "Season", value: "Live" },
+    { label: "Quest Feed", value: "Ready" }
+  ];
 
   return (
     <div className="auth-screen">
-      <form className="auth-card" onSubmit={onSubmit}>
-        <p className="eyebrow">Private LifeXP Account</p>
-        <h1>{isRegister ? "Create your save" : "Log in to LifeXP"}</h1>
-        <p>
-          Your password is hashed before it is stored, and your game progress is saved under your username.
-        </p>
+      <div className="auth-launcher-shell">
+        <section className="auth-launcher-panel" aria-label="LifeXP launcher status">
+          <p className="eyebrow">LifeXP Launcher</p>
+          <h1>Real Life RPG</h1>
+          <p>Boot into your private save, sync your hero, and turn today&apos;s actions into XP.</p>
 
-        <label>
-          <span>Username</span>
-          <input
-            type="text"
-            value={username}
-            placeholder="username"
-            autoComplete="username"
-            minLength="3"
-            maxLength="32"
-            onChange={(event) => setUsername(event.target.value)}
-          />
-          <small className="auth-helper">Use 3-32 lowercase letters, numbers, or underscores.</small>
-        </label>
+          <div className="auth-launcher-core" aria-hidden="true">
+            <span />
+            <strong>XP</strong>
+          </div>
 
-        <label>
-          <span>Password</span>
-          <input
-            type="password"
-            value={password}
-            placeholder="8+ characters"
-            autoComplete={isRegister ? "new-password" : "current-password"}
-            minLength="8"
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
+          <div className="auth-signal-grid">
+            {authSignals.map((signal) => (
+              <span key={signal.label}>
+                <small>{signal.label}</small>
+                <strong>{signal.value}</strong>
+              </span>
+            ))}
+          </div>
+        </section>
 
-        {error && <strong className="auth-error">{error}</strong>}
+        <form className="auth-card" onSubmit={onSubmit}>
+          <p className="eyebrow">Private LifeXP Account</p>
+          <h1>{isRegister ? "Create your save" : "Log in to LifeXP"}</h1>
+          <p>
+            Your password is hashed before it is stored, and your game progress is saved under your username.
+          </p>
 
-        <button type="submit" disabled={busy}>
-          {busy ? "Working..." : isRegister ? "Create Account" : "Log In"}
-        </button>
+          <label>
+            <span>Username</span>
+            <input
+              type="text"
+              value={username}
+              placeholder="username"
+              autoComplete="username"
+              minLength="3"
+              maxLength="32"
+              onChange={(event) => setUsername(event.target.value)}
+            />
+            <small className="auth-helper">Use 3-32 lowercase letters, numbers, or underscores.</small>
+          </label>
 
-        <button
-          type="button"
-          className="auth-mode-button"
-          onClick={() => {
-            setMode(isRegister ? "login" : "register");
-          }}
-        >
-          {isRegister ? "Already have an account? Log in" : "Need an account? Create one"}
-        </button>
-      </form>
+          <label>
+            <span>Password</span>
+            <input
+              type="password"
+              value={password}
+              placeholder="8+ characters"
+              autoComplete={isRegister ? "new-password" : "current-password"}
+              minLength="8"
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </label>
+
+          {error && <strong className="auth-error">{error}</strong>}
+
+          <button type="submit" disabled={busy}>
+            {busy ? "Working..." : isRegister ? "Create Account" : "Log In"}
+          </button>
+
+          <button
+            type="button"
+            className="auth-mode-button"
+            onClick={() => {
+              setMode(isRegister ? "login" : "register");
+            }}
+          >
+            {isRegister ? "Already have an account? Log in" : "Need an account? Create one"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
 
 function HeroProgressPanel({ state, xpNeeded, xpPercent }) {
+  const meta = CLASS_META[state.primaryClass] || CLASS_META[state.activeClass] || CLASS_META.NOVICE;
+  const activeMeta = CLASS_META[state.activeClass] || meta;
+  const xpRemaining = Math.max(0, xpNeeded - (state.xp || 0));
+
   return (
     <div className="panel hero-panel">
       <p className="eyebrow">Primary Class</p>
       <h2>
-        {CLASS_META[state.primaryClass]?.icon || "✨"} {CLASS_META[state.primaryClass]?.label || state.primaryClass}
+        {meta?.icon || "✨"} {meta?.label || state.primaryClass}
       </h2>
 
-      <p>Active Class: {CLASS_META[state.activeClass]?.label || state.activeClass}</p>
-      <p>World: {CLASS_META[state.activeClass]?.world || "Unknown"}</p>
+      <div className="campaign-chip-row">
+        <span>Active: {activeMeta?.label || state.activeClass}</span>
+        <span>World: {activeMeta?.world || "Unknown"}</span>
+      </div>
 
       <div className="level-orb">
         <span>LVL</span>
@@ -1854,8 +1959,45 @@ function HeroProgressPanel({ state, xpNeeded, xpPercent }) {
       <p>
         {state.xp} / {xpNeeded} XP
       </p>
+
+      <div className="campaign-telemetry-grid">
+        <span>
+          <small>To Next</small>
+          <strong>{xpRemaining} XP</strong>
+        </span>
+        <span>
+          <small>Bosses</small>
+          <strong>{state.bossesDefeated || 0}</strong>
+        </span>
+        <span>
+          <small>Streak</small>
+          <strong>{state.loginStreak || 1}</strong>
+        </span>
+      </div>
     </div>
   );
+}
+
+function getDashboardNavSignals(state = {}, activeClass = "NOVICE") {
+  const quests = state.dailyQuests || [];
+  const completedQuests = quests.filter((quest) => quest.completed).length;
+  const claimReady = quests.filter((quest) => quest.completed && !quest.claimed).length;
+  const inventory = state.inventory || [];
+  const equippedItems = inventory.filter((item) => item.equipped).length;
+  const activeWorld = (state.worlds || []).find((world) => world.id === state.currentWorldId);
+  const activityCount = (state.activityLog || []).length;
+  const classLabel = CLASS_META[activeClass]?.label || activeClass;
+
+  return {
+    overview: `L${state.level || 1}`,
+    profile: classLabel,
+    avatar: `${equippedItems} gear`,
+    quests: claimReady > 0 ? `${claimReady} claim` : `${completedQuests}/${quests.length || 0}`,
+    shop: `${state.gold || 0}g`,
+    battle: `${state.bossesDefeated || 0} wins`,
+    world: activeWorld?.name || "Map",
+    log: `${activityCount} logs`
+  };
 }
 
 function calculateEnergyCost(amount) {
