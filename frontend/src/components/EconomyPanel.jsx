@@ -11,6 +11,10 @@ export default function EconomyPanel({
   const bankScore = gold + crystals * 12 + essence * 20;
   const walletTier = bankScore >= 1000 ? "Vaulted" : bankScore >= 500 ? "Loaded" : bankScore >= 150 ? "Stocked" : "Starting";
   const spendReadiness = Math.min(100, Math.round((bankScore / 1000) * 100));
+  const energyMode = energyPercent >= 80 ? "Overcharged" : energyPercent >= 45 ? "Stable" : energyPercent > 0 ? "Low Power" : "Empty";
+  const dominantCurrency = getDominantCurrency({ gold, crystals, essence });
+  const shopPips = [25, 50, 75, 100];
+  const restAction = energy >= 100 ? "Capped" : restStatus.ready ? "Ready" : "Cooling";
 
   const currencies = [
     { label: "Gold", value: gold, icon: "🪙", detail: "Spend on shop cosmetics" },
@@ -49,6 +53,28 @@ export default function EconomyPanel({
         </span>
       </div>
 
+      <div className="economy-reactor-console" aria-label="Economy reactor console">
+        <div>
+          <small>Dominant Resource</small>
+          <strong>{dominantCurrency}</strong>
+          <span>{walletTier} wallet</span>
+        </div>
+        <div>
+          <small>Energy Mode</small>
+          <strong>{energyMode}</strong>
+          <span>{restAction} rest node</span>
+        </div>
+        <div className="economy-shop-signal">
+          <small>Shop Signal</small>
+          <strong>{spendReadiness}%</strong>
+          <span>
+            {shopPips.map((pip) => (
+              <i key={pip} className={spendReadiness >= pip ? "active" : ""} />
+            ))}
+          </span>
+        </div>
+      </div>
+
       <div className="economy-vault-card" aria-label="Economy vault status">
         <div>
           <small>Wallet Tier</small>
@@ -79,6 +105,17 @@ export default function EconomyPanel({
       </div>
     </div>
   );
+}
+
+function getDominantCurrency({ gold, crystals, essence }) {
+  const resources = [
+    ["Gold", Number(gold) || 0],
+    ["Crystals", (Number(crystals) || 0) * 12],
+    ["Essence", (Number(essence) || 0) * 20]
+  ];
+  const [label, score] = resources.sort((a, b) => b[1] - a[1])[0];
+
+  return score > 0 ? label : "None";
 }
 
 function getRestStatus(lastRestTimestamp) {
