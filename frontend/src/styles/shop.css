@@ -1023,6 +1023,70 @@
   margin-bottom: 0.5rem;
 }
 
+.timeline-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--class-color);
+  opacity: 0.82;
+}
+
+.timeline-item.log-boss::before,
+.timeline-item.log-loot::before {
+  background: #f59e0b;
+}
+
+.timeline-item.log-level::before,
+.timeline-item.log-skill::before {
+  background: #22d3ee;
+}
+
+.timeline-item.log-quest::before {
+  background: #34d399;
+}
+
+.timeline-item.log-avatar::before {
+  background: #f472b6;
+}
+
+.timeline-item .timeline-dot {
+  box-shadow:
+    inset 0 0 14px rgba(255, 255, 255, 0.06),
+    0 0 14px color-mix(in srgb, var(--class-color), transparent 72%);
+}
+
+.timeline-item.log-boss .timeline-dot,
+.timeline-item.log-loot .timeline-dot {
+  color: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.48);
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.timeline-item.log-level .timeline-dot,
+.timeline-item.log-skill .timeline-dot {
+  color: #cffafe;
+  border-color: rgba(34, 211, 238, 0.45);
+  background: rgba(34, 211, 238, 0.14);
+}
+
+.timeline-item.log-quest .timeline-dot {
+  color: #dcfce7;
+  border-color: rgba(52, 211, 153, 0.42);
+  background: rgba(52, 211, 153, 0.14);
+}
+
+.timeline-item.log-avatar .timeline-dot {
+  color: #fce7f3;
+  border-color: rgba(244, 114, 182, 0.42);
+  background: rgba(244, 114, 182, 0.13);
+}
+
 .loot-burst {
   display: grid;
   gap: 0.6rem;

@@ -4,6 +4,10 @@ export default function ActivityLogPanel({ activityLog = [] }) {
   const summary = getActivitySummary(activityLog);
   const signalStrength = activityLog.length === 0 ? 0 : Math.min(100, activityLog.length * 12 + summary.quest * 8 + summary.boss * 10 + summary.growth * 10);
   const latestCategory = activityLog.length > 0 ? activityCategory(activityLog[0]) : "Idle";
+  const totalTracked = summary.quest + summary.boss + summary.growth;
+  const dominantTrack = getDominantTrack(summary);
+  const momentumLabel = signalStrength >= 80 ? "Surging" : signalStrength >= 45 ? "Active" : activityLog.length > 0 ? "Warming" : "Quiet";
+  const recentChain = Math.min(activityLog.length, 5);
 
   return (
     <div className="panel activity-log premium-activity-log">
@@ -12,6 +16,24 @@ export default function ActivityLogPanel({ activityLog = [] }) {
           <p className="eyebrow">Timeline</p>
           <h3>Recent Activity</h3>
           <p>{activityLog.length} logged events</p>
+        </div>
+      </div>
+
+      <div className="activity-recorder-console" aria-label="Activity recorder console">
+        <div>
+          <small>Recorder</small>
+          <strong>{momentumLabel}</strong>
+          <span>{recentChain ? `${recentChain} recent signals` : "Awaiting first signal"}</span>
+        </div>
+        <div>
+          <small>Dominant Track</small>
+          <strong>{dominantTrack}</strong>
+          <span>{totalTracked} classified events</span>
+        </div>
+        <div>
+          <small>Latest Feed</small>
+          <strong>{latestCategory}</strong>
+          <span>{activityLog.length ? "Synced" : "Standby"}</span>
         </div>
       </div>
 
@@ -35,11 +57,11 @@ export default function ActivityLogPanel({ activityLog = [] }) {
       <div className="activity-timeline">
         {activityLog.length > 0 ? (
           activityLog.map((item, index) => (
-            <div className="log-item timeline-item" key={`${item}-${index}`}>
+            <div className={`log-item timeline-item log-${activityCategory(item).toLowerCase()}`} key={`${item}-${index}`}>
               <div className="timeline-dot">{activityIcon(item)}</div>
               <div>
                 <div className="log-item-title-row">
-                  <small>Event {activityLog.length - index}</small>
+                  <small>Event {String(activityLog.length - index).padStart(2, "0")}</small>
                   <span>{activityCategory(item)}</span>
                 </div>
                 <strong>{activityTitle(item)}</strong>
@@ -56,6 +78,17 @@ export default function ActivityLogPanel({ activityLog = [] }) {
       </div>
     </div>
   );
+}
+
+function getDominantTrack(summary) {
+  const tracks = [
+    ["Quest", summary.quest],
+    ["Boss", summary.boss],
+    ["Growth", summary.growth]
+  ];
+  const [track, total] = tracks.sort((a, b) => b[1] - a[1])[0];
+
+  return total > 0 ? track : "Unclassified";
 }
 
 function getActivitySummary(activityLog = []) {

@@ -374,6 +374,10 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .activity-recorder-console {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .activity-console-grid {
     grid-template-columns: minmax(0, 1fr);
   }
