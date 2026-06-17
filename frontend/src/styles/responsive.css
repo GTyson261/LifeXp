@@ -695,7 +695,11 @@
   }
 
   .avatar-stage-live {
-    min-height: 396px;
+    min-height: 456px;
+  }
+
+  .avatar-rpg-shell {
+    min-height: 442px;
   }
 
   .avatar-stage-live .premium-avatar {
@@ -735,6 +739,10 @@
 }
 
 @media (max-width: 600px) {
+  .avatar-stage-badges {
+    grid-template-columns: 1fr;
+  }
+
   .avatar-panel .avatar-loadout-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -755,7 +763,22 @@
 
 @media (max-width: 430px) {
   .avatar-stage-live {
-    min-height: 340px;
+    min-height: 400px;
+  }
+
+  .avatar-rpg-shell {
+    min-height: 392px;
+    padding: 0.62rem 0.52rem 0.72rem;
+  }
+
+  .avatar-stage-crest {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .avatar-stage-crest em {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    text-align: center;
   }
 
   .avatar-stage-live .premium-avatar {
@@ -784,7 +807,7 @@
 
 @media (max-width: 360px) {
   .avatar-stage-live {
-    min-height: 342px;
+    min-height: 388px;
   }
 
   .avatar-stage-live .premium-avatar {

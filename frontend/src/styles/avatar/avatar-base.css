@@ -35,6 +35,63 @@
   z-index: 0;
 }
 
+.premium-avatar .avatar-rpg-weapon {
+  position: absolute;
+  right: 28px;
+  top: 142px;
+  z-index: 1;
+  width: 34px;
+  height: 156px;
+  pointer-events: none;
+  transform: rotate(16deg);
+  transform-origin: 50% 80%;
+  filter: drop-shadow(0 0 12px var(--outfit-glow));
+}
+
+.premium-avatar .avatar-rpg-weapon i,
+.premium-avatar .avatar-rpg-weapon b {
+  position: absolute;
+  left: 50%;
+  display: block;
+  transform: translateX(-50%);
+}
+
+.premium-avatar .avatar-rpg-weapon i {
+  top: 0;
+  width: 14px;
+  height: 112px;
+  border-radius: 999px 999px 8px 8px;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.68), transparent),
+    linear-gradient(180deg, var(--outfit-glow), #f8fafc 48%, var(--class-color));
+  clip-path: polygon(50% 0, 100% 18%, 72% 100%, 28% 100%, 0 18%);
+}
+
+.premium-avatar .avatar-rpg-weapon b {
+  bottom: 16px;
+  width: 40px;
+  height: 18px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--outfit-glow), white 32%), transparent),
+    rgba(2, 6, 23, 0.86);
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 46%);
+}
+
+.premium-avatar.bookworm .avatar-rpg-weapon,
+.premium-avatar.zen .avatar-rpg-weapon,
+.premium-avatar.musician .avatar-rpg-weapon {
+  right: 20px;
+  transform: rotate(7deg);
+}
+
+.premium-avatar.bookworm .avatar-rpg-weapon i,
+.premium-avatar.zen .avatar-rpg-weapon i,
+.premium-avatar.musician .avatar-rpg-weapon i {
+  width: 18px;
+  clip-path: polygon(50% 0, 86% 14%, 62% 100%, 38% 100%, 14% 14%);
+}
+
 .premium-avatar .avatar-back-glow {
   position: absolute;
   inset: 18px 18px 44px;

@@ -30,6 +30,7 @@ export default function AvatarPreview({
   const nextEvolution = getNextEvolution(activeClass, state?.level || 1);
   const avatarLevel = Number(state?.level || 1);
   const avatarPower = avatarLevel * 120 + Number(state?.skillPoints || 0) * 40 + Math.floor(Number(state?.xp || 0) / 10);
+  const nextGate = nextEvolution ? `Next gate L${nextEvolution.level}` : "Legend tier capped";
   const loadoutSlots = [
     avatar?.outfit,
     avatar?.hairStyle,
@@ -93,13 +94,42 @@ export default function AvatarPreview({
 
       <div className={`avatar-stage avatar-stage-${avatarMode}`}>
         {avatarMode === "live" ? (
-          <FakeAvatar
-            activeClass={activeClass}
-            timerRunning={timerRunning}
-            auraName={equippedAura}
-            avatar={avatar}
-            level={state?.level || 1}
-          />
+          <div className="avatar-rpg-shell">
+            <div className="avatar-stage-crest">
+              <span>{meta.icon}</span>
+              <div>
+                <small>{currentEvolution?.title || "Novice"}</small>
+                <strong>{state?.title || "Gatebound Novice"}</strong>
+              </div>
+              <em>Rank {avatarLevel}</em>
+            </div>
+
+            <div className="avatar-rpg-backdrop" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </div>
+
+            <FakeAvatar
+              activeClass={activeClass}
+              timerRunning={timerRunning}
+              auraName={equippedAura}
+              avatar={avatar}
+              level={state?.level || 1}
+            />
+
+            <div className="avatar-rpg-plinth">
+              <span>{meta.label}</span>
+              <strong>{avatarPower} Power</strong>
+              <small>{nextGate}</small>
+            </div>
+
+            <div className="avatar-stage-badges" aria-label="Avatar RPG loadout">
+              <span><small>Aura</small><strong>{equippedAura}</strong></span>
+              <span><small>Frame</small><strong>{equippedFrame}</strong></span>
+              <span><small>Loadout</small><strong>{loadoutPercent}%</strong></span>
+            </div>
+          </div>
         ) : (
           <HeroCard
             activeClass={activeClass}
@@ -191,6 +221,16 @@ export function FakeAvatar({ activeClass, timerRunning, auraName, avatar, level 
     >
       <div className={`avatar-aura ${auraClass(auraName)}`} />
       <div className="avatar-back-glow" />
+      <div className="avatar-class-effects" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="avatar-rpg-weapon" aria-hidden="true">
+        <i />
+        <b />
+      </div>
 
       <div className="avatar-head">
         <div className="avatar-ear left" />
