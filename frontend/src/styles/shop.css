@@ -1124,6 +1124,70 @@
   color: white;
 }
 
+.loot-vault-console {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0.75rem 0;
+}
+
+.loot-vault-console > div {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.72rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(250, 204, 21, 0.12), transparent 54%),
+    rgba(2, 6, 23, 0.66);
+  border: 1px solid rgba(250, 204, 21, 0.18);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.22);
+}
+
+.loot-vault-console small {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.loot-vault-console strong {
+  color: white;
+  font-weight: 950;
+  overflow-wrap: anywhere;
+}
+
+.loot-vault-console span {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  font-weight: 780;
+  overflow-wrap: anywhere;
+}
+
+.loot-rarity-stack {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.loot-rarity-stack small {
+  grid-column: 1 / -1;
+}
+
+.loot-rarity-stack span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-height: 24px;
+  padding: 0.18rem 0.42rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.loot-rarity-stack b {
+  color: var(--lifexp-gold);
+}
+
 .loot-vault-card,
 .economy-vault-card,
 .timeline-signal-card {

@@ -330,6 +330,7 @@
   .world-command-strip,
   .battle-command-strip,
   .mastery-command-strip,
+  .loot-vault-console,
   .loot-command-strip {
     grid-template-columns: minmax(0, 1fr);
   }

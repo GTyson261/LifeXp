@@ -1,10 +1,14 @@
 
 
 export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], lootHistory = [] }) {
+  const rarityCounts = getRarityCounts(lootHistory);
   const rareDrops = lootHistory.filter((loot) => rarityClass(loot) !== "loot-common").length;
   const vaultScore = lootHistory.reduce((sum, loot) => sum + rarityValue(loot), 0);
   const dropStreak = Math.min(6, lastLootDrops.length || Math.min(lootHistory.length, bossesDefeated));
   const rarePercent = lootHistory.length === 0 ? 0 : Math.round((rareDrops / lootHistory.length) * 100);
+  const bestDrop = getBestDrop(lootHistory);
+  const vaultTier = vaultScore >= 500 ? "Mythic Vault" : vaultScore >= 250 ? "Epic Cache" : vaultScore >= 90 ? "Magic Stash" : "Starter Chest";
+  const scanStatus = lastLootDrops.length > 0 ? "Fresh Drop" : lootHistory.length > 0 ? "Indexed" : "Empty";
 
   return (
     <div className="panel loot-panel premium-loot-panel">
@@ -33,6 +37,26 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
           <small>Vault Size</small>
           <strong>{lootHistory.length}</strong>
         </span>
+      </div>
+
+      <div className="loot-vault-console" aria-label="Loot vault console">
+        <div>
+          <small>Vault Tier</small>
+          <strong>{vaultTier}</strong>
+          <span>{scanStatus}</span>
+        </div>
+        <div>
+          <small>Best Find</small>
+          <strong>{bestDrop.label}</strong>
+          <span>{bestDrop.name}</span>
+        </div>
+        <div className="loot-rarity-stack">
+          <small>Rarity Mix</small>
+          <span><b>{rarityCounts.legendary}</b> Legendary</span>
+          <span><b>{rarityCounts.epic}</b> Epic</span>
+          <span><b>{rarityCounts.magic}</b> Magic</span>
+          <span><b>{rarityCounts.common}</b> Common</span>
+        </div>
       </div>
 
       <div className="loot-vault-card" aria-label="Loot vault status">
@@ -85,6 +109,25 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
       </div>
     </div>
   );
+}
+
+function getRarityCounts(lootHistory = []) {
+  return lootHistory.reduce((counts, loot) => {
+    const label = rarityLabel(loot).toLowerCase();
+    counts[label] += 1;
+    return counts;
+  }, { legendary: 0, epic: 0, magic: 0, common: 0 });
+}
+
+function getBestDrop(lootHistory = []) {
+  if (!lootHistory.length) {
+    return { label: "None Yet", name: "Defeat a boss" };
+  }
+
+  return lootHistory.reduce((best, loot) => {
+    const value = rarityValue(loot);
+    return value > best.value ? { label: rarityLabel(loot), name: loot, value } : best;
+  }, { label: "Common", name: lootHistory[0], value: 0 });
 }
 
 function rarityValue(loot = "") {
