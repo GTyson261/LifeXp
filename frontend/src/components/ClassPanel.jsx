@@ -5,6 +5,8 @@ export default function ClassPanel({ classes = [], classMeta = {}, primaryClass,
   const unlockedCount = classes.filter((className) => getEvolution(className, level)).length;
   const nextEvolution = getNextEvolution(primaryClass, level);
   const classReadiness = classes.length === 0 ? 0 : Math.round((unlockedCount / classes.length) * 100);
+  const currentEvolution = getEvolution(primaryClass, level);
+  const nextGate = nextEvolution ? `L${nextEvolution.level}` : "Max";
 
   return (
     <div className="panel class-panel premium-class-panel">
@@ -15,6 +17,24 @@ export default function ClassPanel({ classes = [], classMeta = {}, primaryClass,
           <p className="sanctuary-warning">
             Changing primary class costs 25 Gold, resets mastery, and applies a temporary XP penalty.
           </p>
+        </div>
+      </div>
+
+      <div className="class-origin-console" aria-label="Class origin console">
+        <div>
+          <small>Origin World</small>
+          <strong>{primaryMeta.world || "Unknown Gate"}</strong>
+          <span>{primaryMeta.label || primaryClass}</span>
+        </div>
+        <div>
+          <small>Current Form</small>
+          <strong>{currentEvolution?.title || "Initiate"}</strong>
+          <span>Level {level}</span>
+        </div>
+        <div>
+          <small>Next Gate</small>
+          <strong>{nextGate}</strong>
+          <span>{nextEvolution?.title || "Path capped"}</span>
         </div>
       </div>
 

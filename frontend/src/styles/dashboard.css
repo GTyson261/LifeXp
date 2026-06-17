@@ -3058,11 +3058,62 @@
   font-weight: 900;
 }
 
+.class-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.class-grid {
+  min-width: 0;
+}
+
 .class-choice {
   position: relative;
   min-width: 0;
   display: grid;
   gap: 0.25rem;
+  overflow: hidden;
+}
+
+.class-origin-console {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.class-origin-console div {
+  min-width: 0;
+  display: grid;
+  gap: 0.16rem;
+  padding: 0.72rem;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 86%), transparent 58%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 8px),
+    rgba(2, 6, 23, 0.66);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 70%);
+}
+
+.class-origin-console small {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.class-origin-console strong {
+  color: white;
+  font-weight: 950;
+  overflow-wrap: anywhere;
+}
+
+.class-origin-console span {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  font-weight: 780;
+  overflow-wrap: anywhere;
 }
 
 .class-sanctuary-card {
