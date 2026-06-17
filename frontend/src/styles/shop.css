@@ -210,6 +210,136 @@
   box-shadow: 0 0 12px color-mix(in srgb, var(--class-color), transparent 48%);
 }
 
+.activity-mission-console {
+  display: grid;
+  gap: 0.72rem;
+  margin: 0.85rem 0;
+  padding: 0.86rem;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 82%), transparent 42%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 12px),
+    rgba(2, 6, 23, 0.72);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 64%);
+  box-shadow:
+    inset 0 0 26px rgba(0, 0, 0, 0.24),
+    0 0 20px color-mix(in srgb, var(--class-color), transparent 88%);
+}
+
+.activity-console-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.72rem;
+  align-items: center;
+}
+
+.activity-console-header > span {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 66%),
+    color-mix(in srgb, var(--class-color), transparent 78%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 48%);
+}
+
+.activity-console-header b {
+  justify-self: end;
+  padding: 0.36rem 0.52rem;
+  border-radius: 8px;
+  color: #020617;
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--class-color), #f8fafc);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--class-color), transparent 58%);
+}
+
+.activity-console-header small,
+.activity-intent-meter small,
+.activity-console-grid small {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.activity-console-header strong,
+.activity-intent-meter strong,
+.activity-console-grid strong {
+  color: white;
+  font-weight: 950;
+  overflow-wrap: anywhere;
+}
+
+.activity-intent-meter {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.activity-intent-meter > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.activity-intent-meter i {
+  display: block;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.activity-intent-meter b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22d3ee, var(--class-color), #f8fafc);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--class-color), transparent 52%);
+  transition: width 0.35s ease;
+}
+
+.activity-signal-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.42rem;
+}
+
+.activity-signal-row span {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.activity-signal-row span.active {
+  background: linear-gradient(90deg, var(--class-color), white);
+  box-shadow: 0 0 13px color-mix(in srgb, var(--class-color), transparent 56%);
+}
+
+.activity-console-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.activity-console-grid span {
+  min-width: 0;
+  display: grid;
+  gap: 0.16rem;
+  padding: 0.58rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
 .activity-command-card {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) minmax(96px, auto);

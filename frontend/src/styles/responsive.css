@@ -374,6 +374,20 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .activity-console-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .activity-console-header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .activity-console-header b {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    text-align: center;
+  }
+
   .battle-connect-grid,
   .friends-grid,
   .friend-request-grid,
