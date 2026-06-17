@@ -695,11 +695,11 @@
   }
 
   .avatar-stage-live {
-    min-height: 456px;
+    min-height: 500px;
   }
 
   .avatar-rpg-shell {
-    min-height: 442px;
+    min-height: 486px;
   }
 
   .avatar-stage-live .premium-avatar {
@@ -763,11 +763,11 @@
 
 @media (max-width: 430px) {
   .avatar-stage-live {
-    min-height: 400px;
+    min-height: 442px;
   }
 
   .avatar-rpg-shell {
-    min-height: 392px;
+    min-height: 432px;
     padding: 0.62rem 0.52rem 0.72rem;
   }
 
@@ -807,7 +807,7 @@
 
 @media (max-width: 360px) {
   .avatar-stage-live {
-    min-height: 388px;
+    min-height: 430px;
   }
 
   .avatar-stage-live .premium-avatar {

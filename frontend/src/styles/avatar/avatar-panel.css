@@ -87,7 +87,7 @@
 }
 
 .avatar-stage-live {
-  min-height: 520px;
+  min-height: 570px;
 }
 
 .avatar-stage-hero {
@@ -98,7 +98,7 @@
   position: relative;
   isolation: isolate;
   width: min(100%, 390px);
-  min-height: 508px;
+  min-height: 558px;
   display: grid;
   justify-items: center;
   align-content: start;
@@ -241,7 +241,7 @@
   width: min(100%, 290px);
   display: grid;
   gap: 0.12rem;
-  margin-top: -2.3rem;
+  margin-top: -1.65rem;
   padding: 0.58rem 0.7rem;
   border-radius: 8px;
   background:
