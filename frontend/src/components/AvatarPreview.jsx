@@ -143,12 +143,12 @@ export default function AvatarPreview({
         )}
       </div>
       <div className="avatar-loadout-grid">
-        <LoadoutStat label="Outfit" value={avatar?.outfit || "Novice Jacket"} status="Hero model" />
-        <LoadoutStat label="Hair" value={avatar?.hairStyle || "Fade"} status="Silhouette" />
-        <LoadoutStat label="Body" value={avatar?.bodyType || "Average"} status="Rig profile" />
-        <LoadoutStat label="Aura" value={equippedAura} status="Battle FX" />
-        <LoadoutStat label="Frame" value={equippedFrame} status="Profile art" />
-        <LoadoutStat label="Pronouns" value={avatar?.pronouns || "they/them"} status="Identity" />
+        <LoadoutStat icon="◆" label="Outfit" value={avatar?.outfit || "Novice Jacket"} status="Hero model" power={92} />
+        <LoadoutStat icon="◒" label="Hair" value={avatar?.hairStyle || "Fade"} status="Silhouette" power={78} />
+        <LoadoutStat icon="⬡" label="Body" value={avatar?.bodyType || "Average"} status="Rig profile" power={84} />
+        <LoadoutStat icon="✦" label="Aura" value={equippedAura} status="Battle FX" power={loadoutPercent} />
+        <LoadoutStat icon="▣" label="Frame" value={equippedFrame} status="Profile art" power={88} />
+        <LoadoutStat icon="◇" label="Pronouns" value={avatar?.pronouns || "they/them"} status="Identity" power={70} />
       </div>
       <div className="avatar-loadout-score" aria-hidden="true">
         <span>Loadout Sync</span>
@@ -181,12 +181,20 @@ export default function AvatarPreview({
   );
 }
 
-export function LoadoutStat({ label, value, status }) {
+export function LoadoutStat({ icon, label, value, status, power = 70 }) {
+  const meterPower = Math.min(100, Math.max(8, Number(power) || 70));
+
   return (
     <div className="avatar-loadout-stat">
-      <span>{label}</span>
+      <div className="loadout-stat-topline">
+        <span className="loadout-stat-icon">{icon || "◇"}</span>
+        <span>{label}</span>
+      </div>
       <strong>{value}</strong>
       {status && <small>{status}</small>}
+      <i aria-hidden="true">
+        <b style={{ width: `${meterPower}%` }} />
+      </i>
     </div>
   );
 }
