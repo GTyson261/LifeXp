@@ -824,7 +824,14 @@
   clip-path: polygon(14% 0, 86% 0, 100% 26%, 76% 100%, 24% 100%, 0 26%) !important;
   background:
     linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 22%),
+    linear-gradient(90deg, rgba(2, 6, 23, 0.44) 0 2px, transparent 2px calc(100% - 2px), rgba(2, 6, 23, 0.5) calc(100% - 2px)),
     linear-gradient(180deg, color-mix(in srgb, var(--outfit-trim), white 12%), color-mix(in srgb, var(--outfit-trim), #020617 42%) 58%, #020617 100%) !important;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 42%) !important;
+  box-shadow:
+    inset -10px -16px 18px rgba(0, 0, 0, 0.34),
+    inset 8px 8px 10px rgba(255, 255, 255, 0.08),
+    0 14px 18px rgba(0, 0, 0, 0.24),
+    0 0 12px color-mix(in srgb, var(--outfit-glow), transparent 64%) !important;
 }
 
 .premium-avatar .avatar-body::after {
@@ -854,6 +861,10 @@
   border-radius: 8px 8px 26px 26px !important;
   clip-path: polygon(0 28%, 78% 0, 100% 72%, 18% 100%) !important;
   opacity: 1 !important;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 44%) !important;
+  box-shadow:
+    inset 0 -8px 10px rgba(0, 0, 0, 0.32),
+    0 0 10px color-mix(in srgb, var(--outfit-glow), transparent 64%) !important;
 }
 
 .premium-avatar .avatar-shoulder.left {
@@ -872,6 +883,8 @@
   height: 112px;
   border-radius: 8px 8px 18px 18px;
   opacity: 0.7;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(2, 6, 23, 0.34);
 }
 
 .premium-avatar .avatar-chest-plate {
@@ -883,6 +896,12 @@
   clip-path: polygon(50% 0, 100% 22%, 78% 100%, 22% 100%, 0 22%) !important;
   transform: translateX(-50%) !important;
   opacity: 0.42 !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 38%),
+    linear-gradient(180deg, color-mix(in srgb, var(--outfit-glow), transparent 70%), rgba(2, 6, 23, 0.7)) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 12px color-mix(in srgb, var(--outfit-glow), transparent 68%) !important;
 }
 
 .premium-avatar .avatar-core {
@@ -890,6 +909,9 @@
   width: 44px !important;
   height: 44px !important;
   border-radius: 999px !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+    0 0 16px color-mix(in srgb, var(--outfit-glow), transparent 48%) !important;
 }
 
 .premium-avatar .avatar-belt {
@@ -907,6 +929,10 @@
 .premium-avatar .avatar-arms span {
   border-radius: 18px 18px 28px 28px !important;
   clip-path: polygon(22% 0, 78% 0, 100% 84%, 56% 100%, 18% 88%, 0 18%) !important;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 56%) !important;
+  box-shadow:
+    inset -7px -12px 12px rgba(0, 0, 0, 0.3),
+    inset 5px 5px 8px rgba(255, 255, 255, 0.08) !important;
 }
 
 .premium-avatar .left-arm {
@@ -936,12 +962,19 @@
 .premium-avatar .avatar-legs span {
   border-radius: 4px 4px 16px 16px !important;
   clip-path: polygon(12% 0, 88% 0, 78% 100%, 22% 100%) !important;
+  border: 1px solid color-mix(in srgb, var(--outfit-glow), transparent 62%) !important;
+  box-shadow:
+    inset -7px -13px 12px rgba(0, 0, 0, 0.36),
+    inset 5px 5px 8px rgba(255, 255, 255, 0.06) !important;
 }
 
 .premium-avatar .avatar-legs span i {
   bottom: -18px !important;
   height: 27px !important;
   border-radius: 10px 18px 12px 12px !important;
+  box-shadow:
+    inset -5px -5px 8px rgba(0, 0, 0, 0.36),
+    0 5px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
 .premium-avatar .avatar-ground-ring {

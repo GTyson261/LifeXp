@@ -17,7 +17,9 @@
   transform-style: preserve-3d;
   --outfit-trim: var(--class-color);
   --outfit-glow: var(--class-color);
-  filter: drop-shadow(0 0 30px var(--class-color));
+  filter:
+    drop-shadow(0 0 14px color-mix(in srgb, var(--class-color), transparent 32%))
+    drop-shadow(0 18px 18px rgba(0, 0, 0, 0.28));
 }
 
 .premium-avatar .avatar-aura {
@@ -30,8 +32,8 @@
   background:
     radial-gradient(circle, var(--class-color), transparent 45%),
     radial-gradient(circle, var(--outfit-glow), transparent 70%);
-  filter: blur(24px);
-  opacity: 0.9;
+  filter: blur(16px);
+  opacity: 0.64;
   z-index: 0;
 }
 
@@ -97,8 +99,8 @@
   inset: 18px 18px 44px;
   border-radius: 42%;
   background: radial-gradient(circle, var(--outfit-glow), transparent 68%);
-  filter: blur(18px);
-  opacity: 0.62;
+  filter: blur(12px);
+  opacity: 0.48;
   z-index: 0;
 }
 
@@ -139,4 +141,6 @@
 .avatar-jacket-panel,
 .avatar-glow-line {
   position: absolute;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
