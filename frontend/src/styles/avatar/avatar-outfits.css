@@ -1302,14 +1302,75 @@
 
 .premium-avatar.outfit-cyber .avatar-face .eye {
   border-color: #67e8f9;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.65);
+  width: 17px;
+  height: 10px;
+  border-radius: 5px 5px 7px 7px;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.88), rgba(8, 47, 73, 0.5) 42% 58%, rgba(2, 6, 23, 0.88)),
+    linear-gradient(180deg, #ecfeff 0 42%, #0e7490 43% 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(2, 6, 23, 0.72),
+    0 0 12px rgba(34, 211, 238, 0.65);
 }
 
 .premium-avatar.outfit-cyber .avatar-face .iris {
+  left: 5px;
+  bottom: 1px;
+  width: 5px;
+  height: 5px;
   background: #67e8f9;
   box-shadow:
     0 0 8px rgba(103, 232, 249, 1),
     0 0 18px rgba(34, 211, 238, 0.85);
+}
+
+.premium-avatar.outfit-cyber .avatar-head {
+  box-shadow:
+    inset -8px -8px 12px rgba(0, 0, 0, 0.24),
+    inset 6px 6px 8px rgba(255, 255, 255, 0.08),
+    0 12px 18px rgba(0, 0, 0, 0.34),
+    0 0 0 2px rgba(34, 211, 238, 0.2),
+    0 0 18px rgba(34, 211, 238, 0.26);
+}
+
+.premium-avatar.outfit-cyber .avatar-head::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 45px;
+  height: 3px;
+  z-index: 23;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.92), transparent);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.72);
+  pointer-events: none;
+}
+
+.premium-avatar.outfit-cyber .avatar-hair {
+  top: -13px;
+  left: -2px;
+  right: -2px;
+  height: 38px;
+  border-radius: 16px 16px 10px 10px;
+  clip-path: polygon(0 18%, 18% 0, 50% 7%, 82% 0, 100% 18%, 94% 100%, 70% 74%, 50% 100%, 30% 74%, 6% 100%);
+  background:
+    linear-gradient(112deg, rgba(103, 232, 249, 0.22) 0 18%, transparent 19% 100%),
+    linear-gradient(248deg, rgba(103, 232, 249, 0.18) 0 18%, transparent 19% 100%),
+    linear-gradient(145deg, color-mix(in srgb, var(--avatar-hair, #111827), white 12%), color-mix(in srgb, var(--avatar-hair, #020617), black 36%));
+  box-shadow:
+    inset 0 -8px 12px rgba(2, 6, 23, 0.38),
+    0 0 12px rgba(34, 211, 238, 0.18);
+}
+
+.premium-avatar.outfit-cyber .avatar-hair::before {
+  left: 23px;
+  right: 23px;
+  bottom: -5px;
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(103, 232, 249, 0.62), rgba(2, 6, 23, 0.64));
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.34);
 }
 
 .premium-avatar.outfit-arcade .avatar-face .eye:first-child .iris {
