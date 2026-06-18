@@ -9,6 +9,7 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
   const bestDrop = getBestDrop(lootHistory);
   const vaultTier = vaultScore >= 500 ? "Mythic Vault" : vaultScore >= 250 ? "Epic Cache" : vaultScore >= 90 ? "Magic Stash" : "Starter Chest";
   const scanStatus = lastLootDrops.length > 0 ? "Fresh Drop" : lootHistory.length > 0 ? "Indexed" : "Empty";
+  const bestDropClass = bestDrop.name ? rarityClass(bestDrop.name) : "loot-common";
 
   return (
     <div className="panel loot-panel premium-loot-panel">
@@ -68,6 +69,16 @@ export default function LootPanel({ bossesDefeated = 0, lastLootDrops = [], loot
           <b style={{ width: `${rarePercent}%` }} />
         </i>
         <span>{rarePercent}% rare+ history · {dropStreak} drop streak</span>
+      </div>
+
+      <div className={`loot-signature-card ${bestDropClass}`} aria-label="Signature loot drop">
+        <div className="loot-signature-icon">{rarityIcon(bestDrop.name)}</div>
+        <div>
+          <small>Signature Drop</small>
+          <strong>{bestDrop.name}</strong>
+          <span>{bestDrop.label} reward profile</span>
+        </div>
+        <em>{vaultTier}</em>
       </div>
 
       {lastLootDrops.length > 0 ? (
