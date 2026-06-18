@@ -10,6 +10,7 @@ export default function QuestPanel({ quests = [], onClaimQuest, className = "", 
   const totalRewardGold = quests.reduce((sum, quest) => sum + (quest.claimed ? 0 : quest.rewardGold || 0), 0);
   const campaignPressure = Math.min(100, completionPercent + readyToClaim * 12 + storyQuests.length * 3);
   const nextQuest = quests.find((quest) => !quest.completed) || quests.find((quest) => quest.completed && !quest.claimed);
+  const boardState = readyToClaim > 0 ? "Rewards Ready" : completionPercent >= 100 ? "Board Cleared" : "Mission Active";
 
   return (
     <div className={`panel quests-panel premium-quest-panel ${className}`.trim()}>
@@ -28,6 +29,18 @@ export default function QuestPanel({ quests = [], onClaimQuest, className = "", 
 
       <div className="quest-progress-track">
         <div style={{ width: `${completionPercent}%` }} />
+      </div>
+
+      <div className="quest-mission-briefing" aria-label="Quest mission briefing">
+        <div className="quest-mission-orb">
+          <span>{readyToClaim || completedQuests || 1}</span>
+        </div>
+        <div>
+          <small>Mission Board</small>
+          <strong>{boardState}</strong>
+          <p>{nextQuest ? nextQuest.description : "All current operations are complete."}</p>
+        </div>
+        <em>{formatClassName(primaryClass)}</em>
       </div>
 
       <div className="quest-intel-grid" aria-label="Quest board intel">
@@ -124,7 +137,15 @@ function QuestCard({ quest, onClaimQuest, storyStep = null }) {
   const difficulty = questDifficulty(target, progressPercent, storyStep);
 
   return (
-    <div className={quest.completed ? `quest-card completed premium-quest-card quest-tier-${tier.toLowerCase()}` : `quest-card premium-quest-card quest-tier-${tier.toLowerCase()}`}>
+    <div className={[
+      "quest-card",
+      "premium-quest-card",
+      `quest-tier-${tier.toLowerCase()}`,
+      quest.completed ? "completed" : "",
+      quest.claimed ? "claimed" : "",
+      canClaim ? "claim-ready" : "",
+      storyStep ? "story-quest" : "daily-quest"
+    ].filter(Boolean).join(" ")}>
       <div className="quest-status-icon">
         {storyStep ? storyStep : statusIcon}
       </div>
