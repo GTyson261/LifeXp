@@ -2881,6 +2881,43 @@
   gap: 0.75rem;
 }
 
+.premium-currency-card {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(148, 163, 184, 0.14);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.055), transparent 34%),
+    rgba(2, 6, 23, 0.62);
+}
+
+.premium-currency-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: color-mix(in srgb, var(--class-color), transparent 36%);
+}
+
+.premium-currency-card.currency-gold::before {
+  background: #facc15;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.4);
+}
+
+.premium-currency-card.currency-crystal::before {
+  background: #22d3ee;
+  box-shadow: 0 0 16px rgba(34, 211, 238, 0.38);
+}
+
+.premium-currency-card.currency-essence::before {
+  background: #a855f7;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.38);
+}
+
+.premium-currency-card.currency-energy::before {
+  background: #34d399;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.38);
+}
+
 .sanctuary-stat-grid {
   grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
 }

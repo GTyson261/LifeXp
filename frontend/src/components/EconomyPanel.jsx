@@ -15,12 +15,13 @@ export default function EconomyPanel({
   const dominantCurrency = getDominantCurrency({ gold, crystals, essence });
   const shopPips = [25, 50, 75, 100];
   const restAction = energy >= 100 ? "Capped" : restStatus.ready ? "Ready" : "Cooling";
+  const treasuryState = spendReadiness >= 75 ? "Market Ready" : energyPercent < 25 ? "Recharge Needed" : "Resource Run";
 
   const currencies = [
-    { label: "Gold", value: gold, icon: "🪙", detail: "Spend on shop cosmetics" },
-    { label: "Crystals", value: crystals, icon: "💎", detail: "Premium upgrade currency" },
-    { label: "Essence", value: essence, icon: "🔮", detail: "Earned from deeper progress" },
-    { label: "Energy", value: `${energy}%`, icon: "⚡", detail: restStatus.ready ? "Rest is ready" : restStatus.label }
+    { label: "Gold", value: gold, icon: "🪙", detail: "Spend on shop cosmetics", type: "gold" },
+    { label: "Crystals", value: crystals, icon: "💎", detail: "Premium upgrade currency", type: "crystal" },
+    { label: "Essence", value: essence, icon: "🔮", detail: "Earned from deeper progress", type: "essence" },
+    { label: "Energy", value: `${energy}%`, icon: "⚡", detail: restStatus.ready ? "Rest is ready" : restStatus.label, type: "energy" }
   ];
 
   return (
@@ -86,9 +87,21 @@ export default function EconomyPanel({
         <span>{spendReadiness}% shop readiness · {energyPercent}% energy</span>
       </div>
 
+      <div className="economy-treasury-card" aria-label="Economy treasury status">
+        <div className="economy-treasury-orb">
+          <span>{Math.max(1, Math.round(bankScore / 100))}</span>
+        </div>
+        <div>
+          <small>Treasury State</small>
+          <strong>{treasuryState}</strong>
+          <span>{dominantCurrency} leads the wallet · {restAction} rest node</span>
+        </div>
+        <em>{walletTier}</em>
+      </div>
+
       <div className="currency-grid premium-currency-grid">
         {currencies.map((currency) => (
-          <div className="currency premium-currency-card" key={currency.label}>
+          <div className={`currency premium-currency-card currency-${currency.type}`} key={currency.label}>
             <div className="currency-icon">{currency.icon}</div>
             <div>
               <span>{currency.label}</span>
