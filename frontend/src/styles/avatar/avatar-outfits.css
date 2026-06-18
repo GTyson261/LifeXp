@@ -494,29 +494,38 @@
 
 .premium-avatar.outfit-cyber .avatar-body {
   background:
-    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.14), transparent 26%),
-    linear-gradient(180deg, #22d3ee 0%, #0e7490 42%, #083344 72%, #020617 100%) !important;
+    linear-gradient(112deg, transparent 0 24%, rgba(2, 6, 23, 0.36) 25% 27%, transparent 28% 100%),
+    linear-gradient(248deg, transparent 0 23%, rgba(2, 6, 23, 0.32) 24% 26%, transparent 27% 100%),
+    radial-gradient(circle at 32% 10%, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(180deg, #67e8f9 0%, #0e7490 36%, #083344 68%, #020617 100%) !important;
 }
 
 .premium-avatar.outfit-cyber .avatar-jacket-panel.left,
 .premium-avatar.outfit-cyber .avatar-jacket-panel.right {
-  opacity: 0.72;
+  opacity: 0.9;
   background:
-    linear-gradient(180deg, rgba(103, 232, 249, 0.26), rgba(8, 47, 73, 0.68) 58%, rgba(2, 6, 23, 0.92));
-  border: 1px solid rgba(103, 232, 249, 0.2);
+    linear-gradient(155deg, rgba(207, 250, 254, 0.2), transparent 32%),
+    linear-gradient(180deg, rgba(103, 232, 249, 0.34), rgba(8, 47, 73, 0.76) 58%, rgba(2, 6, 23, 0.94));
+  border: 1px solid rgba(103, 232, 249, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -10px 18px rgba(2, 6, 23, 0.32);
 }
 
 .premium-avatar.outfit-cyber .outfit-sash {
-  left: 82px;
-  top: 28px;
-  width: 5px;
-  height: 120px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #a5f3fc, #22d3ee 54%, #0891b2);
+  left: 81px;
+  top: 24px;
+  width: 7px;
+  height: 132px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.65), transparent 28% 72%, rgba(2, 6, 23, 0.5)),
+    linear-gradient(180deg, #ecfeff, #22d3ee 48%, #0891b2);
   box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
     0 0 12px rgba(34, 211, 238, 0.85),
     0 0 24px rgba(34, 211, 238, 0.35);
-  opacity: 0.9;
+  opacity: 0.96;
 }
 
 .premium-avatar.outfit-cyber .outfit-sash::before,
@@ -524,10 +533,12 @@
   content: "";
   position: absolute;
   top: 10px;
-  width: 3px;
-  height: 44px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #cffafe, #22d3ee 72%, transparent);
+  width: 5px;
+  height: 46px;
+  border-radius: 2px;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.55), transparent 45% 55%, rgba(2, 6, 23, 0.34)),
+    linear-gradient(180deg, #cffafe, #22d3ee 72%, transparent);
   box-shadow: 0 0 10px rgba(34, 211, 238, 0.75);
   opacity: 0.72;
 }
@@ -543,16 +554,18 @@
 }
 
 .premium-avatar.outfit-cyber .outfit-pouch {
-  left: 57px;
-  bottom: 34px;
-  width: 54px;
-  height: 24px;
-  border-radius: 999px 999px 14px 14px;
+  left: 52px;
+  bottom: 31px;
+  width: 64px;
+  height: 30px;
+  border-radius: 8px 8px 14px 14px;
   background:
-    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.08), transparent 28%),
-    linear-gradient(180deg, rgba(2, 6, 23, 0.64), rgba(2, 6, 23, 0.9));
+    linear-gradient(90deg, rgba(14, 165, 233, 0.34) 0 9px, transparent 10px 54px, rgba(14, 165, 233, 0.28) 55px 100%),
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.12), transparent 28%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.96));
   border: 1px solid rgba(103, 232, 249, 0.78);
   box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
     inset 0 -8px 14px rgba(0, 0, 0, 0.42),
     0 0 16px rgba(34, 211, 238, 0.38);
 }
@@ -570,24 +583,42 @@
 }
 
 .premium-avatar.outfit-cyber .outfit-strap {
-  display: none;
+  left: 36px;
+  right: 36px;
+  bottom: 55px;
+  display: block;
+  height: 7px;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, transparent 0 11%, rgba(2, 6, 23, 0.9) 12% 28%, transparent 29% 71%, rgba(2, 6, 23, 0.9) 72% 88%, transparent 89%),
+    linear-gradient(180deg, rgba(207, 250, 254, 0.86), rgba(14, 116, 144, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 0 12px rgba(34, 211, 238, 0.34);
 }
 /* ---------- Coder Hoodie Detail Polish ---------- */
 .premium-avatar.outfit-cyber .avatar-chest-plate {
-  top: 58px;
-  left: 56px;
-  width: 56px;
-  height: 48px;
-  opacity: 0.10;
-  border-radius: 20px;
+  top: 52px;
+  left: 50px;
+  width: 68px;
+  height: 60px;
+  opacity: 0.38;
+  border-radius: 10px 10px 22px 22px;
   background:
-    radial-gradient(circle at center, rgba(103, 232, 249, 0.2), transparent 60%),
-    rgba(2, 6, 23, 0.28);
+    linear-gradient(135deg, transparent 0 17%, rgba(103, 232, 249, 0.32) 18% 20%, transparent 21% 100%),
+    linear-gradient(225deg, transparent 0 17%, rgba(103, 232, 249, 0.26) 18% 20%, transparent 21% 100%),
+    radial-gradient(circle at center, rgba(103, 232, 249, 0.28), transparent 54%),
+    rgba(2, 6, 23, 0.46);
+  border: 1px solid rgba(103, 232, 249, 0.2);
+  box-shadow:
+    inset 0 0 0 1px rgba(2, 6, 23, 0.42),
+    0 0 18px rgba(34, 211, 238, 0.18);
 }
 
 .premium-avatar.outfit-cyber .avatar-glow-line.line-one {
-  left: 81px;
-  opacity: 0.82;
+  left: 80px;
+  width: 8px;
+  opacity: 0.92;
 }
 
 .premium-avatar.outfit-cyber .avatar-glow-line.line-two {
@@ -595,17 +626,22 @@
 }
 
 .premium-avatar.outfit-cyber .avatar-belt {
-  left: 42px;
-  right: 42px;
-  bottom: 34px;
-  height: 8px;
-  opacity: 0.30;
+  left: 35px;
+  right: 35px;
+  bottom: 32px;
+  height: 10px;
+  opacity: 0.56;
+  border-radius: 3px;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.96) 0 22%, rgba(103, 232, 249, 0.78) 23% 29%, rgba(2, 6, 23, 0.96) 30% 70%, rgba(103, 232, 249, 0.78) 71% 77%, rgba(2, 6, 23, 0.96) 78% 100%);
+  border: 1px solid rgba(103, 232, 249, 0.26);
 }
 
 .premium-avatar.outfit-cyber .avatar-core {
   font-size: 1.2rem;
-  transform: translateY(-2px) scale(0.74);
-  opacity: 0.28;
+  transform: translateY(-1px) scale(0.88);
+  opacity: 0.62;
+  filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.86));
 }
 
 .premium-avatar.outfit-cyber .avatar-shoulder.left,
@@ -618,8 +654,17 @@
     0 0 14px rgba(34, 211, 238, 0.34) !important;
 }
 
-.premium-avatar.outfit-cyber .avatar-shoulder.left::after {
-  content: none;
+.premium-avatar.outfit-cyber .avatar-shoulder.left::after,
+.premium-avatar.outfit-cyber .avatar-shoulder.right::after {
+  content: "";
+  position: absolute;
+  inset: 9px 14px auto;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(236, 254, 255, 0.92);
+  box-shadow:
+    0 0 8px rgba(34, 211, 238, 0.9),
+    0 8px 0 rgba(8, 145, 178, 0.54);
 }
 
 
