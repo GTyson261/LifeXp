@@ -2755,6 +2755,82 @@
   overflow-wrap: anywhere;
 }
 
+.activity-feed-briefing {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.78rem;
+  margin: 0.85rem 0;
+  padding: 0.85rem 0.9rem;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--class-color), transparent 78%), transparent 42%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 8px),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.84), rgba(2, 6, 23, 0.86));
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 56%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 14px 30px rgba(0, 0, 0, 0.18);
+}
+
+.activity-feed-briefing::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: color-mix(in srgb, var(--class-color), white 16%);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--class-color), transparent 42%);
+}
+
+.activity-feed-orb {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 38% 26%, rgba(255, 255, 255, 0.2), transparent 30%),
+    color-mix(in srgb, var(--class-color), transparent 72%);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 42%);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--class-color), transparent 70%);
+}
+
+.activity-feed-orb span,
+.activity-feed-briefing strong {
+  color: white;
+  font-weight: 950;
+}
+
+.activity-feed-briefing small,
+.activity-feed-briefing em {
+  color: var(--lifexp-muted);
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.activity-feed-briefing p {
+  margin: 0.1rem 0 0;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.activity-feed-briefing em {
+  justify-self: end;
+  padding: 0.3rem 0.48rem;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--class-color), white 38%);
+  font-style: normal;
+  background: rgba(2, 6, 23, 0.66);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 64%);
+  white-space: nowrap;
+}
+
 .activity-summary-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

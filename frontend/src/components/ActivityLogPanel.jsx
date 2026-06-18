@@ -8,6 +8,7 @@ export default function ActivityLogPanel({ activityLog = [] }) {
   const dominantTrack = getDominantTrack(summary);
   const momentumLabel = signalStrength >= 80 ? "Surging" : signalStrength >= 45 ? "Active" : activityLog.length > 0 ? "Warming" : "Quiet";
   const recentChain = Math.min(activityLog.length, 5);
+  const recorderState = signalStrength >= 80 ? "Run Hot" : activityLog.length > 0 ? "Recording" : "Standby";
 
   return (
     <div className="panel activity-log premium-activity-log">
@@ -35,6 +36,18 @@ export default function ActivityLogPanel({ activityLog = [] }) {
           <strong>{latestCategory}</strong>
           <span>{activityLog.length ? "Synced" : "Standby"}</span>
         </div>
+      </div>
+
+      <div className="activity-feed-briefing" aria-label="Activity feed briefing">
+        <div className="activity-feed-orb">
+          <span>{recentChain || 1}</span>
+        </div>
+        <div>
+          <small>Recorder State</small>
+          <strong>{recorderState}</strong>
+          <p>{activityLog.length ? activityLog[0] : "Complete an action to begin the live timeline."}</p>
+        </div>
+        <em>{momentumLabel}</em>
       </div>
 
       <div className="activity-summary-strip">
