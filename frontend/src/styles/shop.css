@@ -842,13 +842,18 @@
 
 .boss-phase-banner {
   display: grid;
-  gap: 0.2rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
   margin-bottom: 0.85rem;
   padding: 0.7rem 0.85rem;
   border-radius: 8px;
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--class-color), transparent 82%), rgba(2, 6, 23, 0.6));
   border: 1px solid color-mix(in srgb, var(--class-color), transparent 62%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 22px rgba(0, 0, 0, 0.12);
 }
 
 .boss-phase-banner span {
@@ -862,6 +867,21 @@
 .boss-phase-banner strong {
   color: white;
   font-size: 0.92rem;
+}
+
+.boss-phase-banner em {
+  justify-self: end;
+  padding: 0.3rem 0.5rem;
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--class-color), white 42%);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(2, 6, 23, 0.66);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 62%);
+  white-space: nowrap;
 }
 
 .boss-avatar-ring {
@@ -926,6 +946,64 @@
 
 .boss-phase-enraged .boss-avatar-core {
   animation: bossCoreEnraged 0.9s ease-in-out infinite alternate;
+}
+
+.boss-phase-wounded .boss-phase-banner {
+  border-color: rgba(251, 146, 60, 0.42);
+  background:
+    linear-gradient(90deg, rgba(251, 146, 60, 0.2), rgba(2, 6, 23, 0.66));
+}
+
+.boss-phase-enraged .boss-phase-banner {
+  border-color: rgba(248, 113, 113, 0.5);
+  background:
+    linear-gradient(90deg, rgba(248, 113, 113, 0.24), rgba(2, 6, 23, 0.7));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 0 28px rgba(248, 113, 113, 0.14);
+}
+
+.boss-raid-status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.boss-raid-status span {
+  min-width: 0;
+  position: relative;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem 0.7rem;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--class-color), transparent 88%), transparent 58%),
+    rgba(2, 6, 23, 0.66);
+  border: 1px solid color-mix(in srgb, var(--class-color), transparent 78%);
+}
+
+.boss-raid-status span::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: color-mix(in srgb, var(--class-color), white 14%);
+  opacity: 0.8;
+}
+
+.boss-raid-status small {
+  color: var(--lifexp-muted);
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.boss-raid-status strong {
+  color: white;
+  overflow-wrap: anywhere;
 }
 
 .boss-footer-grid {

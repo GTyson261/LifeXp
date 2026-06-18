@@ -2383,6 +2383,31 @@
   position: relative;
 }
 
+.boss-health {
+  height: 22px;
+  border-color: color-mix(in srgb, var(--class-color), transparent 68%);
+  background:
+    linear-gradient(90deg, rgba(248, 113, 113, 0.12), transparent 32%),
+    rgba(2, 6, 23, 0.9);
+  box-shadow:
+    inset 0 0 0 1px rgba(2, 6, 23, 0.72),
+    0 0 18px color-mix(in srgb, var(--class-color), transparent 84%);
+}
+
+.boss-health::before {
+  content: "Boss HP";
+  position: absolute;
+  left: 0.62rem;
+  top: 50%;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.58rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: translateY(-50%);
+}
+
 .xp-bar div,
 .boss-health div,
 .mini-progress div {

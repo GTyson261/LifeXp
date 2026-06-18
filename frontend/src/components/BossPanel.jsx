@@ -24,6 +24,8 @@ export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) 
   ];
   const phaseSteps = ["Active", "Wounded", "Enraged"];
   const threatScore = phase === "Enraged" ? 100 : phase === "Wounded" ? 66 : 34;
+  const hpStatus = hpPercent <= 25 ? "Critical" : hpPercent <= 50 ? "Breaking" : "Stable";
+  const raidSignal = phase === "Enraged" ? "Execute Window" : phase === "Wounded" ? "Pressure Phase" : "Engage";
 
   return (
     <div className={`panel boss-panel premium-boss-panel boss-phase-${phase.toLowerCase()} ${className}`.trim()}>
@@ -37,8 +39,11 @@ export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) 
       </div>
 
       <div className="boss-phase-banner">
-        <span>{phase} Phase</span>
-        <strong>{phaseMessage}</strong>
+        <div>
+          <span>{phase} Phase</span>
+          <strong>{phaseMessage}</strong>
+        </div>
+        <em>{raidSignal}</em>
       </div>
 
       <div className="boss-phase-track" aria-label={`Boss phase ${phase}`}>
@@ -66,6 +71,21 @@ export default function BossPanel({ boss, bossesDefeated = 0, className = "" }) 
             <span>{phase}</span>
           </div>
         </div>
+      </div>
+
+      <div className="boss-raid-status" aria-label="Boss raid status">
+        <span>
+          <small>HP Status</small>
+          <strong>{hpStatus}</strong>
+        </span>
+        <span>
+          <small>Damage Window</small>
+          <strong>{100 - hpPercent}% Open</strong>
+        </span>
+        <span>
+          <small>Rewards</small>
+          <strong>{nextRewards.length} Drops</strong>
+        </span>
       </div>
 
       <div className="boss-health">
