@@ -30,6 +30,7 @@ export default function EquipmentPanel({
   const gearScore = equippedItems.length * 25 + rareSignals * 15;
   const loadoutPower = Math.min(100, Math.round((gearScore / 160) * 100));
   const signatureSlot = equippedItems.find((item) => equipmentTier(item.value) !== "Standard") || equippedItems[0];
+  const signatureTier = equipmentTier(signatureSlot.value);
 
   return (
     <div className="panel equipment-panel premium-equipment-panel">
@@ -63,24 +64,38 @@ export default function EquipmentPanel({
         </i>
       </div>
 
-      <div className="equipment-grid">
-        {equippedItems.map((item) => (
-          <div className="equipment-card" key={item.label}>
-            <div className="equipment-icon">{item.icon}</div>
+      <div className={`equipment-signature-card tier-${signatureTier.toLowerCase()}`}>
+        <div className="equipment-signature-icon">{signatureSlot.icon}</div>
+        <div>
+          <small>Signature Slot</small>
+          <strong>{signatureSlot.value}</strong>
+          <span>{signatureTier} {signatureSlot.label}</span>
+        </div>
+        <em>{loadoutPower}% Sync</em>
+      </div>
 
-            <div>
-              <div className="equipment-card-title">
-                <span>{item.label}</span>
-                <em>{equipmentTier(item.value)}</em>
-              </div>
-              <strong>{item.value}</strong>
-              <small>{equipmentStatus(item.label)}</small>
-              <div className="equipment-card-meter" aria-hidden="true">
-                <b style={{ width: `${equipmentPower(item.value)}%` }} />
+      <div className="equipment-grid">
+        {equippedItems.map((item) => {
+          const tier = equipmentTier(item.value);
+
+          return (
+            <div className={`equipment-card tier-${tier.toLowerCase()}`} key={item.label}>
+              <div className="equipment-icon">{item.icon}</div>
+
+              <div>
+                <div className="equipment-card-title">
+                  <span>{item.label}</span>
+                  <em>{tier}</em>
+                </div>
+                <strong>{item.value}</strong>
+                <small>{equipmentStatus(item.label)}</small>
+                <div className="equipment-card-meter" aria-hidden="true">
+                  <b style={{ width: `${equipmentPower(item.value)}%` }} />
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
