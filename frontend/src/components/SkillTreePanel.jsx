@@ -8,6 +8,7 @@ export default function SkillTreePanel({ skills = [], skillPoints = 0, onUnlockS
   const readySkills = skills.filter((skill) => !skill.unlocked && skillPoints >= Math.max(1, skill.cost || 1) && (!skill.prerequisiteId || unlockedById[skill.prerequisiteId]));
   const nextSkill = readySkills[0] || skills.find((skill) => !skill.unlocked);
   const branchCount = new Set(skills.map((skill) => skill.category || "Core")).size;
+  const coreState = readySkills.length > 0 ? "Unlock Ready" : unlockPercent >= 100 ? "Tree Mastered" : "Charging Nodes";
 
   return (
     <div className="panel skill-panel premium-skill-panel">
@@ -25,6 +26,18 @@ export default function SkillTreePanel({ skills = [], skillPoints = 0, onUnlockS
 
       <div className="skill-progress-track">
         <div style={{ width: `${unlockPercent}%` }} />
+      </div>
+
+      <div className="skill-core-briefing" aria-label="Skill core briefing">
+        <div className="skill-core-orb">
+          <span>{readySkills.length || skillPoints || unlockedCount || 1}</span>
+        </div>
+        <div>
+          <small>Progression Core</small>
+          <strong>{coreState}</strong>
+          <p>{nextSkill ? `${nextSkill.name} is the next available upgrade path.` : "Every skill node is online."}</p>
+        </div>
+        <em>{unlockPercent}% Sync</em>
       </div>
 
       <div className="skill-planner-strip" aria-label="Skill upgrade planner">
@@ -90,10 +103,11 @@ function SkillCard({ skill, skillNamesById, unlockedById, skillPoints, onUnlockS
   const canUnlock = !skill.unlocked && skillPoints >= cost && dependencyUnlocked;
   const readiness = skill.unlocked ? 100 : Math.min(100, Math.round((skillPoints / cost) * 100));
   const branchRole = skill.unlocked ? "Active Node" : canUnlock ? "Ready Node" : dependencyUnlocked ? "Charging" : "Linked Lock";
+  const stateClass = skill.unlocked ? "unlocked" : canUnlock ? "unlock-ready" : dependencyUnlocked ? "charging-node" : "locked-node";
 
   return (
     <button
-      className={skill.unlocked ? "skill-card unlocked" : canUnlock ? "skill-card unlock-ready" : "skill-card"}
+      className={`skill-card ${stateClass}`}
       disabled={!canUnlock}
       onClick={() => onUnlockSkill(skill.id)}
       type="button"
