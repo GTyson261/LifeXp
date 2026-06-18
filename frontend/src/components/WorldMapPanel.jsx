@@ -6,6 +6,7 @@ export default function WorldMapPanel({ worlds = [], currentWorldId, onTravel })
   const openBosses = worlds.filter((world) => world.unlocked && !world.bossDefeated).length;
   const campaignPercent = worlds.length === 0 ? 0 : Math.round((clearedWorlds / worlds.length) * 100);
   const unlockPercent = worlds.length === 0 ? 0 : Math.round((unlockedWorlds / worlds.length) * 100);
+  const campaignState = campaignPercent >= 100 ? "Conquered" : openBosses > 0 ? "Bosses Active" : "Scout Route";
 
   return (
     <div className="panel world-map-panel premium-world-map-panel">
@@ -56,6 +57,18 @@ export default function WorldMapPanel({ worlds = [], currentWorldId, onTravel })
         </span>
       </div>
 
+      <div className="world-campaign-briefing" aria-label="Campaign briefing">
+        <div className="world-campaign-orb">
+          <span>{openBosses || clearedWorlds || 1}</span>
+        </div>
+        <div>
+          <small>Campaign State</small>
+          <strong>{campaignState}</strong>
+          <p>{currentWorld?.bossName || "Unknown boss"} is broadcasting from {currentWorld?.name || "the current arena"}.</p>
+        </div>
+        <em>{campaignPercent}% Clear</em>
+      </div>
+
       <div className="world-grid premium-world-grid">
         {worlds.map((world) => (
           <WorldCard
@@ -79,7 +92,8 @@ function WorldCard({ world, isCurrent, onTravel }) {
     "premium-world-card",
     isCurrent ? "active-world" : "",
     !world.unlocked ? "locked-world" : "",
-    world.bossDefeated ? "cleared-world" : ""
+    world.bossDefeated ? "cleared-world" : "",
+    world.unlocked && !world.bossDefeated ? "open-world" : ""
   ].filter(Boolean).join(" ");
 
   return (
