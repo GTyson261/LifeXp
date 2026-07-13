@@ -28,7 +28,10 @@ public class SkillController {
     }
 
     @PostMapping("/unlock")
-    public Map<String, Object> unlockSkill(@RequestBody UnlockRequest request) {
+    public Map<String, Object> unlockSkill(@RequestBody(required = false) UnlockRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Skill selection is required.");
+        }
         String className = request.currentClass();
         String skillId = request.skillId();
 
@@ -67,6 +70,12 @@ public class SkillController {
         response.put("player", playerController.getPlayer());
 
         return response;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public Map<String, String> skillError(IllegalArgumentException exception) {
+        return Map.of("message", exception.getMessage());
     }
 
     private void setupSkills() {

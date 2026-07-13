@@ -39,7 +39,7 @@ public class FriendService {
         return response;
     }
 
-    public FriendsResponse sendRequest(UserAccount account, String username) {
+    public synchronized FriendsResponse sendRequest(UserAccount account, String username) {
         String targetUsername = normalizeUsername(username);
 
         if (account.username.equals(targetUsername)) {

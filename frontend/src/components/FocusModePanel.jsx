@@ -2,7 +2,8 @@ export default function FocusModePanel({
   state,
   classMeta = {},
   onQuickAction,
-  onOpenQuests
+  onOpenQuests,
+  busy = false
 }) {
   const activeClass = state?.activeClass || "NOVICE";
   const meta = classMeta[activeClass] || classMeta.NOVICE || { icon: "◇", label: activeClass };
@@ -70,8 +71,8 @@ export default function FocusModePanel({
       </div>
 
       <div className="focus-actions">
-        <button type="button" onClick={() => onQuickAction?.(quest?.actionType || "focus")}>
-          Log 10-Min Action
+        <button disabled={busy} type="button" onClick={() => onQuickAction?.(quest?.actionType || "focus")}>
+          {busy ? "Saving Action..." : "Log 10-Min Action"}
         </button>
         <button type="button" onClick={onOpenQuests}>
           View Quests

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -64,6 +65,7 @@ public class FriendlyBattleService {
     }
 
     @Scheduled(fixedDelay = 60000)
+    @Transactional
     public synchronized void cleanupStaleBattleState() {
         Instant now = Instant.now();
         matchmakingQueue.entrySet().removeIf(entry -> isOlderThan(entry.getValue().joinedAt, now, MATCHMAKING_TTL));
@@ -140,7 +142,9 @@ public class FriendlyBattleService {
     }
 
     public FriendlyBattleResponse getRoom(UserAccount account, String roomCode) {
-        return toResponse(requireRoom(roomCode), account.username);
+        FriendlyBattleRoom room = requireRoom(roomCode);
+        playerFor(room, account.username);
+        return toResponse(room, account.username);
     }
 
     public FriendlyBattleResponse getActiveRoom(UserAccount account) {

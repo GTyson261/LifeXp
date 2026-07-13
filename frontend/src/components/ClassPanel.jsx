@@ -65,6 +65,7 @@ export default function ClassPanel({ classes = [], classMeta = {}, primaryClass,
             <button
               key={className}
               className={isActive ? "class-choice active" : "class-choice"}
+              disabled={isActive}
               onClick={() => onClassSelect(className)}
               type="button"
             >

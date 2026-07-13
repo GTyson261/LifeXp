@@ -194,6 +194,7 @@ export default function AvatarCustomizer({
             <button
               key={modelType}
               type="button"
+              aria-pressed={selectedModelType === modelType}
               className={
                 selectedModelType === modelType
                   ? "model-toggle-button active"
@@ -221,6 +222,8 @@ export default function AvatarCustomizer({
           <input
             className="body-type-slider"
             type="range"
+            aria-label="Body type"
+            aria-valuetext={selectedBodyType}
             min="0"
             max={BODY_TYPES.length - 1}
             step="1"
@@ -240,6 +243,7 @@ export default function AvatarCustomizer({
               <button
                 key={type}
                 type="button"
+                aria-pressed={selectedBodyType === type}
                 className={
                   selectedBodyType === type
                     ? "active"
@@ -275,6 +279,7 @@ export default function AvatarCustomizer({
               key={tone}
               type="button"
               aria-label={`Set skin tone ${tone}`}
+              aria-pressed={(avatarDraft?.skinTone || "#8d5524") === tone}
               className={
                 (avatarDraft?.skinTone || "#8d5524") === tone
                   ? "skin-tone-swatch active"
@@ -289,6 +294,7 @@ export default function AvatarCustomizer({
         <input
           className="skin-tone-input"
           type="color"
+          aria-label="Custom skin tone"
           value={avatarDraft?.skinTone || "#8d5524"}
           onChange={(event) =>
             updateAvatarField(
@@ -312,6 +318,7 @@ export default function AvatarCustomizer({
               key={color}
               type="button"
               aria-label={`Set hair color ${color}`}
+              aria-pressed={(avatarDraft?.hairColor || "#020617") === color}
               className={
                 (avatarDraft?.hairColor || "#020617") === color
                   ? "hair-color-swatch active"
@@ -326,6 +333,7 @@ export default function AvatarCustomizer({
         <input
           className="hair-color-input"
           type="color"
+          aria-label="Custom hair color"
           value={avatarDraft?.hairColor || "#020617"}
           onChange={(event) =>
             updateAvatarField(
@@ -348,6 +356,7 @@ export default function AvatarCustomizer({
           {HAIR_STYLES.map((style) => (
             <button
               key={style}
+              aria-pressed={avatarDraft?.hairStyle === style}
               className={
                 avatarDraft?.hairStyle === style
                   ? "choice-card active"
@@ -377,6 +386,8 @@ export default function AvatarCustomizer({
           {OUTFITS.map((outfit) => (
             <button
               key={outfit}
+              aria-disabled={!isOutfitUnlocked(outfit)}
+              aria-pressed={avatarDraft?.outfit === outfit}
               style={{
                 "--outfit-trim": OUTFIT_STYLE_MAP[outfit]?.trim || "#94a3b8",
                 "--outfit-glow": OUTFIT_STYLE_MAP[outfit]?.glow || "#64748b"

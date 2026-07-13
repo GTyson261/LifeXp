@@ -55,6 +55,7 @@ public class PlayerState {
     public List<String> activityLog = new ArrayList<>();
     public List<String> lastLootDrops = new ArrayList<>();
     public List<String> lootHistory = new ArrayList<>();
+    public List<String> visitedWorldIds = new ArrayList<>();
     public List<Quest> dailyQuests = new ArrayList<>();
     public List<Skill> skills = new ArrayList<>();
     public List<Achievement> achievements = new ArrayList<>();
@@ -64,6 +65,7 @@ public class PlayerState {
 
     public PlayerState() {
         activityLog.add("LifeXP initialized. The gate is waiting.");
+        visitedWorldIds.add("world_gate");
 
         dailyQuests.add(new Quest("q1", "Start Your Grind", "Complete any real-life action today.", false, false, 40, 15, 0, "any", 1));
         dailyQuests.add(new Quest("q2", "Focus Spark", "Complete a focus, coding, or reading session.", false, false, 55, 20, 1, "focus", 1));

@@ -1,4 +1,15 @@
+import { useEffect, useRef } from "react";
+
 export default function VictoryScreen({ reward, onDismiss }) {
+  const continueButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!reward) return;
+    const previousFocus = document.activeElement;
+    continueButtonRef.current?.focus();
+    return () => previousFocus?.focus?.();
+  }, [reward]);
+
   if (!reward) return null;
 
   const loot = reward.loot?.length ? reward.loot : ["Victory logged"];
@@ -6,13 +17,27 @@ export default function VictoryScreen({ reward, onDismiss }) {
   const grade = score >= 220 ? "S" : score >= 140 ? "A" : score >= 70 ? "B" : "C";
 
   return (
-    <div className="victory-screen" role="dialog" aria-modal="true">
+    <div
+      className="victory-screen"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="victory-title"
+      aria-describedby="victory-description"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          onDismiss();
+        } else if (event.key === "Tab") {
+          event.preventDefault();
+          continueButtonRef.current?.focus();
+        }
+      }}
+    >
       <div className="victory-card">
         <div className="victory-title-row">
           <div>
             <p className="eyebrow">Boss Defeated</p>
-            <h2>{reward.bossName}</h2>
-            <p>Your momentum cracked the encounter open.</p>
+            <h2 id="victory-title">{reward.bossName}</h2>
+            <p id="victory-description">Your momentum cracked the encounter open.</p>
           </div>
           <div className="victory-grade" aria-label={`Victory grade ${grade}`}>
             <small>Grade</small>
@@ -40,7 +65,7 @@ export default function VictoryScreen({ reward, onDismiss }) {
           ))}
         </div>
 
-        <button type="button" onClick={onDismiss}>
+        <button ref={continueButtonRef} type="button" onClick={onDismiss}>
           Continue
         </button>
       </div>

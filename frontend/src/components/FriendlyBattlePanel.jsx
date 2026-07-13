@@ -56,6 +56,7 @@ export default function FriendlyBattlePanel({
   onSelectFriend,
   friendLeaderboard = [],
   socialToast,
+  socialActionBusy = false,
   classMeta = {}
 }) {
   const host = battleRoom?.host;
@@ -81,7 +82,7 @@ export default function FriendlyBattlePanel({
     : "No room active";
 
   return (
-    <div className="panel friendly-battle-panel">
+    <div className="panel friendly-battle-panel" aria-busy={socialActionBusy}>
       <div className="section-heading-row">
         <div>
           <p className="eyebrow">Friends</p>
@@ -158,7 +159,7 @@ export default function FriendlyBattlePanel({
       </div>
 
       {socialToast && (
-        <div className="social-toast-card">
+        <div className="social-toast-card" role="status" aria-live="polite">
           <strong>{socialToast.title}</strong>
           <span>{socialToast.message}</span>
         </div>
@@ -172,7 +173,7 @@ export default function FriendlyBattlePanel({
           </div>
           <div className="battle-invite-list">
             {battleInvites.map((invite) => (
-              <button key={invite.code} type="button" onClick={() => onAcceptBattleInvite(invite)}>
+              <button key={invite.code} type="button" disabled={socialActionBusy} onClick={() => onAcceptBattleInvite(invite)}>
                 Join {invite.host?.displayName || invite.host?.username || "Friend"} · {invite.code}
               </button>
             ))}
@@ -189,10 +190,10 @@ export default function FriendlyBattlePanel({
           </div>
         </div>
         <div className="matchmaking-actions">
-          <button type="button" onClick={onJoinMatchmaking}>
+          <button type="button" disabled={socialActionBusy || queueActive} onClick={onJoinMatchmaking}>
             Find Match
           </button>
-          <button type="button" disabled={matchmakingStatus !== "QUEUED"} onClick={onLeaveMatchmaking}>
+          <button type="button" disabled={socialActionBusy || matchmakingStatus !== "QUEUED"} onClick={onLeaveMatchmaking}>
             Leave Queue
           </button>
           <button type="button" onClick={onReconnectBattle}>
@@ -225,10 +226,10 @@ export default function FriendlyBattlePanel({
               onChange={(event) => setFriendUsername(event.target.value.toLowerCase())}
             />
           </label>
-          <button type="submit" disabled={friendUsername.trim().length < 3}>
-            Send Friend Request
+          <button type="submit" disabled={socialActionBusy || friendUsername.trim().length < 3}>
+            {socialActionBusy ? "Working..." : "Send Friend Request"}
           </button>
-          {friendError && <small className="friend-error">{friendError}</small>}
+          {friendError && <small className="friend-error" role="alert">{friendError}</small>}
         </form>
 
         <div className="friend-list-card">
@@ -252,7 +253,7 @@ export default function FriendlyBattlePanel({
                   actions={
                     <button
                       type="button"
-                      disabled={invitedUsername === friend.username}
+                      disabled={socialActionBusy || invitedUsername === friend.username}
                       onClick={() => onInviteFriend(friend)}
                     >
                       {invitedUsername === friend.username ? "Invited" : "Invite"}
@@ -280,8 +281,8 @@ export default function FriendlyBattlePanel({
                     classMeta={classMeta}
                     actions={
                       <>
-                        <button type="button" onClick={() => onAcceptFriend(friend.friendshipId)}>Accept</button>
-                        <button type="button" onClick={() => onDeclineFriend(friend.friendshipId)}>Decline</button>
+                        <button type="button" disabled={socialActionBusy} onClick={() => onAcceptFriend(friend.friendshipId)}>Accept</button>
+                        <button type="button" disabled={socialActionBusy} onClick={() => onDeclineFriend(friend.friendshipId)}>Decline</button>
                       </>
                     }
                   />
@@ -299,7 +300,7 @@ export default function FriendlyBattlePanel({
                     key={friend.friendshipId}
                     friend={friend}
                     classMeta={classMeta}
-                    actions={<button type="button" onClick={() => onDeclineFriend(friend.friendshipId)}>Cancel</button>}
+                    actions={<button type="button" disabled={socialActionBusy} onClick={() => onDeclineFriend(friend.friendshipId)}>Cancel</button>}
                   />
                 ))}
               </div>
@@ -315,6 +316,7 @@ export default function FriendlyBattlePanel({
               friend={selectedFriend}
               classMeta={classMeta}
               invitePending={invitedUsername === selectedFriend.username}
+              socialActionBusy={socialActionBusy}
               onInviteFriend={onInviteFriend}
             />
           )}
@@ -357,8 +359,8 @@ export default function FriendlyBattlePanel({
         <div className="battle-connect-card">
           <strong>Create a Room</strong>
           <p>Start a local friendly match and share the 6-digit code.</p>
-          <button type="button" onClick={() => onCreateRoom()}>
-            Create Battle Code
+          <button type="button" disabled={socialActionBusy} onClick={() => onCreateRoom()}>
+            {socialActionBusy ? "Working..." : "Create Battle Code"}
           </button>
         </div>
 
@@ -376,13 +378,13 @@ export default function FriendlyBattlePanel({
               onChange={(event) => setBattleCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
             />
           </label>
-          <button type="submit" disabled={battleCode.length !== 6}>
+          <button type="submit" disabled={socialActionBusy || battleCode.length !== 6}>
             Join Battle
           </button>
         </form>
       </div>
 
-      {battleError && <strong className="friendly-battle-error">{battleError}</strong>}
+      {battleError && <strong className="friendly-battle-error" role="alert">{battleError}</strong>}
 
       {!battleRoom && (
         <div className="battle-empty-card">
@@ -436,7 +438,7 @@ export default function FriendlyBattlePanel({
             <button type="button" onClick={() => onRefreshRoom()}>
               Refresh Battle
             </button>
-            <button type="button" className="battle-leave-button" onClick={onLeaveRoom}>
+            <button type="button" className="battle-leave-button" disabled={socialActionBusy} onClick={onLeaveRoom}>
               Leave Room
             </button>
             <span>{battleRoom.viewerMoveLocked ? "Your move is locked." : "Choose your move."}</span>
@@ -450,7 +452,7 @@ export default function FriendlyBattlePanel({
                   key={move.key}
                   type="button"
                   className={`battle-move-${move.key.toLowerCase()}`}
-                  disabled={battleRoom.viewerMoveLocked}
+                  disabled={socialActionBusy || battleRoom.viewerMoveLocked}
                   onClick={() => onChooseMove(move.key)}
                 >
                   <small>{moveRole(move.key)}</small>
@@ -502,7 +504,7 @@ function FriendCard({ friend, classMeta, selected = false, onSelectFriend, actio
   );
 }
 
-function FriendProfileCard({ friend, classMeta, invitePending = false, onInviteFriend }) {
+function FriendProfileCard({ friend, classMeta, invitePending = false, socialActionBusy = false, onInviteFriend }) {
   const meta = classMeta[friend.primaryClass] || classMeta.NOVICE || { icon: "◇", label: friend.primaryClass };
 
   return (
@@ -541,7 +543,7 @@ function FriendProfileCard({ friend, classMeta, invitePending = false, onInviteF
           <b style={{ width: `${playerPowerScore(friend)}%` }} />
         </i>
       </div>
-      <button type="button" disabled={invitePending} onClick={() => onInviteFriend(friend)}>
+      <button type="button" disabled={socialActionBusy || invitePending} onClick={() => onInviteFriend(friend)}>
         {invitePending ? "Invite Pending" : "Invite to Battle"}
       </button>
     </div>

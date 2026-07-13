@@ -1,4 +1,35 @@
+import { useEffect, useRef } from "react";
+
 export default function DailyLoginReward({ state, onClaim, onDismiss }) {
+  const claimButtonRef = useRef(null);
+
+  useEffect(() => {
+    const previousFocus = document.activeElement;
+    claimButtonRef.current?.focus();
+    return () => previousFocus?.focus?.();
+  }, []);
+
+  function handleDialogKeyDown(event) {
+    if (event.key === "Escape") {
+      onDismiss();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(event.currentTarget.querySelectorAll("button:not(:disabled)"));
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   if (!state) return null;
 
   const streak = Math.max(0, state.loginRewardStreak || 0) + 1;
@@ -10,11 +41,18 @@ export default function DailyLoginReward({ state, onClaim, onDismiss }) {
   const streakPower = Math.min(100, Math.round((day / 7) * 100));
 
   return (
-    <div className="daily-reward-screen" role="dialog" aria-modal="true">
+    <div
+      className="daily-reward-screen"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="daily-reward-title"
+      aria-describedby="daily-reward-description"
+      onKeyDown={handleDialogKeyDown}
+    >
       <div className="daily-reward-card">
         <p className="eyebrow">Daily Login</p>
-        <h2>Day {day} Streak Reward</h2>
-        <p>Claim today’s boost before jumping back into quests.</p>
+        <h2 id="daily-reward-title">Day {day} Streak Reward</h2>
+        <p id="daily-reward-description">Claim today’s boost before jumping back into quests.</p>
 
         <div className="daily-reward-status">
           <span>
@@ -46,7 +84,7 @@ export default function DailyLoginReward({ state, onClaim, onDismiss }) {
         </div>
 
         <div className="daily-reward-actions">
-          <button type="button" onClick={onClaim}>Claim Reward</button>
+          <button ref={claimButtonRef} type="button" onClick={onClaim}>Claim Reward</button>
           <button type="button" onClick={onDismiss}>Later</button>
         </div>
       </div>

@@ -1,6 +1,9 @@
 
 
-export default function ShopPanel({ items = [], onBuyItem }) {
+export default function ShopPanel({ items = [], inventory = [], balances = {}, onBuyItem }) {
+  const ownedItems = new Set(inventory.map((item) => `${item.type}:${item.name}`));
+  const availableItems = items.filter((item) => !ownedItems.has(`${item.type}:${item.name}`)).length;
+
   return (
     <div className="panel shop-panel premium-shop-panel">
       <div className="section-heading-row">
@@ -11,14 +14,20 @@ export default function ShopPanel({ items = [], onBuyItem }) {
         </div>
 
         <div className="shop-count-chip">
-          🛒 {items.length} items
+          🛒 {availableItems} available
         </div>
       </div>
 
       <div className="shop-grid premium-shop-grid">
         {items.length > 0 ? (
           items.map((item) => (
-            <ShopItemCard key={item.id} item={item} onBuyItem={onBuyItem} />
+            <ShopItemCard
+              key={item.id}
+              item={item}
+              owned={ownedItems.has(`${item.type}:${item.name}`)}
+              balance={Number(balances[item.currency]) || 0}
+              onBuyItem={onBuyItem}
+            />
           ))
         ) : (
           <div className="empty-state-card">
@@ -31,11 +40,19 @@ export default function ShopPanel({ items = [], onBuyItem }) {
   );
 }
 
-function ShopItemCard({ item, onBuyItem }) {
+function ShopItemCard({ item, owned, balance, onBuyItem }) {
   const rarity = itemRarity(item);
+  const canAfford = balance >= item.cost;
+  const shortfall = Math.max(0, item.cost - balance);
 
   return (
-    <div className={`shop-card premium-shop-card rarity-${rarity.toLowerCase()}`}>
+    <div className={[
+      "shop-card",
+      "premium-shop-card",
+      `rarity-${rarity.toLowerCase()}`,
+      owned ? "is-owned" : "",
+      !owned && !canAfford ? "is-unaffordable" : ""
+    ].filter(Boolean).join(" ")}>
       <div className="shop-item-icon">
         {itemIcon(item.type)}
       </div>
@@ -61,8 +78,8 @@ function ShopItemCard({ item, onBuyItem }) {
         </div>
       </div>
 
-      <button onClick={() => onBuyItem(item.id)} type="button">
-        Buy
+      <button disabled={owned || !canAfford} onClick={() => onBuyItem(item.id)} type="button">
+        {owned ? "Owned" : canAfford ? "Buy" : `Need ${shortfall} more`}
       </button>
     </div>
   );

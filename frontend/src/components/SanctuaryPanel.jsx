@@ -1,11 +1,19 @@
+import { useEffect, useState } from "react";
+
 export default function SanctuaryPanel({ state, classMeta = {} }) {
+  const [now, setNow] = useState(Date.now);
   const primaryMeta = classMeta[state?.primaryClass] || { label: state?.primaryClass || "Unknown", icon: "✨" };
   const activeMeta = classMeta[state?.activeClass] || { label: state?.activeClass || "Unknown", icon: "✨" };
-  const resetStatus = getResetStatus(state?.lastDailyReset);
+  const resetStatus = getResetStatus(state?.lastDailyReset, now);
   const energy = Math.max(0, Math.min(100, state?.energy ?? 100));
   const penalty = state?.xpPenaltyActionsLeft ?? 0;
   const stability = Math.max(0, Math.min(100, energy - penalty * 8 + (state?.loginStreak ?? 1) * 4));
   const dailyState = resetStatus === "Ready" ? "Reset Ready" : "Cycle Active";
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 15000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   return (
     <div className="panel sanctuary-status premium-sanctuary-panel">
@@ -72,14 +80,14 @@ function SanctuaryStat({ label, value, icon }) {
   );
 }
 
-function getResetStatus(lastDailyReset) {
+function getResetStatus(lastDailyReset, now = Date.now()) {
   if (!lastDailyReset) {
     return "Loading";
   }
 
   const resetInterval = 1000 * 60 * 60 * 24;
   const nextReset = Number(lastDailyReset) + resetInterval;
-  const timeLeft = Math.max(0, nextReset - Date.now());
+  const timeLeft = Math.max(0, nextReset - now);
 
   if (timeLeft <= 0) {
     return "Ready";

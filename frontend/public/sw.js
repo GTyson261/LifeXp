@@ -1,4 +1,4 @@
-const CACHE_NAME = "lifexp-shell-v1";
+const CACHE_NAME = "lifexp-shell-v2";
 const APP_SHELL = ["/", "/manifest.webmanifest", "/lifexp-icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -22,11 +22,25 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname.startsWith("/api/")) {
+  if (event.request.method !== "GET" || url.pathname.startsWith("/api/") || url.origin !== self.location.origin) {
     return;
   }
 
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request).then((cached) => cached || caches.match("/")))
+    fetch(event.request)
+      .then(async (response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, copy);
+        }
+        return response;
+      })
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        if (event.request.mode === "navigate") return caches.match("/");
+        return new Response("Offline", { status: 503, statusText: "Offline" });
+      })
   );
 });

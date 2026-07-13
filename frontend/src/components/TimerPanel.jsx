@@ -6,7 +6,8 @@ export default function TimerPanel({
   timerSeconds,
   onStart,
   onStopAndClaim,
-  formatTime
+  formatTime,
+  busy = false
 }) {
   const selectedActivity = activities.find((activity) => activity.key === timerActivity);
   const minutes = Math.floor(timerSeconds / 60);
@@ -70,6 +71,10 @@ export default function TimerPanel({
         </i>
       </div>
 
+      <p className="timer-minimum-note">
+        Verified rewards unlock after the first full minute. Only completed minutes are claimed.
+      </p>
+
       <div className="timer-signal-row" aria-hidden="true">
         <span className={timerRunning ? "active" : ""} />
         <span className={timerRunning ? "active" : ""} />
@@ -80,7 +85,9 @@ export default function TimerPanel({
       {!timerRunning ? (
         <button onClick={onStart} type="button">Start Timer</button>
       ) : (
-        <button onClick={onStopAndClaim} type="button">Stop & Claim Verified XP</button>
+        <button disabled={busy} onClick={onStopAndClaim} type="button">
+          {busy ? "Claiming Session..." : "Stop & Claim Verified XP"}
+        </button>
       )}
     </div>
   );

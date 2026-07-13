@@ -520,7 +520,7 @@
   }
 
   .app-shell {
-    padding-bottom: 5.75rem;
+    padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
   }
 
   .dashboard-tabs {
@@ -531,7 +531,7 @@
     position: fixed;
     left: 0.75rem;
     right: 0.75rem;
-    bottom: 0.75rem;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
     z-index: 60;
     display: grid;
     grid-template-columns: repeat(8, minmax(0, 1fr));

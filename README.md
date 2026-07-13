@@ -34,19 +34,22 @@ By combining gaming elements with real-life progress, I want to create something
 
 ---
 
-🛠️ Core Features (Planned Scope)
+🛠️ Current Features
 
-- Focus session tracking (coding/reading)
-- XP and leveling system
-- Class-based progression (Bookworm, Coder)
-- Activity history tracking
-- Basic quest system (daily/weekly goals)
+- Manual and verified-timer tracking across nine activity types
+- XP, leveling, class mastery, skill trees, streaks, and energy management
+- Eight playable classes with perks, evolutions, and themed worlds
+- Daily and class-story quests, achievements, bosses, and loot
+- Avatar customization, unlockable cosmetics, inventory, and shop systems
+- Friends, invites, matchmaking, friendly battles, history, and reconnect support
+- MySQL-backed accounts and per-player saves
+- Responsive desktop/mobile UI and installable PWA support
 
 ---
 
-⚙️ Tech Stack (Planned)
+⚙️ Tech Stack
 
-Frontend: React (Web) / React Native (Mobile)
+Frontend: React + Vite responsive PWA
 Backend: Spring Boot (Java)
 Database: MySQL
 API: RESTful endpoints for sessions, users, and progress tracking
@@ -55,11 +58,7 @@ API: RESTful endpoints for sessions, users, and progress tracking
 
 ✅ Project Scope Notes
 
-This project focuses on a single core feature:
-
-«Tracking focus sessions and converting them into game-based progression.»
-
-Future ideas like full social systems, avatars, or large-scale features are intentionally out of scope for this version.
+The core loop remains focused: real-world actions become game progression. The current demo expands that loop with persistent accounts, character customization, world bosses, quests, rewards, and opt-in social battles while keeping progression tied to logged activity.
 
 ---
 
@@ -127,6 +126,16 @@ http://192.168.1.20:5174
 
 The frontend will call the backend on the same host at port `8080`.
 
+### Production API Origin
+
+Production builds default to same-origin `/api` requests, which works cleanly behind a reverse proxy. If the frontend and backend are deployed on different origins, provide the backend origin when building:
+
+```bash
+VITE_API_ORIGIN='https://api.example.com' npm run build
+```
+
+The value may include a trailing slash; LifeXP normalizes it automatically.
+
 ### Demo Flow
 
 1. Register or log in.
@@ -166,3 +175,8 @@ This creates temporary users, joins matchmaking, creates matched rooms, submits 
 - Matchmaking queue is intentionally short-lived and expires stale entries.
 - Waiting rooms, stale rooms, and old completed room snapshots are cleaned on a timer.
 - Friendly battle moves are server-validated for duplicate moves, stale rounds, full rooms, and completed rooms.
+- Game actions are server-validated for known activity types, balanced amounts, valid classes, and owned post-onboarding cosmetics.
+- Login sessions expire after 30 days and are invalidated server-side on logout.
+- Daily quest progress and missed-day streaks reset correctly.
+- Explorer discovery rewards are granted once per world to prevent travel farming.
+- The PWA caches versioned frontend assets after a successful load for a reliable offline shell.

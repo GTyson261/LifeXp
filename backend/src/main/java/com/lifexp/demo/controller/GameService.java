@@ -3,10 +3,24 @@ package com.lifexp.demo.controller;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @Service
 public class GameService {
+    private static final Set<String> ACTIVITY_TYPES = Set.of(
+            "coding", "reading", "walking", "workout", "focus",
+            "meditation", "music", "cooking", "gaming"
+    );
+    private static final Set<String> CLASS_NAMES = Set.of(
+            "NOVICE", "CODER", "BOOKWORM", "SPORT_MASTER", "GAMER",
+            "EXPLORER", "ZEN", "MUSICIAN", "CHEF"
+    );
+    private static final Set<String> AVATAR_GENDERS = Set.of("Custom", "Male", "Female");
+    private static final Set<String> AVATAR_BODY_TYPES = Set.of("Lean", "Average", "Athletic", "Strong");
+    private static final Set<String> AVATAR_HAIR_STYLES = Set.of("Fade", "Curly", "Locs", "Afro", "Short", "Long");
+    private static final Set<String> INVENTORY_TYPES = Set.of("aura", "theme", "frame", "outfit");
     private final SaveService saveService;
     private final DailyResetService dailyResetService;
     private UserAccount currentAccount;
@@ -55,7 +69,7 @@ public class GameService {
 
     public PlayerState travelToWorld(String worldId) {
         if (worldId == null || worldId.isBlank()) {
-            return state;
+            throw new IllegalArgumentException("Choose a world to travel to.");
         }
 
         syncCatalog();
@@ -64,26 +78,26 @@ public class GameService {
         for (PlayerState.WorldZone world : state.worlds) {
             if (world.id.equals(worldId)) {
                 if (!world.unlocked) {
-                    state.activityLog.add(0, "World locked: " + world.name + " needs level " + world.minLevel + " and " + world.requiredBosses + " boss win(s).");
-                    trimLog();
-                    return state;
+                    throw new IllegalArgumentException("World locked: " + world.name + " needs level " + world.minLevel + " and " + world.requiredBosses + " boss win(s).");
                 }
 
                 int travelCost = hasSkill("s5") ? 0 : classAdjustedTravelCost(world.travelCost);
 
                 if (state.energy < travelCost) {
-                    state.activityLog.add(0, "Not enough energy to travel to " + world.name + ".");
-                    trimLog();
-                    return state;
+                    throw new IllegalArgumentException("You need " + travelCost + " energy to travel to " + world.name + ".");
                 }
 
+                boolean firstVisit = !state.visitedWorldIds.contains(world.id);
                 state.energy -= travelCost;
                 state.currentWorldId = world.id;
+                if (firstVisit) {
+                    state.visitedWorldIds.add(world.id);
+                }
 
                 state.currentBoss = createBossForWorld(world);
                 advanceQuest("travel", 1);
 
-                if (state.primaryClass.equals("EXPLORER")) {
+                if (state.primaryClass.equals("EXPLORER") && firstVisit) {
                     int travelXp = 25 + Math.max(0, world.requiredBosses * 5) + classUpgradeBonusStep() * 8;
                     int travelGold = 10 + classUpgradeBonusStep() * 4;
                     state.xp += travelXp;
@@ -100,15 +114,11 @@ public class GameService {
             }
         }
 
-        state.activityLog.add(0, "World not found.");
-        trimLog();
-        return state;
+        throw new IllegalArgumentException("World not found.");
     }
 
     public PlayerState changePrimaryClassAtSanctuary(String className) {
-        if (className == null || className.isBlank()) {
-            return state;
-        }
+        className = requireClassName(className, true);
 
         if (state.primaryClass.equals(className)) {
             state.activityLog.add(0, "You are already bound to " + className + ".");
@@ -117,15 +127,14 @@ public class GameService {
         }
 
         if (state.gold < 25) {
-            state.activityLog.add(0, "Not enough Gold to change primary class at the Sanctuary.");
-            trimLog();
-            return state;
+            throw new IllegalArgumentException("You need 25 Gold to change primary class at the Sanctuary.");
         }
 
         state.gold -= 25;
         applyClassTheme(className);
         state.classMastery = 0;
         state.xpPenaltyActionsLeft = 3;
+        syncCatalog();
 
         state.activityLog.add(0, "Class Sanctuary complete. Primary class changed to " + className + ".");
         state.activityLog.add(0, "Class mastery reset. Temporary XP penalty active for 3 actions.");
@@ -135,13 +144,16 @@ public class GameService {
     }
 
     public PlayerState chooseIntroClass(String className) {
-        if (className == null || className.isBlank() || state.introCompleted) {
+        if (state.introCompleted) {
             return state;
         }
+
+        className = requireClassName(className, false);
 
         applyClassTheme(className);
         state.classMastery = 0;
         state.xpPenaltyActionsLeft = 0;
+        syncCatalog();
         state.activityLog.add(0, "Origin chosen: " + className + ".");
         trimLog();
         saveState();
@@ -149,23 +161,32 @@ public class GameService {
     }
 
     public PlayerState completeActivity(ActivityRequest request) {
-        if (request == null) return state;
+        if (request == null) {
+            throw new IllegalArgumentException("Activity details are required.");
+        }
 
         dailyResetService.applyDailyResetIfNeeded(state);
         syncCatalog();
         unlockAvailableWorlds();
 
-        String type = safe(request.type);
-        int amount = dailyResetService.sanitizeActivityAmount((int) Math.min(request.amount, 60));
-        String summary = safe(request.summary);
+        String type = safe(request.type).toLowerCase();
+        boolean isIntro = type.equals("intro");
+
+        if (!isIntro && !ACTIVITY_TYPES.contains(type)) {
+            throw new IllegalArgumentException("Choose a valid LifeXP activity type.");
+        }
+
+        if (!isIntro && (request.amount < 1 || request.amount > 60)) {
+            throw new IllegalArgumentException("Activity amount must be between 1 and 60.");
+        }
+
+        int amount = isIntro ? 0 : dailyResetService.sanitizeActivityAmount((int) request.amount);
+        String summary = clip(safe(request.summary), 240);
 
         int energyCost = classAdjustedEnergyCost(type, Math.max(1, amount / 5));
 
         if (!type.equals("intro") && state.energy < energyCost) {
-            state.activityLog.add(0, "Not enough energy for this activity.");
-            trimLog();
-            saveState();
-            return state;
+            throw new IllegalArgumentException("You need " + energyCost + " energy for this activity.");
         }
 
         if (!type.equals("intro")) {
@@ -194,9 +215,7 @@ public class GameService {
         }
 
         if (dailyResetService.isSuspiciousGain(xpGain)) {
-            state.activityLog.add(0, "Suspicious XP gain blocked.");
-            trimLog();
-            return state;
+            throw new IllegalArgumentException("This XP gain exceeded the allowed limit and was blocked.");
         }
 
         state.lastXpGain = xpGain;
@@ -226,6 +245,7 @@ public class GameService {
         }
 
         damageBoss(damage);
+        advanceQuest("boss_damage", 1);
         checkLevelUp();
         completeQuests(type);
         checkAchievements(type);
@@ -243,10 +263,13 @@ public class GameService {
     }
 
     public PlayerState updateAvatar(PlayerState.Avatar avatar) {
-        if (avatar == null) return state;
+        if (avatar == null) {
+            throw new IllegalArgumentException("Avatar details are required.");
+        }
+        if (state.avatar == null) state.avatar = new PlayerState.Avatar();
 
-        String displayName = safe(avatar.displayName);
-        String pronouns = safe(avatar.pronouns);
+        String displayName = clip(safe(avatar.displayName), 32);
+        String pronouns = clip(safe(avatar.pronouns), 24);
 
         if (displayName.isBlank()) {
             displayName = state.playerName == null || state.playerName.isBlank()
@@ -262,6 +285,20 @@ public class GameService {
 
         avatar.displayName = displayName;
         avatar.pronouns = pronouns;
+        avatar.gender = allowedChoice(avatar.gender, AVATAR_GENDERS, state.avatar.gender);
+        avatar.bodyType = allowedChoice(avatar.bodyType, AVATAR_BODY_TYPES, state.avatar.bodyType);
+        avatar.hairStyle = allowedChoice(avatar.hairStyle, AVATAR_HAIR_STYLES, state.avatar.hairStyle);
+        avatar.skinTone = validHexColor(avatar.skinTone) ? avatar.skinTone.toLowerCase() : state.avatar.skinTone;
+        avatar.hairColor = validHexColor(avatar.hairColor) ? avatar.hairColor.toLowerCase() : state.avatar.hairColor;
+        avatar.outfit = fallbackClipped(avatar.outfit, state.avatar.outfit, 64);
+        avatar.aura = fallbackClipped(avatar.aura, state.avatar.aura, 64);
+
+        if (state.introCompleted && !avatar.outfit.equals(state.avatar.outfit) && !alreadyOwns(avatar.outfit, "outfit")) {
+            avatar.outfit = state.avatar.outfit;
+        }
+        if (state.introCompleted && !avatar.aura.equals(state.avatar.aura) && !alreadyOwns(avatar.aura, "aura")) {
+            avatar.aura = state.avatar.aura;
+        }
         state.avatar = avatar;
         state.playerName = displayName;
         state.pronouns = pronouns;
@@ -278,18 +315,13 @@ public class GameService {
         long cooldown = 1000L * 60 * 30;
 
         if (state.energy >= 100) {
-            state.activityLog.add(0, "Energy is already full.");
-            trimLog();
-            saveState();
-            return state;
+            throw new IllegalArgumentException("Energy is already full.");
         }
 
         if (state.lastRestTimestamp > 0 && now - state.lastRestTimestamp < cooldown) {
-            long minutesLeft = Math.max(1, (cooldown - (now - state.lastRestTimestamp)) / (1000L * 60));
-            state.activityLog.add(0, "Rest is on cooldown. Try again in " + minutesLeft + " minute(s).");
-            trimLog();
-            saveState();
-            return state;
+            long remaining = cooldown - (now - state.lastRestTimestamp);
+            long minutesLeft = Math.max(1, (remaining + (1000L * 60) - 1) / (1000L * 60));
+            throw new IllegalArgumentException("Rest is on cooldown. Try again in " + minutesLeft + " minute(s).");
         }
 
         int before = state.energy;
@@ -305,10 +337,11 @@ public class GameService {
         String today = LocalDate.now().toString();
 
         if (today.equals(state.lastLoginRewardDate)) {
-            state.activityLog.add(0, "Daily reward already claimed today.");
-            trimLog();
-            saveState();
-            return state;
+            throw new IllegalArgumentException("Daily reward already claimed today.");
+        }
+
+        if (!isPreviousCalendarDay(state.lastLoginRewardDate)) {
+            state.loginRewardStreak = 0;
         }
 
         state.loginRewardStreak = Math.max(0, state.loginRewardStreak) + 1;
@@ -338,21 +371,25 @@ public class GameService {
     }
 
     public PlayerState unlockSkill(String skillId) {
+        if (skillId == null || skillId.isBlank()) {
+            throw new IllegalArgumentException("Choose a skill to unlock.");
+        }
+
         syncCatalog();
 
         for (PlayerState.Skill skill : state.skills) {
-            if (skill.id.equals(skillId) && !skill.unlocked) {
+            if (skill.id.equals(skillId)) {
+                if (skill.unlocked) {
+                    throw new IllegalArgumentException(skill.name + " is already unlocked.");
+                }
+
                 int cost = Math.max(1, skill.cost);
                 if (state.skillPoints < cost) {
-                    state.activityLog.add(0, "Not enough skill points for " + skill.name + ".");
-                    trimLog();
-                    return state;
+                    throw new IllegalArgumentException("You need " + cost + " skill point(s) to unlock " + skill.name + ".");
                 }
 
                 if (!skill.prerequisiteId.isBlank() && !hasSkill(skill.prerequisiteId)) {
-                    state.activityLog.add(0, "Skill locked: unlock its prerequisite first.");
-                    trimLog();
-                    return state;
+                    throw new IllegalArgumentException("Skill locked: unlock its prerequisite first.");
                 }
 
                 skill.unlocked = true;
@@ -361,16 +398,16 @@ public class GameService {
                 trimLog();
                 unlockAvailableWorlds();
                 saveState();
-                break;
+                return state;
             }
         }
 
-        return state;
+        throw new IllegalArgumentException("Skill not found.");
     }
 
     public PlayerState claimQuest(String questId) {
         if (questId == null || questId.isBlank()) {
-            return state;
+            throw new IllegalArgumentException("Choose a quest reward to claim.");
         }
 
         syncCatalog();
@@ -381,15 +418,11 @@ public class GameService {
             }
 
             if (!quest.completed) {
-                state.activityLog.add(0, "Quest not complete yet: " + quest.name + ".");
-                trimLog();
-                return state;
+                throw new IllegalArgumentException("Quest not complete yet: " + quest.name + ".");
             }
 
             if (quest.claimed) {
-                state.activityLog.add(0, "Quest already claimed: " + quest.name + ".");
-                trimLog();
-                return state;
+                throw new IllegalArgumentException("Quest already claimed: " + quest.name + ".");
             }
 
             int rewardXp = quest.rewardXp + (hasSkill("s7") ? 20 : 0);
@@ -414,9 +447,7 @@ public class GameService {
             return state;
         }
 
-        state.activityLog.add(0, "Quest not found.");
-        trimLog();
-        return state;
+        throw new IllegalArgumentException("Quest not found.");
     }
 
     private int calculateXp(String type, int amount, String summary, boolean verified) {
@@ -806,6 +837,13 @@ public class GameService {
     private void syncCatalog() {
         PlayerState defaults = new PlayerState();
 
+        if (state.visitedWorldIds == null) {
+            state.visitedWorldIds = new java.util.ArrayList<>();
+        }
+        if (state.currentWorldId != null && !state.currentWorldId.isBlank() && !state.visitedWorldIds.contains(state.currentWorldId)) {
+            state.visitedWorldIds.add(state.currentWorldId);
+        }
+
         for (PlayerState.Quest defaultQuest : defaults.dailyQuests) {
             PlayerState.Quest existing = findQuest(defaultQuest.id);
             if (existing == null) {
@@ -1074,7 +1112,46 @@ public class GameService {
         if (world != null) {
             world.bossDefeated = true;
         }
-        advanceQuest("boss_damage", 1);
+    }
+
+    private boolean isPreviousCalendarDay(String date) {
+        if (date == null || date.isBlank()) {
+            return false;
+        }
+
+        try {
+            return LocalDate.parse(date).equals(LocalDate.now().minusDays(1));
+        } catch (DateTimeParseException exception) {
+            return false;
+        }
+    }
+
+    private String requireClassName(String className, boolean allowNovice) {
+        String normalized = safe(className).toUpperCase();
+
+        if (!CLASS_NAMES.contains(normalized) || (!allowNovice && normalized.equals("NOVICE"))) {
+            throw new IllegalArgumentException("Choose a valid LifeXP class.");
+        }
+
+        return normalized;
+    }
+
+    private String clip(String value, int maxLength) {
+        return value.length() <= maxLength ? value : value.substring(0, maxLength);
+    }
+
+    private String allowedChoice(String value, Set<String> allowed, String fallback) {
+        String normalized = safe(value);
+        return allowed.contains(normalized) ? normalized : fallback;
+    }
+
+    private boolean validHexColor(String value) {
+        return value != null && value.matches("#[0-9a-fA-F]{6}");
+    }
+
+    private String fallbackClipped(String value, String fallback, int maxLength) {
+        String normalized = clip(safe(value), maxLength);
+        return normalized.isBlank() ? fallback : normalized;
     }
 
     private String activeClassForActivity(String type) {
@@ -1212,7 +1289,7 @@ public class GameService {
     }
     public PlayerState buyShopItem(String itemId) {
         if (itemId == null || itemId.isBlank()) {
-            return state;
+            throw new IllegalArgumentException("Choose a shop item to purchase.");
         }
 
         PlayerState.ShopItem itemToBuy = null;
@@ -1225,21 +1302,15 @@ public class GameService {
         }
 
         if (itemToBuy == null) {
-            state.activityLog.add(0, "Shop item not found.");
-            trimLog();
-            return state;
+            throw new IllegalArgumentException("Shop item not found.");
         }
 
         if (alreadyOwns(itemToBuy.name, itemToBuy.type)) {
-            state.activityLog.add(0, "You already own " + itemToBuy.name + ".");
-            trimLog();
-            return state;
+            throw new IllegalArgumentException("You already own " + itemToBuy.name + ".");
         }
 
         if (!canAfford(itemToBuy.currency, itemToBuy.cost)) {
-            state.activityLog.add(0, "Not enough " + itemToBuy.currency + " to buy " + itemToBuy.name + ".");
-            trimLog();
-            return state;
+            throw new IllegalArgumentException("You need " + itemToBuy.cost + " " + itemToBuy.currency + " to buy " + itemToBuy.name + ".");
         }
 
         spendCurrency(itemToBuy.currency, itemToBuy.cost);
@@ -1259,7 +1330,7 @@ public class GameService {
 
     public PlayerState equipInventoryItem(String itemId) {
         if (itemId == null || itemId.isBlank()) {
-            return state;
+            throw new IllegalArgumentException("Choose an inventory item to equip.");
         }
 
         PlayerState.InventoryItem selected = null;
@@ -1272,9 +1343,11 @@ public class GameService {
         }
 
         if (selected == null) {
-            state.activityLog.add(0, "Inventory item not found.");
-            trimLog();
-            return state;
+            throw new IllegalArgumentException("Inventory item not found.");
+        }
+
+        if (!INVENTORY_TYPES.contains(selected.type)) {
+            throw new IllegalArgumentException("This inventory item cannot be equipped.");
         }
 
         for (PlayerState.InventoryItem item : state.inventory) {

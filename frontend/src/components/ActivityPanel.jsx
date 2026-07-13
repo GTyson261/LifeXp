@@ -10,12 +10,13 @@ export default function ActivityPanel({
   setVerified,
   energy = 100,
   energyCost = 0,
-  onSubmit
+  onSubmit,
+  busy = false
 }) {
   const energyAfter = Math.max(0, energy - energyCost);
   const canAffordEnergy = energy >= energyCost;
   const selectedActivity = activities.find((activity) => activity.key === activityType) || activities[0];
-  const numericAmount = Math.max(0, Number(amount) || 0);
+  const numericAmount = Math.min(60, Math.max(0, Number(amount) || 0));
   const estimatedXp = numericAmount > 0 ? Math.max(5, Math.round(numericAmount * (verified ? 1.35 : 1))) : 0;
   const summaryLength = summary.trim().length;
   const intentPercent = Math.min(100, Math.round((numericAmount / 45) * 100));
@@ -125,8 +126,13 @@ export default function ActivityPanel({
           type="number"
           placeholder="Minutes, pages, steps, or points"
           value={amount}
+          min="1"
+          max="60"
+          step="1"
+          required
           onChange={(event) => setAmount(event.target.value)}
         />
+        <small>Log up to 60 units per entry so rewards stay balanced.</small>
       </label>
 
       <label>
@@ -134,6 +140,7 @@ export default function ActivityPanel({
         <textarea
           placeholder="What did you complete?"
           value={summary}
+          maxLength="240"
           onChange={(event) => setSummary(event.target.value)}
         />
       </label>
@@ -147,8 +154,8 @@ export default function ActivityPanel({
         Verified bonus
       </label>
 
-      <button type="submit" disabled={!canAffordEnergy}>
-        {canAffordEnergy ? "Claim XP" : "Not Enough Energy"}
+      <button type="submit" disabled={busy || !canAffordEnergy || numericAmount <= 0}>
+        {busy ? "Saving Progress..." : !canAffordEnergy ? "Not Enough Energy" : numericAmount > 0 ? "Claim XP" : "Enter an Amount"}
       </button>
     </form>
   );

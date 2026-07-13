@@ -29,7 +29,8 @@ public class PlayerController {
     }
 
     @PostMapping("/walking")
-    public ActionResponse walking(@RequestBody WalkingRequest r) {
+    public ActionResponse walking(@RequestBody(required = false) WalkingRequest request) {
+        WalkingRequest r = requireRequest(request);
         String c = clean(r.currentClass());
 
         int base = r.steps() / 100 + r.minutes() * 2;
@@ -40,7 +41,8 @@ public class PlayerController {
     }
 
     @PostMapping("/coding")
-    public ActionResponse coding(@RequestBody CodingRequest r) {
+    public ActionResponse coding(@RequestBody(required = false) CodingRequest request) {
+        CodingRequest r = requireRequest(request);
         String c = clean(r.currentClass());
 
         int base = r.minutes() * 3;
@@ -51,7 +53,8 @@ public class PlayerController {
     }
 
     @PostMapping("/reading")
-    public ActionResponse reading(@RequestBody ReadingRequest r) {
+    public ActionResponse reading(@RequestBody(required = false) ReadingRequest request) {
+        ReadingRequest r = requireRequest(request);
         String c = clean(r.currentClass());
 
         int base = r.pages() * 2;
@@ -63,7 +66,8 @@ public class PlayerController {
     }
 
     @PostMapping("/passive")
-    public ActionResponse passive(@RequestBody PassiveRequest r) {
+    public ActionResponse passive(@RequestBody(required = false) PassiveRequest request) {
+        PassiveRequest r = requireRequest(request);
         String c = clean(r.currentClass());
 
         int base = Math.max(1, r.minutes());
@@ -87,6 +91,19 @@ public class PlayerController {
         log(actionText + " | +" + finalXp + " XP to " + c + " | x" + multiplier);
 
         return build(c, finalXp, bonusXp);
+    }
+
+    private <T> T requireRequest(T request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Activity details are required.");
+        }
+        return request;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    public Map<String, String> activityError(IllegalArgumentException exception) {
+        return Map.of("message", exception.getMessage());
     }
 
     public Map<String, Object> applyXp(String className, int rawXp) {

@@ -64,8 +64,8 @@ export default function DashboardHUD({ state, classMeta = {}, rankTitle = "" }) 
           <HudStat icon="🪙" label="Gold" value={state?.gold || 0} />
           <HudStat icon="💎" label="Crystals" value={state?.crystals || 0} />
           <HudStat icon="💠" label="Skill Points" value={state?.skillPoints || 0} />
-          <button className="hud-action-button" onClick={state?.onRest}>Rest</button>
-          <button className="hud-action-button" onClick={state?.onReset}>Reset</button>
+          <button type="button" className="hud-action-button" onClick={state?.onRest}>Rest</button>
+          <button type="button" className="hud-action-button" onClick={state?.onSettings}>Settings</button>
         </div>
       </div>
 

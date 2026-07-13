@@ -125,6 +125,7 @@ export default function AvatarShowcase({
               type="button"
               className={isActive ? "showcase-class-card active" : "showcase-class-card"}
               style={{ "--showcase-color": meta.color || "#22d3ee" }}
+              disabled={isActive}
               onClick={() => onClassSelect(className)}
             >
               <span className="showcase-class-status">{isActive ? "Selected" : "Path"}</span>

@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/game")
 @CrossOrigin(originPatterns = "*")
@@ -22,43 +24,49 @@ public class GameController {
     }
 
     @PostMapping("/activity")
-    public PlayerState completeActivity(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody ActivityRequest request) {
+    public PlayerState completeActivity(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) ActivityRequest request) {
         return runAsUser(authorization, () -> gameService.completeActivity(request));
     }
 
     @PostMapping("/sanctuary/change-primary-class")
-    public PlayerState changePrimaryClassAtSanctuary(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody ClassRequest request) {
-        return runAsUser(authorization, () -> gameService.changePrimaryClassAtSanctuary(request.className));
+    public PlayerState changePrimaryClassAtSanctuary(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) ClassRequest request) {
+        ClassRequest body = requireRequest(request, "Class selection is required.");
+        return runAsUser(authorization, () -> gameService.changePrimaryClassAtSanctuary(body.className));
     }
 
     @PostMapping("/intro/class")
-    public PlayerState chooseIntroClass(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody ClassRequest request) {
-        return runAsUser(authorization, () -> gameService.chooseIntroClass(request.className));
+    public PlayerState chooseIntroClass(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) ClassRequest request) {
+        ClassRequest body = requireRequest(request, "Class selection is required.");
+        return runAsUser(authorization, () -> gameService.chooseIntroClass(body.className));
     }
 
     @PostMapping("/avatar")
-    public PlayerState updateAvatar(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody PlayerState.Avatar avatar) {
+    public PlayerState updateAvatar(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) PlayerState.Avatar avatar) {
         return runAsUser(authorization, () -> gameService.updateAvatar(avatar));
     }
 
     @PostMapping("/skill")
-    public PlayerState unlockSkill(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody SkillRequest request) {
-        return runAsUser(authorization, () -> gameService.unlockSkill(request.skillId));
+    public PlayerState unlockSkill(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) SkillRequest request) {
+        SkillRequest body = requireRequest(request, "Skill selection is required.");
+        return runAsUser(authorization, () -> gameService.unlockSkill(body.skillId));
     }
 
     @PostMapping("/quest/claim")
-    public PlayerState claimQuest(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody QuestClaimRequest request) {
-        return runAsUser(authorization, () -> gameService.claimQuest(request.questId));
+    public PlayerState claimQuest(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) QuestClaimRequest request) {
+        QuestClaimRequest body = requireRequest(request, "Quest selection is required.");
+        return runAsUser(authorization, () -> gameService.claimQuest(body.questId));
     }
 
     @PostMapping("/shop/buy")
-    public PlayerState buyShopItem(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody PurchaseRequest request) {
-        return runAsUser(authorization, () -> gameService.buyShopItem(request.itemId));
+    public PlayerState buyShopItem(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) PurchaseRequest request) {
+        PurchaseRequest body = requireRequest(request, "Shop item selection is required.");
+        return runAsUser(authorization, () -> gameService.buyShopItem(body.itemId));
     }
 
     @PostMapping("/inventory/equip")
-    public PlayerState equipInventoryItem(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody EquipRequest request) {
-        return runAsUser(authorization, () -> gameService.equipInventoryItem(request.itemId));
+    public PlayerState equipInventoryItem(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) EquipRequest request) {
+        EquipRequest body = requireRequest(request, "Inventory item selection is required.");
+        return runAsUser(authorization, () -> gameService.equipInventoryItem(body.itemId));
     }
 
     @PostMapping("/reset")
@@ -87,20 +95,39 @@ public class GameController {
     }
 
     @GetMapping("/save-location")
-    public String saveLocation() {
+    public String saveLocation(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        requireAuthenticatedAccount(authorization);
         return gameService.getSaveLocation();
     }
 
     @PostMapping("/world/travel")
-    public PlayerState travelToWorld(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody WorldTravelRequest request) {
-        return runAsUser(authorization, () -> gameService.travelToWorld(request.worldId));
+    public PlayerState travelToWorld(@RequestHeader(value = "Authorization", required = false) String authorization, @RequestBody(required = false) WorldTravelRequest request) {
+        WorldTravelRequest body = requireRequest(request, "World selection is required.");
+        return runAsUser(authorization, () -> gameService.travelToWorld(body.worldId));
+    }
+
+    private <T> T requireRequest(T request, String message) {
+        if (request == null) {
+            throw new IllegalArgumentException(message);
+        }
+        return request;
     }
 
     private PlayerState runAsUser(String authorization, java.util.function.Supplier<PlayerState> action) {
+        return gameService.withAccount(requireAuthenticatedAccount(authorization), action);
+    }
+
+    private UserAccount requireAuthenticatedAccount(String authorization) {
         try {
-            return gameService.withAccount(authService.requireAccount(authorization), action);
+            return authService.requireAccount(authorization);
         } catch (IllegalArgumentException exception) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, exception.getMessage());
         }
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> gameActionError(IllegalArgumentException exception) {
+        return Map.of("message", exception.getMessage());
     }
 }

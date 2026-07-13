@@ -13,8 +13,10 @@
   "crystals" : 10,
   "essence" : 0,
   "energy" : 100,
-  "lastDailyReset" : 1781009780445,
-  "loginStreak" : 1,
+  "lastDailyReset" : 1783877609089,
+  "loginStreak" : 5,
+  "lastLoginRewardDate" : "",
+  "loginRewardStreak" : 0,
   "lastActivityTimestamp" : 1781009780445,
   "lastRestTimestamp" : 0,
   "title" : "Cyber Architect",
@@ -31,6 +33,7 @@
     "bodyType" : "Average",
     "skinTone" : "#8d5524",
     "hairStyle" : "Fade",
+    "hairColor" : "#020617",
     "outfit" : "Neon Tech Jacket",
     "aura" : "Blue Terminal Aura"
   },
@@ -43,9 +46,10 @@
     "level" : 1,
     "element" : "Shadow"
   },
-  "activityLog" : [ "The LifeXP Gate opened.", "Origin chosen: CODER.", "LifeXP initialized. The gate is waiting." ],
+  "activityLog" : [ "Daily reset complete. Energy restored and quests refreshed.", "Daily reset complete. Energy restored and quests refreshed.", "Daily reset complete. Energy restored and quests refreshed.", "Daily reset complete. Energy restored and quests refreshed.", "The LifeXP Gate opened.", "Origin chosen: CODER.", "LifeXP initialized. The gate is waiting." ],
   "lastLootDrops" : [ ],
   "lootHistory" : [ ],
+  "visitedWorldIds" : [ "world_gate" ],
   "dailyQuests" : [ {
     "id" : "q1",
     "name" : "Start Your Grind",
@@ -92,6 +96,42 @@
     "rewardGold" : 20,
     "rewardEssence" : 1,
     "actionType" : "travel",
+    "target" : 1,
+    "progress" : 0
+  }, {
+    "id" : "class_coder_1",
+    "name" : "Boot Sequence",
+    "description" : "Complete one coding action.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 70,
+    "rewardGold" : 24,
+    "rewardEssence" : 1,
+    "actionType" : "coding",
+    "target" : 1,
+    "progress" : 0
+  }, {
+    "id" : "class_coder_2",
+    "name" : "Debug Loop",
+    "description" : "Complete 2 focused build actions.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 95,
+    "rewardGold" : 32,
+    "rewardEssence" : 2,
+    "actionType" : "focus",
+    "target" : 2,
+    "progress" : 0
+  }, {
+    "id" : "class_coder_3",
+    "name" : "Bug Lord Trace",
+    "description" : "Damage a boss after debugging.",
+    "completed" : false,
+    "claimed" : false,
+    "rewardXp" : 120,
+    "rewardGold" : 42,
+    "rewardEssence" : 3,
+    "actionType" : "boss_damage",
     "target" : 1,
     "progress" : 0
   } ],
@@ -264,6 +304,11 @@
     "name" : "Default Cyber Grid",
     "type" : "theme",
     "equipped" : true
+  }, {
+    "id" : "class_coder_outfit",
+    "name" : "Neon Tech Jacket",
+    "type" : "outfit",
+    "equipped" : false
   } ],
   "worlds" : [ {
     "id" : "world_gate",

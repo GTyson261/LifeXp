@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export default function EconomyPanel({
   gold = 0,
   crystals = 0,
@@ -6,7 +8,13 @@ export default function EconomyPanel({
   lastRestTimestamp = 0,
   onRest
 }) {
-  const restStatus = getRestStatus(lastRestTimestamp);
+  const [now, setNow] = useState(Date.now);
+  const restStatus = getRestStatus(lastRestTimestamp, now);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 15000);
+    return () => window.clearInterval(interval);
+  }, []);
   const energyPercent = Math.max(0, Math.min(100, Number(energy) || 0));
   const bankScore = gold + crystals * 12 + essence * 20;
   const walletTier = bankScore >= 1000 ? "Vaulted" : bankScore >= 500 ? "Loaded" : bankScore >= 150 ? "Stocked" : "Starting";
@@ -131,13 +139,13 @@ function getDominantCurrency({ gold, crystals, essence }) {
   return score > 0 ? label : "None";
 }
 
-function getRestStatus(lastRestTimestamp) {
+function getRestStatus(lastRestTimestamp, now = Date.now()) {
   if (!lastRestTimestamp || Number(lastRestTimestamp) <= 0) {
     return { ready: true, label: "Rest Ready" };
   }
 
   const cooldown = 1000 * 60 * 30;
-  const timeLeft = Math.max(0, Number(lastRestTimestamp) + cooldown - Date.now());
+  const timeLeft = Math.max(0, Number(lastRestTimestamp) + cooldown - now);
 
   if (timeLeft <= 0) {
     return { ready: true, label: "Rest Ready" };

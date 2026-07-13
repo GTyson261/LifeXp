@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DashboardHUD from "./components/DashboardHUD";
 import AvatarCustomizer from "./components/AvatarCustomizer";
 import AvatarPreview from "./components/AvatarPreview";
@@ -47,6 +47,7 @@ import {
   resetGame,
   registerUser,
   loginUser,
+  logoutUser,
   getStoredSession,
   clearStoredSession,
   createFriendlyBattleRoom,
@@ -89,6 +90,28 @@ const DASHBOARD_TABS = [
   { key: "world", label: "World", icon: "⌖" },
   { key: "log", label: "Log", icon: "☰" }
 ];
+
+const API_STATUS_LABEL = import.meta.env.DEV
+  ? "Port 8080"
+  : import.meta.env.VITE_API_ORIGIN
+    ? "Custom API"
+    : "Same Origin";
+
+function readPreference(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writePreference(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Preferences remain active for this tab when persistent storage is unavailable.
+  }
+}
 
 const INTRO_OPENINGS = {
   CODER: {
@@ -365,6 +388,10 @@ export default function App() {
   const [introClass, setIntroClass] = useState("CODER");
   const [introName, setIntroName] = useState("");
   const [introPronouns, setIntroPronouns] = useState("they/them");
+  const [introError, setIntroError] = useState("");
+  const [introBusy, setIntroBusy] = useState(false);
+  const [classChangeRequest, setClassChangeRequest] = useState("");
+  const [classChangeBusy, setClassChangeBusy] = useState(false);
   const [avatarSaveStatus, setAvatarSaveStatus] = useState("saved");
   const [lockedOutfitPreview, setLockedOutfitPreview] = useState("");
   const [battleRecap, setBattleRecap] = useState(null);
@@ -385,9 +412,15 @@ export default function App() {
   const [battleStats, setBattleStats] = useState(null);
   const [selectedFriendUsername, setSelectedFriendUsername] = useState("");
   const [socialToast, setSocialToast] = useState(null);
-  const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem("lifexp_reduce_motion") === "true");
-  const [compactMobile, setCompactMobile] = useState(() => localStorage.getItem("lifexp_compact_mobile") === "true");
-  const [audioFeedback, setAudioFeedback] = useState(() => localStorage.getItem("lifexp_audio_feedback") === "true");
+  const [actionNotice, setActionNotice] = useState(null);
+  const [reduceMotion, setReduceMotion] = useState(() => {
+    const stored = readPreference("lifexp_reduce_motion");
+    return stored === null
+      ? window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true
+      : stored === "true";
+  });
+  const [compactMobile, setCompactMobile] = useState(() => readPreference("lifexp_compact_mobile") === "true");
+  const [audioFeedback, setAudioFeedback] = useState(() => readPreference("lifexp_audio_feedback") === "true");
 
   const [activityType, setActivityType] = useState("coding");
   const [amount, setAmount] = useState("");
@@ -397,12 +430,19 @@ export default function App() {
   const [timerActivity, setTimerActivity] = useState("coding");
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
+  const timerStartedAtRef = useRef(null);
+  const socialPollInFlightRef = useRef(false);
+  const progressActionInFlightRef = useRef(false);
+  const pendingGameActionKeysRef = useRef(new Set());
+  const [progressActionBusy, setProgressActionBusy] = useState(false);
   const [floatingXp, setFloatingXp] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [authUsername, setAuthUsername] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
+  const [socialActionBusy, setSocialActionBusy] = useState(false);
+  const socialActionInFlightRef = useRef(false);
 
   async function loadGame() {
     if (!getStoredSession()) {
@@ -441,23 +481,32 @@ export default function App() {
   useEffect(() => {
     if (!timerRunning) return;
 
+    if (!timerStartedAtRef.current) {
+      timerStartedAtRef.current = Date.now() - timerSeconds * 1000;
+    }
+
+    const syncElapsedTime = () => {
+      setTimerSeconds(Math.max(0, Math.floor((Date.now() - timerStartedAtRef.current) / 1000)));
+    };
+
+    syncElapsedTime();
     const interval = setInterval(() => {
-      setTimerSeconds((prev) => prev + 1);
+      syncElapsedTime();
     }, 1000);
 
     return () => clearInterval(interval);
   }, [timerRunning]);
 
   useEffect(() => {
-    localStorage.setItem("lifexp_reduce_motion", String(reduceMotion));
+    writePreference("lifexp_reduce_motion", String(reduceMotion));
   }, [reduceMotion]);
 
   useEffect(() => {
-    localStorage.setItem("lifexp_compact_mobile", String(compactMobile));
+    writePreference("lifexp_compact_mobile", String(compactMobile));
   }, [compactMobile]);
 
   useEffect(() => {
-    localStorage.setItem("lifexp_audio_feedback", String(audioFeedback));
+    writePreference("lifexp_audio_feedback", String(audioFeedback));
   }, [audioFeedback]);
 
   useEffect(() => {
@@ -465,20 +514,6 @@ export default function App() {
       setDailyRewardVisible(true);
     }
   }, [state?.introCompleted, state?.lastLoginRewardDate]);
-
-  useEffect(() => {
-    if (activeView !== "friends" || !battleRoom?.code) return;
-
-    const interval = setInterval(async () => {
-      try {
-        setBattleRoom(await getFriendlyBattleRoom(battleRoom.code));
-      } catch {
-        // Manual refresh will show actionable errors; silent polling should stay quiet.
-      }
-    }, 3500);
-
-    return () => clearInterval(interval);
-  }, [activeView, battleRoom?.code]);
 
   useEffect(() => {
     if (activeView !== "friends") return;
@@ -491,16 +526,26 @@ export default function App() {
   useEffect(() => {
     if (activeView !== "friends") return;
 
-    const interval = setInterval(() => {
-      handleRefreshFriends({ quiet: true });
-      handleRefreshBattleInvites({ quiet: true });
-      handleRefreshBattleStats({ quiet: true });
-      if (battleRoom?.code) {
-        handleRefreshBattleRoom({ quiet: true });
+    const interval = setInterval(async () => {
+      if (socialPollInFlightRef.current) return;
+      socialPollInFlightRef.current = true;
+
+      try {
+        await Promise.all([
+          handleRefreshFriends({ quiet: true }),
+          handleRefreshBattleInvites({ quiet: true }),
+          handleRefreshBattleStats({ quiet: true }),
+          battleRoom?.code ? handleRefreshBattleRoom({ quiet: true }) : Promise.resolve()
+        ]);
+      } finally {
+        socialPollInFlightRef.current = false;
       }
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      socialPollInFlightRef.current = false;
+    };
   }, [activeView, battleRoom?.code]);
 
   useEffect(() => {
@@ -508,6 +553,51 @@ export default function App() {
     const timeout = setTimeout(() => setSocialToast(null), 3600);
     return () => clearTimeout(timeout);
   }, [socialToast]);
+
+  useEffect(() => {
+    if (!actionNotice) return;
+    const timeout = setTimeout(() => setActionNotice(null), 5200);
+    return () => clearTimeout(timeout);
+  }, [actionNotice]);
+
+  function showActionError(error, fallback = "LifeXP could not complete that action.") {
+    setActionNotice({
+      tone: "error",
+      title: "Action not saved",
+      message: error?.message || fallback
+    });
+  }
+
+  async function runExclusiveGameAction(actionKey, action, fallback) {
+    if (pendingGameActionKeysRef.current.has(actionKey)) return null;
+    pendingGameActionKeysRef.current.add(actionKey);
+
+    try {
+      return await action();
+    } catch (error) {
+      showActionError(error, fallback);
+      return null;
+    } finally {
+      pendingGameActionKeysRef.current.delete(actionKey);
+    }
+  }
+
+  async function runExclusiveSocialAction(action, fallback, setError = setBattleError) {
+    if (socialActionInFlightRef.current) return { ok: false, skipped: true };
+    socialActionInFlightRef.current = true;
+    setSocialActionBusy(true);
+
+    try {
+      setError("");
+      return { ok: true, value: await action() };
+    } catch (error) {
+      setError(error?.message || fallback);
+      return { ok: false, skipped: false };
+    } finally {
+      socialActionInFlightRef.current = false;
+      setSocialActionBusy(false);
+    }
+  }
 
   const hasUnsavedAvatarChanges = Boolean(
     state?.avatar &&
@@ -560,13 +650,23 @@ export default function App() {
     }
   }
 
-  function logout() {
+  function clearSession() {
     clearStoredSession();
     setSession(null);
     setState(null);
     setAvatarDraft(null);
     setLoadError("");
   }
+
+  function logout() {
+    logoutUser();
+    clearSession();
+  }
+
+  useEffect(() => {
+    window.addEventListener("lifexp:session-expired", clearSession);
+    return () => window.removeEventListener("lifexp:session-expired", clearSession);
+  }, []);
 
   if (!session) {
     return (
@@ -592,9 +692,11 @@ export default function App() {
             <span>!</span>
             <div>
               <p className="eyebrow">Connection Needed</p>
-              <h1>LifeXP backend is offline</h1>
+              <h1>LifeXP connection is unavailable</h1>
               <p>
-                Start the Spring Boot backend on port 8080, then retry the dashboard.
+                {import.meta.env.DEV
+                  ? "Start the Spring Boot backend on port 8080, then retry the dashboard."
+                  : "Check your connection and retry. Your saved progress has not been changed."}
               </p>
             </div>
           </div>
@@ -605,7 +707,7 @@ export default function App() {
           <div className="boot-status-grid">
             <span><small>Frontend</small><strong>Online</strong></span>
             <span><small>Backend</small><strong>Offline</strong></span>
-            <span><small>Port</small><strong>8080</strong></span>
+            <span><small>API Route</small><strong>{API_STATUS_LABEL}</strong></span>
           </div>
           <button type="button" onClick={loadGame}>
             Retry Connection
@@ -713,115 +815,196 @@ export default function App() {
       return;
     }
 
-    await updateAvatar({
-      ...(avatarDraft || state.avatar || {}),
-      displayName: trimmedName,
-      pronouns: trimmedPronouns,
-      gender: selectedGender
-    });
+    setIntroBusy(true);
+    setIntroError("");
 
-    const updated = await chooseIntroClass(introClass);
+    try {
+      await updateAvatar({
+        ...(avatarDraft || state.avatar || {}),
+        displayName: trimmedName,
+        pronouns: trimmedPronouns,
+        gender: selectedGender
+      });
 
-    setState(updated);
-    setAvatarDraft({
-      ...(updated.avatar || {}),
-      displayName: updated.playerName || trimmedName,
-      pronouns: updated.pronouns || trimmedPronouns,
-      gender: selectedGender
-    });
-    setIntroStep("avatar");
+      const updated = await chooseIntroClass(introClass);
+
+      setState(updated);
+      setAvatarDraft({
+        ...(updated.avatar || {}),
+        displayName: updated.playerName || trimmedName,
+        pronouns: updated.pronouns || trimmedPronouns,
+        gender: selectedGender
+      });
+      setIntroStep("avatar");
+    } catch (error) {
+      setIntroError(error.message || "The gate could not open. Check the backend and try again.");
+    } finally {
+      setIntroBusy(false);
+    }
   }
 
   async function finishIntroCustomization() {
-    const saved = await updateAvatar(avatarDraft || state.avatar || {});
+    setIntroBusy(true);
+    setIntroError("");
 
-    const updated = await completeActivity({
-      type: "intro",
-      amount: 0,
-      summary: `Opened the ${CLASS_META[introClass]?.world || "LifeXP"} Gate`,
-      verified: true
-    });
+    try {
+      const saved = await updateAvatar(avatarDraft || state.avatar || {});
 
-    setState({
-      ...updated,
-      avatar: saved.avatar || updated.avatar
-    });
-    setAvatarDraft(saved.avatar || updated.avatar);
-    setIntroStep("reveal");
-    setActiveView("avatar");
+      const updated = await completeActivity({
+        type: "intro",
+        amount: 0,
+        summary: `Opened the ${CLASS_META[introClass]?.world || "LifeXP"} Gate`,
+        verified: true
+      });
 
-    setTimeout(() => {
-      setShowIntro(false);
-      setIntroStep("origin");
-    }, 1900);
+      setState({
+        ...updated,
+        avatar: saved.avatar || updated.avatar
+      });
+      setAvatarDraft(saved.avatar || updated.avatar);
+      setIntroStep("reveal");
+      setActiveView("avatar");
+
+      setTimeout(() => {
+        setShowIntro(false);
+        setIntroStep("origin");
+      }, 1900);
+    } catch (error) {
+      setIntroError(error.message || "Your hero could not enter LifeXP yet. Try again.");
+    } finally {
+      setIntroBusy(false);
+    }
   }
 
-  async function handleClassChoice(className) {
-    const currentAvatar = avatarDraft || state?.avatar || {};
-    const updated = await changePrimaryClassAtSanctuary(className);
+  function requestClassChoice(className) {
+    if (!className || className === state?.primaryClass) return;
+    setClassChangeRequest(className);
+  }
 
-    const preservedAvatar = {
-      ...(updated.avatar || {}),
-      displayName: currentAvatar.displayName || updated.playerName || "PlayerOne",
-      pronouns: currentAvatar.pronouns || updated.pronouns || "they/them",
-      gender: currentAvatar.gender || updated.avatar?.gender,
-      bodyType: currentAvatar.bodyType || updated.avatar?.bodyType,
-      skinTone: currentAvatar.skinTone || updated.avatar?.skinTone,
-      hairStyle: currentAvatar.hairStyle || updated.avatar?.hairStyle,
-      hairColor: currentAvatar.hairColor || updated.avatar?.hairColor
-    };
+  async function confirmClassChoice() {
+    const className = classChangeRequest;
+    if (!className || classChangeBusy) return;
+    setClassChangeBusy(true);
 
-    setState({
-      ...updated,
-      avatar: preservedAvatar
-    });
+    try {
+      const currentAvatar = avatarDraft || state?.avatar || {};
+      const updated = await changePrimaryClassAtSanctuary(className);
 
-    setAvatarDraft(preservedAvatar);
+      const preservedAvatar = {
+        ...(updated.avatar || {}),
+        displayName: currentAvatar.displayName || updated.playerName || "PlayerOne",
+        pronouns: currentAvatar.pronouns || updated.pronouns || "they/them",
+        gender: currentAvatar.gender || updated.avatar?.gender,
+        bodyType: currentAvatar.bodyType || updated.avatar?.bodyType,
+        skinTone: currentAvatar.skinTone || updated.avatar?.skinTone,
+        hairStyle: currentAvatar.hairStyle || updated.avatar?.hairStyle,
+        hairColor: currentAvatar.hairColor || updated.avatar?.hairColor
+      };
+
+      setState({
+        ...updated,
+        avatar: preservedAvatar
+      });
+
+      setAvatarDraft(preservedAvatar);
+      setClassChangeRequest("");
+    } catch (error) {
+      showActionError(error, "Your class was not changed.");
+    } finally {
+      setClassChangeBusy(false);
+    }
   }
 
   async function submitActivity(event) {
     event.preventDefault();
 
-    if (!amount || Number(amount) <= 0) return;
+    if (!amount || Number(amount) <= 0 || progressActionInFlightRef.current) return;
+    progressActionInFlightRef.current = true;
+    setProgressActionBusy(true);
 
-    const updated = await completeActivity({
-      type: activityType,
-      amount: Number(amount),
-      summary,
-      verified
-    });
+    try {
+      const updated = await completeActivity({
+        type: activityType,
+        amount: Number(amount),
+        summary,
+        verified
+      });
 
-    showXp(updated.lastXpGain);
-    playFeedbackTone("claim", audioFeedback);
-    applyGameStateUpdate(updated, { recapLabel: `${ACTIVITIES.find((activity) => activity.key === activityType)?.label || "Action"} complete` });
-    setAmount("");
-    setSummary("");
-    setVerified(false);
+      showXp(updated.lastXpGain);
+      playFeedbackTone("claim", audioFeedback);
+      applyGameStateUpdate(updated, { recapLabel: `${ACTIVITIES.find((activity) => activity.key === activityType)?.label || "Action"} complete` });
+      setAmount("");
+      setSummary("");
+      setVerified(false);
+    } catch (error) {
+      showActionError(error, "Your activity was not saved. Your form has been kept so you can retry.");
+    } finally {
+      progressActionInFlightRef.current = false;
+      setProgressActionBusy(false);
+    }
   }
 
   async function stopTimerAndClaim() {
-    const minutes = Math.max(1, Math.round(timerSeconds / 60));
+    const elapsedSeconds = timerStartedAtRef.current
+      ? Math.floor((Date.now() - timerStartedAtRef.current) / 1000)
+      : timerSeconds;
+    if (elapsedSeconds < 60) {
+      setActionNotice({
+        tone: "info",
+        title: "Session still warming up",
+        message: `${60 - elapsedSeconds} more seconds are needed before verified XP can be claimed.`
+      });
+      return;
+    }
 
-    const updated = await completeActivity({
-      type: timerActivity,
-      amount: minutes,
-      summary: `Verified ${timerActivity} timer session`,
-      verified: true
-    });
+    if (progressActionInFlightRef.current) return;
+    progressActionInFlightRef.current = true;
+    setProgressActionBusy(true);
 
-    showXp(updated.lastXpGain);
-    playFeedbackTone("claim", audioFeedback);
-    applyGameStateUpdate(updated, { recapLabel: `Timer ${timerActivity} complete` });
-    setTimerRunning(false);
-    setTimerSeconds(0);
+    const minutes = Math.max(1, Math.floor(elapsedSeconds / 60));
+
+    try {
+      const updated = await completeActivity({
+        type: timerActivity,
+        amount: minutes,
+        summary: `Verified ${timerActivity} timer session`,
+        verified: true
+      });
+
+      showXp(updated.lastXpGain);
+      playFeedbackTone("claim", audioFeedback);
+      applyGameStateUpdate(updated, { recapLabel: `Timer ${timerActivity} complete` });
+      setTimerRunning(false);
+      setTimerSeconds(0);
+      timerStartedAtRef.current = null;
+    } catch (error) {
+      showActionError(error, "The timer is still running because this session could not be claimed.");
+    } finally {
+      progressActionInFlightRef.current = false;
+      setProgressActionBusy(false);
+    }
+  }
+
+  function startTimer() {
+    timerStartedAtRef.current = Date.now() - timerSeconds * 1000;
+    setTimerRunning(true);
   }
 
   async function saveAvatar() {
     setAvatarSaveStatus("saving");
-    const updated = await updateAvatar(avatarDraft);
-    setState(updated);
-    setAvatarDraft(updated.avatar);
-    setAvatarSaveStatus("saved");
+    try {
+      const updated = await updateAvatar(avatarDraft);
+      setState(updated);
+      setAvatarDraft(updated.avatar);
+      setAvatarSaveStatus("saved");
+    } catch (error) {
+      setAvatarSaveStatus("unsaved");
+      if (showIntro) {
+        setIntroError(error.message || "Your avatar changes are still here and ready to retry.");
+      } else {
+        showActionError(error, "Your avatar changes are still here and ready to retry.");
+      }
+    }
   }
 
   function handleDashboardTabChange(nextView) {
@@ -836,106 +1019,162 @@ export default function App() {
     setActiveView(nextView);
   }
 
+  function openSettings() {
+    setActiveView("log");
+    window.requestAnimationFrame(() => {
+      document.querySelector(".settings-panel")?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start"
+      });
+    });
+  }
+
   async function handleBuyItem(itemId) {
-    const updated = await buyShopItem(itemId);
-    applyGameStateUpdate(updated);
+    const updated = await runExclusiveGameAction(
+      `buy:${itemId}`,
+      () => buyShopItem(itemId),
+      "That shop purchase could not be completed."
+    );
+    if (updated) applyGameStateUpdate(updated);
   }
 
   async function handleEquipItem(itemId) {
-    const updated = await equipInventoryItem(itemId);
-    applyGameStateUpdate(updated);
+    const updated = await runExclusiveGameAction(
+      `equip:${itemId}`,
+      () => equipInventoryItem(itemId),
+      "That item could not be equipped."
+    );
+    if (updated) applyGameStateUpdate(updated);
   }
 
   async function handleTravel(worldId) {
-    const updated = await travelToWorld(worldId);
-    applyGameStateUpdate(updated, { recapLabel: "World travel", bossEntrance: true });
+    const updated = await runExclusiveGameAction(
+      `travel:${worldId}`,
+      () => travelToWorld(worldId),
+      "Travel failed and your current world was kept."
+    );
+    if (updated) {
+      applyGameStateUpdate(updated, { recapLabel: "World travel", bossEntrance: true });
+    }
   }
 
   async function handleRest() {
-    const updated = await restEnergy();
-    applyGameStateUpdate(updated);
+    const updated = await runExclusiveGameAction(
+      "rest",
+      restEnergy,
+      "Energy could not be restored yet."
+    );
+    if (updated) applyGameStateUpdate(updated);
   }
 
   async function handleUnlockSkill(skillId) {
-    const updated = await unlockSkill(skillId);
-    applyGameStateUpdate(updated);
+    const updated = await runExclusiveGameAction(
+      `skill:${skillId}`,
+      () => unlockSkill(skillId),
+      "That skill could not be unlocked."
+    );
+    if (updated) applyGameStateUpdate(updated);
   }
 
   async function handleClaimQuest(questId) {
     const quest = (state.dailyQuests || []).find((item) => item.id === questId);
-    const updated = await claimQuest(questId);
-    if (updated.lastXpGain > 0) {
-      showXp(updated.lastXpGain);
+    const updated = await runExclusiveGameAction(
+      `quest:${questId}`,
+      () => claimQuest(questId),
+      "That quest reward is still available to retry."
+    );
+    if (updated) {
+      if (updated.lastXpGain > 0) {
+        showXp(updated.lastXpGain);
+      }
+      showRewardBurst({
+        xp: quest?.rewardXp || 0,
+        gold: quest?.rewardGold || 0,
+        essence: quest?.rewardEssence || 0
+      });
+      playFeedbackTone("claim", audioFeedback);
+      applyGameStateUpdate(updated, { recapLabel: "Quest reward claimed" });
     }
-    showRewardBurst({
-      xp: quest?.rewardXp || 0,
-      gold: quest?.rewardGold || 0,
-      essence: quest?.rewardEssence || 0
-    });
-    playFeedbackTone("claim", audioFeedback);
-    applyGameStateUpdate(updated, { recapLabel: "Quest reward claimed" });
   }
 
   async function handleClaimDailyReward() {
     const previousGold = state.gold;
     const previousCrystals = state.crystals;
     const previousEssence = state.essence;
-    const updated = await claimDailyLoginReward();
+    const updated = await runExclusiveGameAction(
+      "daily-reward",
+      claimDailyLoginReward,
+      "The daily reward could not be claimed yet."
+    );
 
-    showRewardBurst({
-      xp: 0,
-      gold: Math.max(0, updated.gold - previousGold),
-      crystals: Math.max(0, updated.crystals - previousCrystals),
-      essence: Math.max(0, updated.essence - previousEssence)
-    });
-    setDailyRewardVisible(false);
-    playFeedbackTone("claim", audioFeedback);
-    applyGameStateUpdate(updated);
+    if (updated) {
+      showRewardBurst({
+        xp: 0,
+        gold: Math.max(0, updated.gold - previousGold),
+        crystals: Math.max(0, updated.crystals - previousCrystals),
+        essence: Math.max(0, updated.essence - previousEssence)
+      });
+      setDailyRewardVisible(false);
+      playFeedbackTone("claim", audioFeedback);
+      applyGameStateUpdate(updated);
+    }
   }
 
   async function handleQuickFocusAction(actionType = "focus") {
+    if (progressActionInFlightRef.current) return;
+    progressActionInFlightRef.current = true;
+    setProgressActionBusy(true);
     const sanitizedType = actionType === "any" || actionType === "boss_damage" || actionType === "travel"
       ? "focus"
       : actionType;
-    const updated = await completeActivity({
-      type: sanitizedType,
-      amount: 10,
-      summary: "Quick focus mode action",
-      verified: true
-    });
+    try {
+      const updated = await completeActivity({
+        type: sanitizedType,
+        amount: 10,
+        summary: "Quick focus mode action",
+        verified: true
+      });
 
-    showXp(updated.lastXpGain);
-    playFeedbackTone("claim", audioFeedback);
-    applyGameStateUpdate(updated, { recapLabel: "Focus mode action" });
+      showXp(updated.lastXpGain);
+      playFeedbackTone("claim", audioFeedback);
+      applyGameStateUpdate(updated, { recapLabel: "Focus mode action" });
+    } catch (error) {
+      showActionError(error, "The focus action could not be saved.");
+    } finally {
+      progressActionInFlightRef.current = false;
+      setProgressActionBusy(false);
+    }
   }
 
   async function handleCreateBattleRoom(invitedUsername = "") {
-    try {
-      setBattleError("");
-      const room = await createFriendlyBattleRoom(invitedUsername);
-      setBattleRoom(room);
-      setBattleCode(room.code || "");
-      if (invitedUsername) {
-        setSocialToast({ title: "Battle invite sent", message: `@${invitedUsername} can join from their Battle tab.` });
-      }
-      playFeedbackTone("boss", audioFeedback);
-    } catch (error) {
-      setBattleError(error.message || "Could not create battle room.");
+    const result = await runExclusiveSocialAction(
+      () => createFriendlyBattleRoom(invitedUsername),
+      "Could not create battle room."
+    );
+    if (!result.ok) return;
+
+    const room = result.value;
+    setBattleRoom(room);
+    setBattleCode(room.code || "");
+    if (invitedUsername) {
+      setSocialToast({ title: "Battle invite sent", message: `@${invitedUsername} can join from their Battle tab.` });
     }
+    playFeedbackTone("boss", audioFeedback);
   }
 
   async function handleJoinBattleRoom(event) {
     event.preventDefault();
 
-    try {
-      setBattleError("");
-      const room = await joinFriendlyBattleRoom(battleCode);
-      setBattleRoom(room);
-      setBattleInvites((current) => current.filter((invite) => invite.code !== room.code));
-      playFeedbackTone("boss", audioFeedback);
-    } catch (error) {
-      setBattleError(error.message || "Could not join battle room.");
-    }
+    const result = await runExclusiveSocialAction(
+      () => joinFriendlyBattleRoom(battleCode),
+      "Could not join battle room."
+    );
+    if (!result.ok) return;
+
+    const room = result.value;
+    setBattleRoom(room);
+    setBattleInvites((current) => current.filter((invite) => invite.code !== room.code));
+    playFeedbackTone("boss", audioFeedback);
   }
 
   async function handleRefreshBattleRoom(options = {}) {
@@ -958,34 +1197,35 @@ export default function App() {
   async function handleLeaveBattleRoom() {
     if (!battleRoom?.code) return;
 
-    try {
-      setBattleError("");
-      await leaveFriendlyBattleRoom(battleRoom.code);
-      setBattleRoom(null);
-      setBattleCode("");
-      setMatchmakingStatus("");
-      setSocialToast({ title: "Left battle", message: "You are out of the room and can start another match." });
-      handleRefreshBattleStats({ quiet: true });
-      handleRefreshBattleHistory({ quiet: true });
-    } catch (error) {
-      setBattleError(error.message || "Could not leave battle room.");
-    }
+    const result = await runExclusiveSocialAction(
+      () => leaveFriendlyBattleRoom(battleRoom.code),
+      "Could not leave battle room."
+    );
+    if (!result.ok) return;
+
+    setBattleRoom(null);
+    setBattleCode("");
+    setMatchmakingStatus("");
+    setSocialToast({ title: "Left battle", message: "You are out of the room and can start another match." });
+    handleRefreshBattleStats({ quiet: true });
+    handleRefreshBattleHistory({ quiet: true });
   }
 
   async function handleChooseBattleMove(move) {
     if (!battleRoom?.code) return;
 
-    try {
-      setBattleError("");
-      const updatedRoom = await chooseFriendlyBattleMove(battleRoom.code, move, battleRoom.round || 0);
-      setBattleRoom(updatedRoom);
-      if (updatedRoom.status === "COMPLETE") {
-        handleRefreshBattleHistory({ quiet: true });
-      }
-      playFeedbackTone(updatedRoom.lastResult ? "victory" : "claim", audioFeedback);
-    } catch (error) {
-      setBattleError(error.message || "Could not lock in battle move.");
+    const result = await runExclusiveSocialAction(
+      () => chooseFriendlyBattleMove(battleRoom.code, move, battleRoom.round || 0),
+      "Could not lock in battle move."
+    );
+    if (!result.ok) return;
+
+    const updatedRoom = result.value;
+    setBattleRoom(updatedRoom);
+    if (updatedRoom.status === "COMPLETE") {
+      handleRefreshBattleHistory({ quiet: true });
     }
+    playFeedbackTone(updatedRoom.lastResult ? "victory" : "claim", audioFeedback);
   }
 
   async function handleReconnectBattle() {
@@ -1005,34 +1245,35 @@ export default function App() {
   }
 
   async function handleJoinMatchmaking() {
-    try {
-      setBattleError("");
-      const result = await joinFriendlyBattleMatchmaking();
-      setMatchmakingStatus(result.status);
-      if (result.room) {
-        setBattleRoom(result.room);
-        setBattleCode(result.room.code || "");
+    const actionResult = await runExclusiveSocialAction(
+      joinFriendlyBattleMatchmaking,
+      "Could not join matchmaking."
+    );
+    if (!actionResult.ok) return;
+
+    const result = actionResult.value;
+    setMatchmakingStatus(result.status);
+    if (result.room) {
+      setBattleRoom(result.room);
+      setBattleCode(result.room.code || "");
         setSocialToast({ title: "Match found", message: "A friendly opponent is ready." });
-        playFeedbackTone("boss", audioFeedback);
-      } else {
-        setSocialToast({ title: "Searching for match", message: "Keep this tab open while another player joins." });
-      }
-      handleRefreshBattleStats({ quiet: true });
-    } catch (error) {
-      setBattleError(error.message || "Could not join matchmaking.");
+      playFeedbackTone("boss", audioFeedback);
+    } else {
+      setSocialToast({ title: "Searching for match", message: "Keep this tab open while another player joins." });
     }
+    handleRefreshBattleStats({ quiet: true });
   }
 
   async function handleLeaveMatchmaking() {
-    try {
-      setBattleError("");
-      const result = await leaveFriendlyBattleMatchmaking();
-      setMatchmakingStatus(result.status);
-      setSocialToast({ title: "Queue left", message: "You left matchmaking." });
-      handleRefreshBattleStats({ quiet: true });
-    } catch (error) {
-      setBattleError(error.message || "Could not leave matchmaking.");
-    }
+    const actionResult = await runExclusiveSocialAction(
+      leaveFriendlyBattleMatchmaking,
+      "Could not leave matchmaking."
+    );
+    if (!actionResult.ok) return;
+
+    setMatchmakingStatus(actionResult.value.status);
+    setSocialToast({ title: "Queue left", message: "You left matchmaking." });
+    handleRefreshBattleStats({ quiet: true });
   }
 
   async function handleRefreshBattleHistory(options = {}) {
@@ -1077,56 +1318,65 @@ export default function App() {
   }
 
   async function handleAcceptBattleInvite(invite) {
-    try {
-      setBattleCode(invite.code);
-      setBattleError("");
-      const room = await joinFriendlyBattleRoom(invite.code);
-      setBattleRoom(room);
-      setBattleInvites((current) => current.filter((item) => item.code !== invite.code));
-      setSocialToast({ title: "Battle joined", message: `You joined ${invite.host?.displayName || "your friend"}'s room.` });
-      playFeedbackTone("boss", audioFeedback);
-    } catch (error) {
-      setBattleError(error.message || "Could not join battle invite.");
-    }
+    setBattleCode(invite.code);
+    const result = await runExclusiveSocialAction(
+      () => joinFriendlyBattleRoom(invite.code),
+      "Could not join battle invite."
+    );
+    if (!result.ok) return;
+
+    setBattleRoom(result.value);
+    setBattleInvites((current) => current.filter((item) => item.code !== invite.code));
+    setSocialToast({ title: "Battle joined", message: `You joined ${invite.host?.displayName || "your friend"}'s room.` });
+    playFeedbackTone("boss", audioFeedback);
   }
 
   async function handleSendFriendRequest(event) {
     event.preventDefault();
 
-    try {
-      setFriendError("");
-      const updatedFriends = await sendFriendRequest(friendUsername.trim());
-      setFriends(updatedFriends);
-      setFriendUsername("");
-      setSocialToast({ title: "Friend request sent", message: "They will appear here once they accept." });
-      playFeedbackTone("claim", audioFeedback);
-    } catch (error) {
-      setFriendError(error.message || "Could not send friend request.");
-    }
+    const result = await runExclusiveSocialAction(
+      () => sendFriendRequest(friendUsername.trim()),
+      "Could not send friend request.",
+      setFriendError
+    );
+    if (!result.ok) return;
+
+    setFriends(result.value);
+    setFriendUsername("");
+    setSocialToast({ title: "Friend request sent", message: "They will appear here once they accept." });
+    playFeedbackTone("claim", audioFeedback);
   }
 
   async function handleAcceptFriend(friendshipId) {
-    try {
-      setFriendError("");
-      setFriends(await acceptFriendRequest(friendshipId));
-      setSocialToast({ title: "Friend added", message: "They are now in your party list." });
-      playFeedbackTone("claim", audioFeedback);
-    } catch (error) {
-      setFriendError(error.message || "Could not accept friend request.");
-    }
+    const result = await runExclusiveSocialAction(
+      () => acceptFriendRequest(friendshipId),
+      "Could not accept friend request.",
+      setFriendError
+    );
+    if (!result.ok) return;
+
+    setFriends(result.value);
+    setSocialToast({ title: "Friend added", message: "They are now in your party list." });
+    playFeedbackTone("claim", audioFeedback);
   }
 
   async function handleDeclineFriend(friendshipId) {
-    try {
-      setFriendError("");
-      setFriends(await declineFriendRequest(friendshipId));
-    } catch (error) {
-      setFriendError(error.message || "Could not update friend request.");
-    }
+    const result = await runExclusiveSocialAction(
+      () => declineFriendRequest(friendshipId),
+      "Could not update friend request.",
+      setFriendError
+    );
+    if (result.ok) setFriends(result.value);
   }
 
   async function hardReset() {
-    const updated = await resetGame();
+    let updated;
+    try {
+      updated = await resetGame();
+    } catch (error) {
+      showActionError(error, "Your save was not reset. No progress was changed.");
+      return;
+    }
     setState(updated);
     setAvatarDraft(updated.avatar);
     setBattleRecap(null);
@@ -1150,10 +1400,17 @@ export default function App() {
     setIntroClass("CODER");
     setIntroName("");
     setIntroPronouns("they/them");
+    setIntroError("");
+    setIntroBusy(false);
+    setClassChangeRequest("");
+    setClassChangeBusy(false);
     setIntroStep("origin");
     setShowIntro(true);
     setTimerRunning(false);
     setTimerSeconds(0);
+    timerStartedAtRef.current = null;
+    progressActionInFlightRef.current = false;
+    setProgressActionBusy(false);
   }
 
   if (showIntro) {
@@ -1306,19 +1563,25 @@ export default function App() {
             </section>
 
             <div className="intro-avatar-actions">
+              {introError && <p className="intro-error" role="alert">{introError}</p>}
               <button
                 type="button"
                 className="intro-secondary-button"
-                onClick={() => setIntroStep("origin")}
+                disabled={introBusy}
+                onClick={() => {
+                  setIntroError("");
+                  setIntroStep("origin");
+                }}
               >
                 Back to Class Choice
               </button>
               <button
                 type="button"
                 className="gate-button"
+                disabled={introBusy}
                 onClick={finishIntroCustomization}
               >
-                Enter LifeXP
+                {introBusy ? "Saving Hero..." : "Enter LifeXP"}
               </button>
             </div>
           </div>
@@ -1380,8 +1643,9 @@ export default function App() {
                 ))}
               </div>
 
-              <button className="gate-button" disabled={!canOpenGate} onClick={openGate}>
-                {canOpenGate ? `Open ${introMeta.world} Gate` : "Name Your Hero First"}
+              {introError && <p className="intro-error" role="alert">{introError}</p>}
+              <button className="gate-button" disabled={!canOpenGate || introBusy} onClick={openGate}>
+                {introBusy ? "Opening Gate..." : canOpenGate ? `Open ${introMeta.world} Gate` : "Name Your Hero First"}
               </button>
             </div>
 
@@ -1408,7 +1672,10 @@ export default function App() {
                   className={selected ? "origin-card selected" : "origin-card"}
                   style={{ "--origin-color": classMeta.color }}
                   aria-pressed={selected}
-                  onClick={() => setIntroClass(className)}
+                  onClick={() => {
+                    setIntroError("");
+                    setIntroClass(className);
+                  }}
                 >
                   <span>{classMeta.icon}</span>
                   <strong>{classMeta.label}</strong>
@@ -1434,7 +1701,7 @@ export default function App() {
   const avatarPreviewDraft = lockedOutfitPreview
     ? { ...(avatarDraft || state.avatar || {}), outfit: lockedOutfitPreview }
     : avatarDraft;
-  const localJoinUrl = `${window.location.protocol}//${window.location.hostname}:5174`;
+  const localJoinUrl = window.location.origin;
   const selectedFriend =
     (friends.friends || []).find((friend) => friend.username === selectedFriendUsername)
     || (friends.friends || [])[0]
@@ -1446,6 +1713,8 @@ export default function App() {
     }
     return (right.xp || 0) - (left.xp || 0);
   });
+  const dailyRewardOpen = dailyRewardVisible && isDailyRewardAvailable(state);
+  const blockingOverlayOpen = dailyRewardOpen || Boolean(victoryReward) || Boolean(classChangeRequest);
 
   return (
     <main
@@ -1474,7 +1743,7 @@ export default function App() {
         reward={victoryReward}
         onDismiss={() => setVictoryReward(null)}
       />
-      {dailyRewardVisible && isDailyRewardAvailable(state) && (
+      {dailyRewardOpen && (
         <DailyLoginReward
           state={state}
           onClaim={handleClaimDailyReward}
@@ -1485,11 +1754,41 @@ export default function App() {
         achievement={achievementToast}
         onDismiss={() => setAchievementToast(null)}
       />
+      {actionNotice && (
+        <div
+          className={`action-notice ${actionNotice.tone || "info"}`}
+          role={actionNotice.tone === "error" ? "alert" : "status"}
+          aria-live={actionNotice.tone === "error" ? "assertive" : "polite"}
+        >
+          <span aria-hidden="true">!</span>
+          <div>
+            <strong>{actionNotice.title}</strong>
+            <p>{actionNotice.message}</p>
+          </div>
+          <button type="button" aria-label="Dismiss message" onClick={() => setActionNotice(null)}>×</button>
+        </div>
+      )}
+      <ClassChangeDialog
+        requestedClass={classChangeRequest}
+        currentClass={state.primaryClass}
+        classMeta={CLASS_META}
+        gold={state.gold}
+        busy={classChangeBusy}
+        onConfirm={confirmClassChoice}
+        onDismiss={() => {
+          if (!classChangeBusy) setClassChangeRequest("");
+        }}
+      />
 
-      <div className="premium-dashboard-layout">
+      <div
+        className="premium-dashboard-layout"
+        aria-hidden={blockingOverlayOpen ? "true" : undefined}
+        inert={blockingOverlayOpen}
+      >
+        <a className="skip-link" href="#dashboard-content">Skip to dashboard content</a>
         <div className="premium-dashboard-main">
           <DashboardHUD
-            state={{ ...state, onReset: hardReset, onRest: handleRest }}
+            state={{ ...state, onSettings: openSettings, onRest: handleRest }}
             classMeta={CLASS_META}
             rankTitle={rankTitle}
           />
@@ -1545,7 +1844,7 @@ export default function App() {
             <button type="button" onClick={logout}>Log Out</button>
           </div>
 
-          <section className={`dashboard-grid view-${activeView}`}>
+          <section id="dashboard-content" tabIndex="-1" className={`dashboard-grid view-${activeView}`}>
             {activeView === "overview" && (
               <>
                 <HeroProgressPanel
@@ -1559,6 +1858,7 @@ export default function App() {
                   classMeta={CLASS_META}
                   onQuickAction={handleQuickFocusAction}
                   onOpenQuests={() => setActiveView("quests")}
+                  busy={progressActionBusy}
                 />
 
                 <AvatarPreview
@@ -1575,9 +1875,10 @@ export default function App() {
                   setTimerActivity={setTimerActivity}
                   timerRunning={timerRunning}
                   timerSeconds={timerSeconds}
-                  onStart={() => setTimerRunning(true)}
+                  onStart={startTimer}
                   onStopAndClaim={stopTimerAndClaim}
                   formatTime={formatTime}
+                  busy={progressActionBusy}
                 />
 
                 <CompanionPanel
@@ -1599,6 +1900,7 @@ export default function App() {
                   energy={state.energy}
                   energyCost={calculateEnergyCost(amount)}
                   onSubmit={submitActivity}
+                  busy={progressActionBusy}
                 />
 
                 <BossPanel
@@ -1654,7 +1956,7 @@ export default function App() {
                   classes={CLASSES}
                   classMeta={CLASS_META}
                   activeClass={state.primaryClass || activeClass}
-                  onClassSelect={handleClassChoice}
+                  onClassSelect={requestClassChoice}
                 />
 
                 <AvatarPreview
@@ -1686,7 +1988,7 @@ export default function App() {
                   classMeta={CLASS_META}
                   primaryClass={state.primaryClass}
                   level={state.level}
-                  onClassSelect={handleClassChoice}
+                  onClassSelect={requestClassChoice}
                 />
 
                 <SanctuaryPanel state={state} classMeta={CLASS_META} />
@@ -1727,6 +2029,7 @@ export default function App() {
                   energy={state.energy}
                   energyCost={calculateEnergyCost(amount)}
                   onSubmit={submitActivity}
+                  busy={progressActionBusy}
                 />
               </>
             )}
@@ -1742,7 +2045,12 @@ export default function App() {
                   onRest={handleRest}
                 />
 
-                <ShopPanel items={state.shopItems || []} onBuyItem={handleBuyItem} />
+                <ShopPanel
+                  items={state.shopItems || []}
+                  inventory={state.inventory || []}
+                  balances={{ gold: state.gold, crystals: state.crystals, essence: state.essence }}
+                  onBuyItem={handleBuyItem}
+                />
 
                 <InventoryPanel
                   items={state.inventory || []}
@@ -1794,6 +2102,7 @@ export default function App() {
                   onSelectFriend={setSelectedFriendUsername}
                   friendLeaderboard={friendLeaderboard}
                   socialToast={socialToast}
+                  socialActionBusy={socialActionBusy}
                   classMeta={CLASS_META}
                 />
 
@@ -1866,6 +2175,99 @@ export default function App() {
   );
 }
 
+function ClassChangeDialog({
+  requestedClass,
+  currentClass,
+  classMeta,
+  gold,
+  busy,
+  onConfirm,
+  onDismiss
+}) {
+  const confirmButtonRef = useRef(null);
+  const cancelButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!requestedClass) return;
+    const previousFocus = document.activeElement;
+    const preferredFocus = confirmButtonRef.current?.disabled
+      ? cancelButtonRef.current
+      : confirmButtonRef.current;
+    preferredFocus?.focus();
+    return () => previousFocus?.focus?.();
+  }, [requestedClass]);
+
+  if (!requestedClass) return null;
+
+  const nextMeta = classMeta[requestedClass] || classMeta.NOVICE || {};
+  const currentMeta = classMeta[currentClass] || classMeta.NOVICE || {};
+  const canAfford = gold >= 25;
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape" && !busy) {
+      onDismiss();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    const focusable = Array.from(event.currentTarget.querySelectorAll("button:not(:disabled)"));
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  return (
+    <div
+      className="class-change-screen"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="class-change-title"
+      aria-describedby="class-change-description"
+      onKeyDown={handleKeyDown}
+    >
+      <div className="class-change-card">
+        <p className="eyebrow">Sanctuary Binding</p>
+        <h2 id="class-change-title">
+          {currentMeta.icon || "◇"} {currentMeta.label || currentClass}
+          <span aria-hidden="true"> → </span>
+          {nextMeta.icon || "◇"} {nextMeta.label || requestedClass}
+        </h2>
+        <p id="class-change-description">
+          This permanently spends 25 Gold, resets current class mastery, and reduces XP from your next three actions by 25%.
+        </p>
+
+        <div className="class-change-cost-grid">
+          <span><small>Cost</small><strong>25 Gold</strong></span>
+          <span><small>Balance After</small><strong>{Math.max(0, gold - 25)} Gold</strong></span>
+          <span><small>New World</small><strong>{nextMeta.world || "Origin Realm"}</strong></span>
+        </div>
+
+        {!canAfford && <p className="intro-error" role="alert">You need {25 - gold} more Gold to change class.</p>}
+
+        <div className="class-change-actions">
+          <button ref={cancelButtonRef} type="button" disabled={busy} onClick={onDismiss}>Cancel</button>
+          <button
+            ref={confirmButtonRef}
+            type="button"
+            className="danger-button"
+            disabled={busy || !canAfford}
+            onClick={onConfirm}
+          >
+            {busy ? "Changing Class..." : `Spend 25 Gold & Become ${nextMeta.label || requestedClass}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AuthScreen({
   mode,
   setMode,
@@ -1907,7 +2309,7 @@ function AuthScreen({
           </div>
         </section>
 
-        <form className="auth-card" onSubmit={onSubmit}>
+        <form className="auth-card" onSubmit={onSubmit} aria-busy={busy}>
           <p className="eyebrow">Private LifeXP Account</p>
           <h1>{isRegister ? "Create your save" : "Log in to LifeXP"}</h1>
           <p>
@@ -1921,6 +2323,9 @@ function AuthScreen({
               value={username}
               placeholder="username"
               autoComplete="username"
+              required
+              autoCapitalize="none"
+              spellCheck="false"
               minLength="3"
               maxLength="32"
               onChange={(event) => setUsername(event.target.value)}
@@ -1935,12 +2340,14 @@ function AuthScreen({
               value={password}
               placeholder="8+ characters"
               autoComplete={isRegister ? "new-password" : "current-password"}
+              required
               minLength="8"
+              maxLength="72"
               onChange={(event) => setPassword(event.target.value)}
             />
           </label>
 
-          {error && <strong className="auth-error">{error}</strong>}
+          {error && <strong className="auth-error" role="alert" aria-live="assertive">{error}</strong>}
 
           <button type="submit" disabled={busy}>
             {busy ? "Working..." : isRegister ? "Create Account" : "Log In"}
@@ -2025,7 +2432,7 @@ function getDashboardNavSignals(state = {}, activeClass = "NOVICE") {
     avatar: `${equippedItems} gear`,
     quests: claimReady > 0 ? `${claimReady} claim` : `${completedQuests}/${quests.length || 0}`,
     shop: `${state.gold || 0}g`,
-    battle: `${state.bossesDefeated || 0} wins`,
+    friends: `${state.bossesDefeated || 0} wins`,
     world: activeWorld?.name || "Map",
     log: `${activityCount} logs`
   };
@@ -2052,7 +2459,7 @@ function getDashboardNavReadiness(state = {}, activeClass = "NOVICE") {
     avatar: Math.min(100, equippedItems * 24 + ((state.avatar?.aura || state.equippedAura) ? 18 : 0)),
     quests: Math.max(questPercent, claimReady > 0 ? 100 : 0),
     shop: Math.min(100, Math.round(((state.gold || 0) / 600) * 100) + Math.min(25, state.crystals || 0)),
-    battle: Math.max(bossPressure, Math.min(100, (state.bossesDefeated || 0) * 25)),
+    friends: Math.max(bossPressure, Math.min(100, (state.bossesDefeated || 0) * 25)),
     world: worlds.length === 0 ? 0 : Math.round((unlockedWorlds / worlds.length) * 100),
     log: Math.min(100, activityCount * 8)
   };

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -33,42 +34,42 @@ public class FriendlyBattleController {
             @RequestBody(required = false) BattleInviteRequest request
     ) {
         String invitedUsername = request == null ? "" : request.invitedUsername;
-        return battleService.createRoom(authService.requireAccount(authorization), invitedUsername);
+        return battleService.createRoom(requireAuthenticatedAccount(authorization), invitedUsername);
     }
 
     @GetMapping("/invites")
     public List<FriendlyBattleService.FriendlyBattleResponse> getInvites(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        return battleService.getInvites(authService.requireAccount(authorization));
+        return battleService.getInvites(requireAuthenticatedAccount(authorization));
     }
 
     @GetMapping("/active")
     public FriendlyBattleService.FriendlyBattleResponse getActiveRoom(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        return battleService.getActiveRoom(authService.requireAccount(authorization));
+        return battleService.getActiveRoom(requireAuthenticatedAccount(authorization));
     }
 
     @PostMapping("/matchmaking/join")
     public FriendlyBattleService.MatchmakingResponse joinMatchmaking(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        return battleService.joinMatchmaking(authService.requireAccount(authorization));
+        return battleService.joinMatchmaking(requireAuthenticatedAccount(authorization));
     }
 
     @PostMapping("/matchmaking/leave")
     public FriendlyBattleService.MatchmakingResponse leaveMatchmaking(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        return battleService.leaveMatchmaking(authService.requireAccount(authorization));
+        return battleService.leaveMatchmaking(requireAuthenticatedAccount(authorization));
     }
 
     @GetMapping("/history")
     public List<FriendlyBattleService.BattleHistoryResponse> getHistory(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        return battleService.getHistory(authService.requireAccount(authorization));
+        return battleService.getHistory(requireAuthenticatedAccount(authorization));
     }
 
     @GetMapping("/stats")
@@ -79,9 +80,12 @@ public class FriendlyBattleController {
     @PostMapping("/rooms/join")
     public FriendlyBattleService.FriendlyBattleResponse joinRoom(
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            @RequestBody BattleRoomRequest request
+            @RequestBody(required = false) BattleRoomRequest request
     ) {
-        return battleService.joinRoom(authService.requireAccount(authorization), request.code);
+        if (request == null) {
+            throw new IllegalArgumentException("Battle room code is required.");
+        }
+        return battleService.joinRoom(requireAuthenticatedAccount(authorization), request.code);
     }
 
     @GetMapping("/rooms/{code}")
@@ -89,16 +93,19 @@ public class FriendlyBattleController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @PathVariable String code
     ) {
-        return battleService.getRoom(authService.requireAccount(authorization), code);
+        return battleService.getRoom(requireAuthenticatedAccount(authorization), code);
     }
 
     @PostMapping("/rooms/{code}/move")
     public FriendlyBattleService.FriendlyBattleResponse chooseMove(
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @PathVariable String code,
-            @RequestBody BattleMoveRequest request
+            @RequestBody(required = false) BattleMoveRequest request
     ) {
-        return battleService.chooseMove(authService.requireAccount(authorization), code, request.move, request.round);
+        if (request == null) {
+            throw new IllegalArgumentException("Battle move is required.");
+        }
+        return battleService.chooseMove(requireAuthenticatedAccount(authorization), code, request.move, request.round);
     }
 
     @PostMapping("/rooms/{code}/leave")
@@ -106,7 +113,15 @@ public class FriendlyBattleController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @PathVariable String code
     ) {
-        return battleService.leaveRoom(authService.requireAccount(authorization), code);
+        return battleService.leaveRoom(requireAuthenticatedAccount(authorization), code);
+    }
+
+    private UserAccount requireAuthenticatedAccount(String authorization) {
+        try {
+            return authService.requireAccount(authorization);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, exception.getMessage());
+        }
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

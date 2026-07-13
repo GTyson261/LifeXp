@@ -18,13 +18,17 @@ public class DailyResetService {
             return;
         }
 
+        long elapsed = now - state.lastDailyReset;
         state.lastDailyReset = now;
         state.energy = 100;
-        state.loginStreak += 1;
+        state.loginStreak = elapsed >= RESET_INTERVAL * 2
+                ? 1
+                : Math.max(0, state.loginStreak) + 1;
 
         for (PlayerState.Quest quest : state.dailyQuests) {
             quest.completed = false;
             quest.claimed = false;
+            quest.progress = 0;
         }
 
         state.activityLog.add(0, "Daily reset complete. Energy restored and quests refreshed.");

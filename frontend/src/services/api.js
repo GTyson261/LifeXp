@@ -1,160 +1,241 @@
-const apiOrigin =
-  import.meta.env.VITE_API_ORIGIN ||
-  `${window.location.protocol}//${window.location.hostname}:8080`;
+const configuredApiOrigin = String(import.meta.env.VITE_API_ORIGIN || "")
+  .trim()
+  .replace(/\/+$/, "");
+const apiOrigin = configuredApiOrigin || (import.meta.env.DEV
+  ? `${window.location.protocol}//${window.location.hostname}:8080`
+  : window.location.origin);
 const API_BASE = `${apiOrigin}/api/game`;
 const AUTH_BASE = `${apiOrigin}/api/auth`;
 const BATTLE_BASE = `${apiOrigin}/api/friendly-battle`;
 const FRIENDS_BASE = `${apiOrigin}/api/friends`;
+const REQUEST_TIMEOUT_MS = 15000;
 const TOKEN_KEY = "lifexp_auth_token";
 const USER_KEY = "lifexp_auth_user";
+const memoryStorage = new Map();
+
+function storageGet(key) {
+  try {
+    return localStorage.getItem(key) ?? memoryStorage.get(key) ?? null;
+  } catch {
+    return memoryStorage.get(key) ?? null;
+  }
+}
+
+function storageSet(key, value) {
+  memoryStorage.set(key, value);
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // The in-memory fallback keeps this tab usable when persistent storage is blocked.
+  }
+}
+
+function storageRemove(key) {
+  memoryStorage.delete(key);
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // The persistent store is unavailable, but the in-memory session is cleared.
+  }
+}
 
 export function getStoredSession() {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const username = localStorage.getItem(USER_KEY);
+  const token = storageGet(TOKEN_KEY);
+  const username = storageGet(USER_KEY);
   return token && username ? { token, username } : null;
 }
 
 export function clearStoredSession() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  storageRemove(TOKEN_KEY);
+  storageRemove(USER_KEY);
+}
+
+function expireStoredSession() {
+  clearStoredSession();
+  window.dispatchEvent(new Event("lifexp:session-expired"));
 }
 
 function storeSession(session) {
-  localStorage.setItem(TOKEN_KEY, session.token);
-  localStorage.setItem(USER_KEY, session.username);
+  storageSet(TOKEN_KEY, session.token);
+  storageSet(USER_KEY, session.username);
   return session;
 }
 
 async function parseJsonOrNull(response) {
   const text = await response.text();
-  return text ? JSON.parse(text) : null;
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
 }
 
-async function request(path, options = {}) {
-  const token = localStorage.getItem(TOKEN_KEY);
+async function getErrorMessage(response, fallback) {
+  const data = await parseJsonOrNull(response);
+  return data?.message || data?.error || fallback;
+}
+
+async function fetchWithTimeout(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+function connectionError(error) {
+  return new Error(
+    error?.name === "AbortError"
+      ? "LifeXP took too long to respond. Check your connection and try again."
+      : import.meta.env.DEV
+        ? "Backend is unreachable. Start Spring Boot and make sure MySQL is running."
+        : "LifeXP services are temporarily unreachable. Check your connection and try again."
+  );
+}
+
+async function requestNow(path, options = {}) {
+  const token = storageGet(TOKEN_KEY);
   let response;
 
   try {
-    response = await fetch(`${API_BASE}${path}`, {
+    response = await fetchWithTimeout(`${API_BASE}${path}`, {
+      ...options,
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {})
-      },
-      ...options
+      }
     });
-  } catch {
-    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  } catch (error) {
+    throw connectionError(error);
   }
 
   if (!response.ok) {
     if (response.status === 401) {
-      clearStoredSession();
+      expireStoredSession();
       throw new Error("Please log in to view your LifeXP data.");
     }
 
-    throw new Error(`API error: ${response.status}`);
+    throw new Error(await getErrorMessage(response, `LifeXP could not complete that action (${response.status}).`));
   }
 
   return parseJsonOrNull(response);
 }
 
-async function battleRequest(path, options = {}) {
-  const token = localStorage.getItem(TOKEN_KEY);
+let gameRequestQueue = Promise.resolve();
+
+function request(path, options = {}) {
+  const queuedRequest = gameRequestQueue.then(
+    () => requestNow(path, options),
+    () => requestNow(path, options)
+  );
+
+  gameRequestQueue = queuedRequest.catch(() => undefined);
+  return queuedRequest;
+}
+
+async function battleRequestNow(path, options = {}) {
+  const token = storageGet(TOKEN_KEY);
   let response;
 
   try {
-    response = await fetch(`${BATTLE_BASE}${path}`, {
+    response = await fetchWithTimeout(`${BATTLE_BASE}${path}`, {
+      ...options,
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {})
-      },
-      ...options
+      }
     });
-  } catch {
-    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  } catch (error) {
+    throw connectionError(error);
   }
 
   if (!response.ok) {
     if (response.status === 401) {
-      clearStoredSession();
+      expireStoredSession();
       throw new Error("Please log in to view your LifeXP data.");
     }
 
-    let message = `Battle error: ${response.status}`;
-    try {
-      const data = await response.json();
-      message = data.message || message;
-    } catch {
-      // Keep status message when the backend does not return JSON.
-    }
-    throw new Error(message);
+    throw new Error(await getErrorMessage(response, `Battle action failed (${response.status}).`));
   }
 
   return parseJsonOrNull(response);
 }
 
-async function friendsRequest(path = "", options = {}) {
-  const token = localStorage.getItem(TOKEN_KEY);
+let battleRequestQueue = Promise.resolve();
+
+function battleRequest(path, options = {}) {
+  const queuedRequest = battleRequestQueue.then(
+    () => battleRequestNow(path, options),
+    () => battleRequestNow(path, options)
+  );
+
+  battleRequestQueue = queuedRequest.catch(() => undefined);
+  return queuedRequest;
+}
+
+async function friendsRequestNow(path = "", options = {}) {
+  const token = storageGet(TOKEN_KEY);
   let response;
 
   try {
-    response = await fetch(`${FRIENDS_BASE}${path}`, {
+    response = await fetchWithTimeout(`${FRIENDS_BASE}${path}`, {
+      ...options,
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {})
-      },
-      ...options
+      }
     });
-  } catch {
-    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  } catch (error) {
+    throw connectionError(error);
   }
 
   if (!response.ok) {
     if (response.status === 401) {
-      clearStoredSession();
+      expireStoredSession();
       throw new Error("Please log in to view your LifeXP friends.");
     }
 
-    let message = `Friends error: ${response.status}`;
-    try {
-      const data = await response.json();
-      message = data.message || message;
-    } catch {
-      // Keep status message when the backend does not return JSON.
-    }
-    throw new Error(message);
+    throw new Error(await getErrorMessage(response, `Friends action failed (${response.status}).`));
   }
 
   return parseJsonOrNull(response);
+}
+
+let friendsRequestQueue = Promise.resolve();
+
+function friendsRequest(path = "", options = {}) {
+  const queuedRequest = friendsRequestQueue.then(
+    () => friendsRequestNow(path, options),
+    () => friendsRequestNow(path, options)
+  );
+
+  friendsRequestQueue = queuedRequest.catch(() => undefined);
+  return queuedRequest;
 }
 
 async function authRequest(path, payload) {
   let response;
 
   try {
-    response = await fetch(`${AUTH_BASE}${path}`, {
+    response = await fetchWithTimeout(`${AUTH_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-  } catch {
-    throw new Error("Backend is unreachable. Start Spring Boot and make sure MySQL is running.");
+  } catch (error) {
+    throw connectionError(error);
   }
 
   if (!response.ok) {
-    let message = `Auth error: ${response.status}`;
-
-    try {
-      const data = await response.json();
-      message = data.message || message;
-    } catch {
-      // Keep the status-based message when the response body is not JSON.
-    }
-
-    throw new Error(message);
+    throw new Error(await getErrorMessage(response, `Account request failed (${response.status}).`));
   }
 
   return storeSession(await response.json());
@@ -166,6 +247,23 @@ export function registerUser(payload) {
 
 export function loginUser(payload) {
   return authRequest("/login", payload);
+}
+
+export async function logoutUser() {
+  const token = storageGet(TOKEN_KEY);
+
+  try {
+    if (token) {
+      await fetchWithTimeout(`${AUTH_BASE}/logout`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    }
+  } catch {
+    // Local logout must still succeed when the backend is unavailable.
+  } finally {
+    clearStoredSession();
+  }
 }
 
 export function getGameState() {

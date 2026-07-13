@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -30,15 +31,18 @@ public class FriendController {
     public FriendService.FriendsResponse getFriends(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        return friendService.getFriends(authService.requireAccount(authorization));
+        return friendService.getFriends(requireAuthenticatedAccount(authorization));
     }
 
     @PostMapping("/request")
     public FriendService.FriendsResponse sendRequest(
             @RequestHeader(value = "Authorization", required = false) String authorization,
-            @RequestBody FriendRequest request
+            @RequestBody(required = false) FriendRequest request
     ) {
-        return friendService.sendRequest(authService.requireAccount(authorization), request.username);
+        if (request == null) {
+            throw new IllegalArgumentException("Friend username is required.");
+        }
+        return friendService.sendRequest(requireAuthenticatedAccount(authorization), request.username);
     }
 
     @PostMapping("/{friendshipId}/accept")
@@ -46,7 +50,7 @@ public class FriendController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @PathVariable Long friendshipId
     ) {
-        return friendService.acceptRequest(authService.requireAccount(authorization), friendshipId);
+        return friendService.acceptRequest(requireAuthenticatedAccount(authorization), friendshipId);
     }
 
     @PostMapping("/{friendshipId}/decline")
@@ -54,7 +58,15 @@ public class FriendController {
             @RequestHeader(value = "Authorization", required = false) String authorization,
             @PathVariable Long friendshipId
     ) {
-        return friendService.declineRequest(authService.requireAccount(authorization), friendshipId);
+        return friendService.declineRequest(requireAuthenticatedAccount(authorization), friendshipId);
+    }
+
+    private UserAccount requireAuthenticatedAccount(String authorization) {
+        try {
+            return authService.requireAccount(authorization);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, exception.getMessage());
+        }
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

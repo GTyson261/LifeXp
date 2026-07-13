@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 export default function SettingsPanel({
   username,
   reduceMotion,
@@ -9,8 +11,15 @@ export default function SettingsPanel({
   onReset,
   onLogout
 }) {
+  const [resetArmed, setResetArmed] = useState(false);
   const comfortScore = [reduceMotion, compactMobile, audioFeedback].filter(Boolean).length;
   const clientMode = compactMobile ? "Travel Ready" : "Full HUD";
+
+  useEffect(() => {
+    if (!resetArmed) return;
+    const timeout = setTimeout(() => setResetArmed(false), 8000);
+    return () => clearTimeout(timeout);
+  }, [resetArmed]);
 
   return (
     <div className="panel settings-panel">
@@ -84,9 +93,17 @@ export default function SettingsPanel({
       </div>
 
       <div className="settings-action-row">
-        <button type="button" onClick={onReset}>
-          Reset Save
-        </button>
+        {!resetArmed ? (
+          <button type="button" onClick={() => setResetArmed(true)}>
+            Reset Save
+          </button>
+        ) : (
+          <div className="settings-reset-confirm" role="alert" aria-live="assertive">
+            <strong>Erase all hero progress?</strong>
+            <button type="button" className="danger-button" onClick={onReset}>Yes, Reset Everything</button>
+            <button type="button" onClick={() => setResetArmed(false)}>Cancel</button>
+          </div>
+        )}
         <button type="button" onClick={onLogout}>
           Log Out
         </button>
